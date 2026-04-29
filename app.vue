@@ -19,9 +19,11 @@ onMounted(() => {
 const currentPet = computed(() => pet.petState.value)
 const effectiveStatus = computed<PetStatus>(() => pet.petStatus.value ?? 'happy')
 const effectiveTitleId = computed<DisguiseTitleId>(
-  () => currentPet.value?.disguiseTitleId ?? DEFAULT_DISGUISE_TITLE_ID,
+  () => currentPet.value?.disguiseTitleId ?? pet.draftDisguiseTitleId.value ?? DEFAULT_DISGUISE_TITLE_ID,
 )
-const effectiveThemeId = computed<ThemeId>(() => currentPet.value?.themeId ?? DEFAULT_THEME_ID)
+const effectiveThemeId = computed<ThemeId>(
+  () => currentPet.value?.themeId ?? pet.draftThemeId.value ?? DEFAULT_THEME_ID,
+)
 const activeTheme = computed(() => getThemeById(effectiveThemeId.value))
 const tabPresentation = computed(() =>
   getTabPresentation({
@@ -136,12 +138,10 @@ function handleLocaleSelect(nextLocale: AppLocale): void {
 
       <aside class="side-stack" :aria-label="messages.app.settingsLabel">
         <DisguiseTitlePicker
-          :disabled="!currentPet"
           :selected-id="effectiveTitleId"
           @select="handleTitleSelect"
         />
         <ThemePicker
-          :disabled="!currentPet"
           :selected-id="effectiveThemeId"
           @select="handleThemeSelect"
         />

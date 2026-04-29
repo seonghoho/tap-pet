@@ -1,7 +1,7 @@
 import type { AppLocale, LocaleOption } from '~/types/i18n'
 
 export const I18N_STORAGE_KEY = 'tab-pet:locale'
-export const DEFAULT_LOCALE: AppLocale = 'en'
+export const DEFAULT_LOCALE: AppLocale = 'ko'
 
 export const LOCALE_OPTIONS: LocaleOption[] = [
   {

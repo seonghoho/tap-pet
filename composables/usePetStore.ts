@@ -1,5 +1,7 @@
 import { computed, readonly } from 'vue'
 import { useState } from '#app'
+import { DEFAULT_DISGUISE_TITLE_ID } from '~/constants/titles'
+import { DEFAULT_THEME_ID } from '~/constants/themes'
 import type { DisguiseTitleId, PetAction, PetSpecies, PetState, ThemeId } from '~/types/pet'
 import { applyPetAction } from '~/utils/petActions'
 import { createInitialPetState } from '~/utils/petFactory'
@@ -11,6 +13,11 @@ export function usePetStore() {
   const petState = useState<PetState | null>('tab-pet:pet-state', () => null)
   const isReady = useState<boolean>('tab-pet:is-ready', () => false)
   const hasRestored = useState<boolean>('tab-pet:has-restored', () => false)
+  const draftDisguiseTitleId = useState<DisguiseTitleId>(
+    'tab-pet:draft-disguise-title-id',
+    () => DEFAULT_DISGUISE_TITLE_ID,
+  )
+  const draftThemeId = useState<ThemeId>('tab-pet:draft-theme-id', () => DEFAULT_THEME_ID)
 
   const petStatus = computed(() => {
     if (!petState.value) return null
@@ -22,6 +29,10 @@ export function usePetStore() {
     if (!import.meta.client || hasRestored.value) return
 
     petState.value = storage.loadPetState()
+    if (petState.value) {
+      draftDisguiseTitleId.value = petState.value.disguiseTitleId
+      draftThemeId.value = petState.value.themeId
+    }
     hasRestored.value = true
     isReady.value = true
   }
@@ -29,7 +40,12 @@ export function usePetStore() {
   function initializePet(species: PetSpecies): void {
     if (!isPetSpecies(species)) return
 
-    commitState(createInitialPetState(species))
+    commitState(
+      createInitialPetState(species, Date.now(), {
+        disguiseTitleId: draftDisguiseTitleId.value,
+        themeId: draftThemeId.value,
+      }),
+    )
   }
 
   function performAction(action: PetAction): void {
@@ -42,7 +58,10 @@ export function usePetStore() {
   }
 
   function setDisguiseTitle(disguiseTitleId: DisguiseTitleId): void {
-    if (!petState.value || !isDisguiseTitleId(disguiseTitleId)) return
+    if (!isDisguiseTitleId(disguiseTitleId)) return
+
+    draftDisguiseTitleId.value = disguiseTitleId
+    if (!petState.value) return
 
     commitState({
       ...petState.value,
@@ -51,7 +70,10 @@ export function usePetStore() {
   }
 
   function setTheme(themeId: ThemeId): void {
-    if (!petState.value || !isThemeId(themeId)) return
+    if (!isThemeId(themeId)) return
+
+    draftThemeId.value = themeId
+    if (!petState.value) return
 
     commitState({
       ...petState.value,
@@ -61,6 +83,8 @@ export function usePetStore() {
 
   function resetPet(): void {
     petState.value = null
+    draftDisguiseTitleId.value = DEFAULT_DISGUISE_TITLE_ID
+    draftThemeId.value = DEFAULT_THEME_ID
     storage.clearPetState()
   }
 
@@ -72,11 +96,15 @@ export function usePetStore() {
     }
 
     petState.value = committedState
+    draftDisguiseTitleId.value = committedState.disguiseTitleId
+    draftThemeId.value = committedState.themeId
     storage.savePetState(committedState, now)
   }
 
   return {
     petState: readonly(petState),
+    draftDisguiseTitleId: readonly(draftDisguiseTitleId),
+    draftThemeId: readonly(draftThemeId),
     isReady: readonly(isReady),
     petStatus,
     storageError: storage.storageError,
