@@ -162,9 +162,9 @@ export const I18N_MESSAGES = {
     },
     emoji: {
       heading: 'Emoji copy',
-      description: 'Quick symbols for notes or custom titles later.',
+      description: 'Copy small symbols for future custom titles or notes.',
       copied: 'Copied',
-      copyFailed: 'Copy failed',
+      copyFailed: 'Auto-copy is blocked. Select this symbol manually:',
     },
   },
   ko: {
@@ -307,9 +307,9 @@ export const I18N_MESSAGES = {
     },
     emoji: {
       heading: '이모지 복사',
-      description: '메모나 커스텀 타이틀에 쓸 빠른 기호입니다.',
+      description: '나중에 커스텀 타이틀이나 메모에 붙여넣을 작은 기호입니다.',
       copied: '복사됨',
-      copyFailed: '복사 실패',
+      copyFailed: '자동 복사가 막혔습니다. 이 기호를 직접 선택하세요:',
     },
   },
   ja: {
@@ -452,9 +452,9 @@ export const I18N_MESSAGES = {
     },
     emoji: {
       heading: '絵文字コピー',
-      description: 'メモやカスタムタイトルに使えるクイック記号です。',
+      description: '今後のカスタムタイトルやメモに貼り付ける小さな記号です。',
       copied: 'コピーしました',
-      copyFailed: 'コピー失敗',
+      copyFailed: '自動コピーがブロックされました。この記号を手動で選択してください:',
     },
   },
 } as const

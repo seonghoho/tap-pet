@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 
 const { messages } = useLocale()
-const isOpen = ref(true)
+const isOpen = ref(false)
 </script>
 
 <template>

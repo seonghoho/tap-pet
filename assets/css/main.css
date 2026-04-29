@@ -297,6 +297,152 @@ button:disabled {
   justify-content: center;
 }
 
+.pet-habitat {
+  aspect-ratio: 1.16;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--habitat-accent) 16%, transparent), transparent 48%),
+    var(--habitat-surface);
+  border: 1px solid var(--habitat-border);
+  border-radius: 8px;
+  box-shadow: inset 0 -32px 0 color-mix(in srgb, var(--habitat-accent) 12%, transparent);
+  max-width: 300px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.pet-habitat__back-wall {
+  inset: 0;
+  position: absolute;
+}
+
+.pet-habitat__shelf {
+  background: color-mix(in srgb, var(--habitat-muted) 32%, transparent);
+  border-radius: 999px;
+  height: 6px;
+  left: 16%;
+  position: absolute;
+  top: 22%;
+  width: 30%;
+}
+
+.pet-habitat__window {
+  background:
+    linear-gradient(90deg, transparent 48%, color-mix(in srgb, var(--habitat-border) 88%, transparent) 48% 52%, transparent 52%),
+    linear-gradient(180deg, transparent 48%, color-mix(in srgb, var(--habitat-border) 88%, transparent) 48% 52%, transparent 52%),
+    color-mix(in srgb, var(--habitat-accent) 18%, var(--app-surface));
+  border: 1px solid var(--habitat-border);
+  border-radius: 8px;
+  height: 46px;
+  position: absolute;
+  right: 13%;
+  top: 14%;
+  width: 58px;
+}
+
+.pet-habitat__floor {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--habitat-border) 55%, transparent) 1px, transparent 1px),
+    color-mix(in srgb, var(--habitat-accent) 10%, var(--app-surface));
+  background-size: 28px 100%;
+  border-top: 1px solid var(--habitat-border);
+  bottom: 0;
+  height: 34%;
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+.pet-habitat__bowl {
+  background: color-mix(in srgb, var(--habitat-accent) 68%, var(--app-surface));
+  border: 1px solid var(--habitat-border);
+  border-radius: 4px 4px 18px 18px;
+  bottom: 18px;
+  height: 18px;
+  left: 13%;
+  position: absolute;
+  width: 42px;
+}
+
+.pet-habitat__cushion {
+  background: color-mix(in srgb, var(--habitat-muted) 28%, var(--app-surface));
+  border: 1px solid var(--habitat-border);
+  border-radius: 999px;
+  bottom: 15px;
+  height: 24px;
+  position: absolute;
+  right: 12%;
+  width: 62px;
+}
+
+.pet-habitat__pet {
+  align-items: center;
+  display: grid;
+  justify-items: center;
+  left: var(--pet-x);
+  position: absolute;
+  top: var(--pet-y);
+  transform: translate(-50%, -50%);
+  transition:
+    left var(--pet-speed) ease-in-out,
+    top var(--pet-speed) ease-in-out;
+  width: 88px;
+  z-index: 2;
+}
+
+.pet-habitat__pet .pet-avatar {
+  filter: drop-shadow(0 7px 10px color-mix(in srgb, var(--app-text) 18%, transparent));
+  grid-area: 1 / 1;
+  transform-origin: center;
+  transition: transform 180ms ease;
+}
+
+.pet-habitat__pet--left .pet-avatar {
+  transform: scaleX(-1);
+}
+
+.pet-habitat__shadow {
+  background: color-mix(in srgb, var(--app-text) 19%, transparent);
+  border-radius: 999px;
+  filter: blur(1px);
+  grid-area: 1 / 1;
+  height: 12px;
+  margin-top: 78px;
+  width: 56px;
+  z-index: -1;
+}
+
+.pet-habitat--sleepy .pet-habitat__pet {
+  opacity: 0.86;
+}
+
+.pet-habitat--sad {
+  filter: saturate(0.82);
+}
+
+.pet-habitat--bounce .pet-avatar {
+  animation: habitat-bounce 720ms ease-in-out infinite;
+}
+
+@keyframes habitat-bounce {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-habitat__pet,
+  .pet-habitat__pet .pet-avatar {
+    animation: none;
+    transition: none;
+  }
+}
+
 .pet-avatar {
   display: block;
   height: 240px;
@@ -473,6 +619,18 @@ button:disabled {
 .mock-message--error,
 .storage-warning {
   color: var(--app-warning);
+}
+
+.manual-copy-token {
+  background: var(--app-surface-strong);
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  color: var(--app-text);
+  display: inline-flex;
+  font-size: 1.1rem;
+  margin-left: 6px;
+  padding: 2px 7px;
+  user-select: all;
 }
 
 .guide-panel {

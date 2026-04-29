@@ -28,6 +28,9 @@ const { messages } = useLocale()
     </p>
     <p v-else-if="clipboard.copyError.value" class="mock-message mock-message--error" role="status">
       {{ messages.emoji.copyFailed }}
+      <span v-if="clipboard.manualCopyText.value" class="manual-copy-token">
+        {{ clipboard.manualCopyText.value }}
+      </span>
     </p>
   </section>
 </template>

@@ -32,11 +32,11 @@ const statRows = computed(() => [
 <template>
   <div class="pet-status">
     <div class="pet-status__visual">
-      <PetAvatar
+      <PetHabitat
         :species="species"
         :status="status"
         :theme-id="themeId"
-        :aria-label="`${messages.species[species].label} ${messages.status.aria[status]}`"
+        :avatar-label="`${messages.species[species].label} ${messages.status.aria[status]}`"
       />
     </div>
 
