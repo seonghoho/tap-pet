@@ -145,6 +145,7 @@ function handleLocaleSelect(nextLocale: AppLocale): void {
           :selected-id="effectiveThemeId"
           @select="handleThemeSelect"
         />
+        <GuidePanel />
         <MonetizationMock />
         <EmojiCopyPanel />
       </aside>

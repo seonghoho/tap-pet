@@ -99,6 +99,34 @@ export const I18N_MESSAGES = {
       heading: 'Disguise title',
       description: 'Pick the base browser tab label.',
     },
+    guide: {
+      heading: 'How to use',
+      description: 'Read the browser tab first; the page is only the control panel.',
+      summary: 'Tab Pet lives in your browser tab title and favicon.',
+      sections: {
+        tab: {
+          title: 'Tab signals',
+          items: [
+            'The selected disguise title becomes the base tab title.',
+            'Status symbols are added after the title.',
+            'The favicon changes color and expression with the pet status.',
+          ],
+        },
+        signals: {
+          title: 'Title symbols',
+          items: ['Normal: no symbol', 'Hungry: *', 'Sleepy: ...', 'Bored: -', 'Sad: !', 'Excited: +'],
+        },
+        care: {
+          title: 'Care loop',
+          items: [
+            'Feed restores fullness.',
+            'Play restores mood but spends energy and fullness.',
+            'Sleep restores energy.',
+            'Closed time is reflected when you return.',
+          ],
+        },
+      },
+    },
     themes: {
       heading: 'Theme',
       description: 'Change the page skin and favicon palette.',
@@ -216,6 +244,34 @@ export const I18N_MESSAGES = {
       heading: '위장 타이틀',
       description: '브라우저 탭에 표시될 기본 문구를 고르세요.',
     },
+    guide: {
+      heading: '이용 안내',
+      description: '먼저 브라우저 탭을 읽으세요. 본문은 조작 패널입니다.',
+      summary: 'Tab Pet은 브라우저 탭 제목과 파비콘 안에서 살아갑니다.',
+      sections: {
+        tab: {
+          title: '탭 신호',
+          items: [
+            '선택한 위장 타이틀이 탭 제목의 기본 문구가 됩니다.',
+            '상태 기호가 타이틀 뒤에 붙습니다.',
+            '파비콘은 펫 상태에 따라 색상과 표정이 바뀝니다.',
+          ],
+        },
+        signals: {
+          title: '타이틀 기호',
+          items: ['정상: 기호 없음', '배고픔: *', '졸림: ...', '지루함: -', '슬픔: !', '신남: +'],
+        },
+        care: {
+          title: '돌봄 루프',
+          items: [
+            '먹이는 포만감을 회복합니다.',
+            '놀이는 기분을 회복하지만 에너지와 포만감을 씁니다.',
+            '잠자기는 에너지를 회복합니다.',
+            '앱을 닫아둔 시간은 다시 열 때 상태에 반영됩니다.',
+          ],
+        },
+      },
+    },
     themes: {
       heading: '테마',
       description: '본문 스킨과 파비콘 팔레트를 바꿉니다.',
@@ -332,6 +388,34 @@ export const I18N_MESSAGES = {
     titles: {
       heading: '偽装タイトル',
       description: 'ブラウザタブに表示する基本文言を選びます。',
+    },
+    guide: {
+      heading: '使い方',
+      description: 'まずブラウザタブを見てください。本文は操作パネルです。',
+      summary: 'Tab Pet はブラウザのタブタイトルとファビコンの中で動きます。',
+      sections: {
+        tab: {
+          title: 'タブの合図',
+          items: [
+            '選んだ偽装タイトルがタブタイトルの基本文言になります。',
+            '状態記号がタイトルの後ろに付きます。',
+            'ファビコンはペット状態に合わせて色と表情が変わります。',
+          ],
+        },
+        signals: {
+          title: 'タイトル記号',
+          items: ['通常: 記号なし', '空腹: *', '眠い: ...', '退屈: -', '悲しい: !', 'わくわく: +'],
+        },
+        care: {
+          title: 'ケアループ',
+          items: [
+            'ごはんは満腹度を回復します。',
+            '遊ぶと気分が回復しますが、エネルギーと満腹度を使います。',
+            '眠るとエネルギーが回復します。',
+            '閉じていた時間は、戻ったときに状態へ反映されます。',
+          ],
+        },
+      },
     },
     themes: {
       heading: 'テーマ',
