@@ -179,6 +179,8 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
           @update-name="pet.updatePetName"
           @update-settings="pet.updatePetSettings"
         />
+        <GuidePanel v-if="currentPet" />
+        <MonetizationMock v-if="currentPet" />
       </aside>
     </main>
 

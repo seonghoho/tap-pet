@@ -4,6 +4,8 @@
 
 Date: 2026-04-29
 
+Legacy note: this section documents the pre-Growth MVP QA run and may refer to the previous mood-based model. The current Growth MVP verification starts at `2026-04-30 Growth MVP QA`.
+
 Target:
 
 - Nuxt dev server
@@ -63,6 +65,7 @@ Checked areas:
 - `npm run lint`: passed
 - `npm run build`: passed after stopping the QA dev server lock
 - `npm run dev -- --port 5175`: passed at `http://localhost:5175/`
+- `npm run dev -- --port 5176`: passed for follow-up hidden-tab browser QA
 - Manual browser QA:
   - First entry cat/dog selection: passed
   - Selecting a pet opens the main pet screen: passed
@@ -72,14 +75,14 @@ Checked areas:
   - Feed/play/sleep/wash controls update stats: passed
   - Fullness/energy/cleanliness display without mood: passed
   - Level and affinity progress after actions: passed
-  - Status title mode: passed for Korean status title in always-visible mode and default title while visible in inactive-only mode
+  - Status title mode: passed for Korean status title in an inactive tab, always-visible mode, and default title while visible in inactive-only mode
   - Disguise preset/custom title modes: passed
   - Favicon data URL changes when pet status changes in disguise title mode: passed
   - Theme system/light/dark visible palette changes: passed
   - Dark theme persistence after reload: passed
   - Reload restores pet state and exercises offline-decay loading path: passed
 - Additional coverage:
-  - Inactive-tab status title behavior is covered by `tests/pet-alert.test.ts` for the hidden `inactive-only` branch. The in-app browser replaced the current tab during two-tab verification, so the hidden-tab branch was not marked as a manual pass.
+  - Inactive-tab status title behavior is covered by `tests/pet-alert.test.ts` and was manually verified with a separate headless Chrome two-tab QA flow.
   - The 24-hour offline decay cap is covered by `tests/pet-model.test.ts`; browser QA verified reload persistence and the storage decay path.
 - Notes:
   - Browser QA found and fixed a custom disguise title input issue before the final checks.
