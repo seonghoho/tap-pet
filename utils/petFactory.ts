@@ -1,21 +1,29 @@
-import { DEFAULT_STATS } from '~/constants/pet'
-import { DEFAULT_DISGUISE_TITLE_ID } from '~/constants/titles'
-import { DEFAULT_THEME_ID } from '~/constants/themes'
-import type { DisguiseTitleId, PetSpecies, PetState, ThemeId } from '~/types/pet'
+import {
+  DEFAULT_GROWTH,
+  DEFAULT_PET_NAMES,
+  DEFAULT_SETTINGS,
+  DEFAULT_STATS,
+} from '~/constants/pet'
+import type { PetSettings, PetSpecies, PetState } from '~/types/pet'
 
 export function createInitialPetState(
   species: PetSpecies,
   now = Date.now(),
   options: {
-    disguiseTitleId?: DisguiseTitleId
-    themeId?: ThemeId
+    name?: string
+    settings?: Partial<PetSettings>
   } = {},
 ): PetState {
   return {
     species,
+    name: options.name?.trim() || DEFAULT_PET_NAMES[species],
     stats: { ...DEFAULT_STATS },
-    disguiseTitleId: options.disguiseTitleId ?? DEFAULT_DISGUISE_TITLE_ID,
-    themeId: options.themeId ?? DEFAULT_THEME_ID,
+    growth: { ...DEFAULT_GROWTH },
+    settings: {
+      ...DEFAULT_SETTINGS,
+      ...options.settings,
+    },
     lastUpdatedAt: now,
+    lastPlayedAt: now,
   }
 }

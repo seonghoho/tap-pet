@@ -15,7 +15,7 @@ export function useLocalPetStorage() {
       const raw = localStorage.getItem(PET_STORAGE_KEY)
       if (!raw) return null
 
-      const parsed = parseStoredPetState(JSON.parse(raw))
+      const parsed = parseStoredPetState(JSON.parse(raw), now)
       if (!parsed) return null
 
       const restored: PetState = {
