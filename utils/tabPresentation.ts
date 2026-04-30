@@ -1,8 +1,14 @@
-import { DEFAULT_DISGUISE_TITLE_ID, getDisguiseTitleLabel, STATUS_TITLE_SIGNALS } from '~/constants/titles'
+import { DEFAULT_SETTINGS } from '~/constants/pet'
+import {
+  APP_DEFAULT_TITLE,
+  DEFAULT_DISGUISE_TITLE_ID,
+  getDisguiseTitleLabel,
+  STATUS_TITLE_MESSAGES,
+} from '~/constants/titles'
 import { DEFAULT_THEME_ID } from '~/constants/themes'
 import { DEFAULT_LOCALE } from '~/constants/i18n'
 import type { AppLocale } from '~/types/i18n'
-import type { DisguiseTitleId, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
+import type { DisguiseTitleId, PetSettings, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
 import { getThemeById } from '~/utils/theme'
 
 export type TabPresentation = {
@@ -10,31 +16,60 @@ export type TabPresentation = {
   faviconSvg: string
 }
 
-export function getDisguiseTitleValue(titleId: DisguiseTitleId, locale: AppLocale): string {
+export function getDisguiseTitleValue(
+  titleId: DisguiseTitleId,
+  locale: AppLocale,
+  customTitle = '',
+): string {
+  const trimmedCustomTitle = customTitle.trim()
+  if (trimmedCustomTitle) return trimmedCustomTitle
+
   return getDisguiseTitleLabel(titleId, locale)
 }
 
-export function getTabTitle(baseTitle: string, status: PetStatus): string {
-  const signal = STATUS_TITLE_SIGNALS[status]
+export function getTabTitle(input: {
+  status: PetStatus
+  settings: PetSettings
+  locale: AppLocale
+  isDocumentVisible: boolean
+}): string {
+  if (input.settings.titleMode === 'disguise') {
+    return getDisguiseTitleValue(
+      input.settings.disguiseTitleId,
+      input.locale,
+      input.settings.customDisguiseTitle,
+    )
+  }
 
-  return signal ? `${baseTitle} ${signal}` : baseTitle
+  if (input.settings.titleVisibility === 'inactive-only' && input.isDocumentVisible) {
+    return APP_DEFAULT_TITLE
+  }
+
+  return STATUS_TITLE_MESSAGES[input.status]?.[input.locale] ?? APP_DEFAULT_TITLE
 }
 
 export function getTabPresentation(input: {
   species?: PetSpecies
   status?: PetStatus
-  disguiseTitleId?: DisguiseTitleId
-  themeId?: ThemeId
+  settings?: PetSettings
   locale?: AppLocale
+  isDocumentVisible?: boolean
+  themeId?: ThemeId
+  disguiseTitleId?: DisguiseTitleId
 }): TabPresentation {
   const species = input.species ?? 'cat'
   const status = input.status ?? 'happy'
-  const disguiseTitleId = input.disguiseTitleId ?? DEFAULT_DISGUISE_TITLE_ID
-  const themeId = input.themeId ?? DEFAULT_THEME_ID
   const locale = input.locale ?? DEFAULT_LOCALE
+  const settings = getPresentationSettings(input)
+  const themeId = input.themeId ?? settings.themeId
 
   return {
-    title: getTabTitle(getDisguiseTitleValue(disguiseTitleId, locale), status),
+    title: getTabTitle({
+      status,
+      settings,
+      locale,
+      isDocumentVisible: input.isDocumentVisible ?? false,
+    }),
     faviconSvg: getFaviconSvg(species, status, themeId),
   }
 }
@@ -68,13 +103,35 @@ export function svgToDataUrl(svg: string): string {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }
 
+function getPresentationSettings(input: {
+  settings?: PetSettings
+  themeId?: ThemeId
+  disguiseTitleId?: DisguiseTitleId
+}): PetSettings {
+  if (input.settings) return input.settings
+
+  return {
+    ...DEFAULT_SETTINGS,
+    titleMode: 'disguise',
+    titleVisibility: 'always',
+    disguiseTitleId: input.disguiseTitleId ?? DEFAULT_DISGUISE_TITLE_ID,
+    themeId: input.themeId ?? DEFAULT_THEME_ID,
+  }
+}
+
 function getFaceSvg(status: PetStatus, color: string): string {
+  const happyFace = `<circle cx="30" cy="38" r="3" fill="${color}"/><circle cx="50" cy="38" r="3" fill="${color}"/><path d="M31 51 C36 56 44 56 49 51" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`
+
+  if (status === 'fine' || status === 'happy') {
+    return happyFace
+  }
+
   if (status === 'sleepy') {
     return `<path d="M25 39 H34" stroke="${color}" stroke-width="4" stroke-linecap="round"/><path d="M46 39 H55" stroke="${color}" stroke-width="4" stroke-linecap="round"/><path d="M34 53 C38 56 42 56 46 53" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`
   }
 
-  if (status === 'sad') {
-    return `<circle cx="30" cy="38" r="3" fill="${color}"/><circle cx="50" cy="38" r="3" fill="${color}"/><path d="M31 56 C36 50 44 50 49 56" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`
+  if (status === 'dirty') {
+    return `<circle cx="30" cy="38" r="3" fill="${color}"/><circle cx="50" cy="38" r="3" fill="${color}"/><path d="M31 55 C36 50 44 50 49 55" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/><path d="M55 26 L61 20" stroke="${color}" stroke-width="3" stroke-linecap="round"/><path d="M58 31 L66 29" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`
   }
 
   if (status === 'bored') {
@@ -89,5 +146,5 @@ function getFaceSvg(status: PetStatus, color: string): string {
     return `<circle cx="30" cy="38" r="4" fill="${color}"/><circle cx="50" cy="38" r="4" fill="${color}"/><path d="M30 51 C35 59 45 59 50 51" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round"/><path d="M61 20 L64 25 L69 26 L65 29 L66 34 L61 31 L56 34 L57 29 L53 26 L58 25 Z" fill="${color}"/>`
   }
 
-  return `<circle cx="30" cy="38" r="3" fill="${color}"/><circle cx="50" cy="38" r="3" fill="${color}"/><path d="M31 51 C36 56 44 56 49 51" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`
+  return happyFace
 }

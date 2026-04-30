@@ -1,11 +1,9 @@
 import { NEED_THRESHOLDS } from '~/constants/pet'
 import type { PetNeedStatus, PetStats } from '~/types/pet'
 
-export type PetAlertSeverity = 'none' | 'warning' | 'urgent'
-
 export type PetAlert = {
   status: PetNeedStatus
-  severity: PetAlertSeverity
+  severity: number
 }
 
 export type PetAlertInput = {
@@ -14,28 +12,50 @@ export type PetAlertInput = {
   now: number
 }
 
+const TIE_BREAK_ORDER: PetNeedStatus[] = ['hungry', 'sleepy', 'dirty', 'bored', 'fine']
+
 export function getPrimaryAlert(input: PetAlertInput): PetAlert {
-  if (input.stats.fullness <= NEED_THRESHOLDS.hungryFullness) {
-    return { status: 'hungry', severity: 'warning' }
-  }
+  const alerts: PetAlert[] = [
+    {
+      status: 'hungry',
+      severity: getStatSeverity(input.stats.fullness, NEED_THRESHOLDS.hungryFullness),
+    },
+    {
+      status: 'sleepy',
+      severity: getStatSeverity(input.stats.energy, NEED_THRESHOLDS.sleepyEnergy),
+    },
+    {
+      status: 'dirty',
+      severity: getStatSeverity(input.stats.cleanliness, NEED_THRESHOLDS.dirtyCleanliness),
+    },
+    {
+      status: 'bored',
+      severity: getBoredSeverity(input.lastPlayedAt, input.now),
+    },
+  ]
 
-  if (input.stats.energy <= NEED_THRESHOLDS.sleepyEnergy) {
-    return { status: 'sleepy', severity: 'warning' }
-  }
+  const activeAlerts = alerts.filter((alert) => alert.severity > 0)
+  if (activeAlerts.length === 0) return { status: 'fine', severity: 0 }
 
-  if (input.stats.cleanliness <= NEED_THRESHOLDS.dirtyCleanliness) {
-    return { status: 'dirty', severity: 'warning' }
-  }
+  return activeAlerts.sort((a, b) => {
+    if (b.severity !== a.severity) return b.severity - a.severity
 
-  const idleMs = Math.max(0, input.now - input.lastPlayedAt)
+    return TIE_BREAK_ORDER.indexOf(a.status) - TIE_BREAK_ORDER.indexOf(b.status)
+  })[0]
+}
 
-  if (idleMs >= NEED_THRESHOLDS.urgentBoredAfterMs) {
-    return { status: 'bored', severity: 'urgent' }
-  }
+function getStatSeverity(value: number, threshold: number): number {
+  if (value > threshold) return 0
 
-  if (idleMs >= NEED_THRESHOLDS.boredAfterMs) {
-    return { status: 'bored', severity: 'warning' }
-  }
+  return Math.min(100, threshold - value)
+}
 
-  return { status: 'fine', severity: 'none' }
+function getBoredSeverity(lastPlayedAt: number, now: number): number {
+  const elapsed = Math.max(0, now - lastPlayedAt)
+  if (elapsed < NEED_THRESHOLDS.boredAfterMs) return 0
+
+  const boredRange = NEED_THRESHOLDS.urgentBoredAfterMs - NEED_THRESHOLDS.boredAfterMs
+  const progress = Math.min(1, (elapsed - NEED_THRESHOLDS.boredAfterMs) / boredRange)
+
+  return Math.round(10 + progress * 90)
 }

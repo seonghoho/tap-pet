@@ -6,6 +6,7 @@ import { createInitialPetState } from '~/utils/petFactory'
 import { getPetStatus } from '~/utils/petStatus'
 import { getDisguiseTitleValue, getTabPresentation, getTabTitle } from '~/utils/tabPresentation'
 import { parseStoredPetState, toStoredPetState } from '~/utils/petValidation'
+import type { PetSettings } from '~/types/pet'
 
 describe('pet status model', () => {
   it('prioritizes the most severe need', () => {
@@ -63,9 +64,28 @@ describe('offline decay', () => {
 })
 
 describe('tab presentation', () => {
-  it('appends compact status signals to disguise titles', () => {
-    expect(getTabTitle('Project Dashboard', 'happy')).toBe('Project Dashboard')
-    expect(getTabTitle('Project Dashboard', 'hungry')).toBe('Project Dashboard *')
+  it('uses localized status title messages', () => {
+    const settings = createTestSettings({
+      titleMode: 'status',
+      titleVisibility: 'always',
+    })
+
+    expect(
+      getTabTitle({
+        status: 'happy',
+        settings,
+        locale: 'en',
+        isDocumentVisible: true,
+      }),
+    ).toBe('Tab Pet')
+    expect(
+      getTabTitle({
+        status: 'hungry',
+        settings,
+        locale: 'en',
+        isDocumentVisible: true,
+      }),
+    ).toBe('I am hungry')
   })
 
   it('localizes disguise title values', () => {
@@ -73,11 +93,16 @@ describe('tab presentation', () => {
     expect(getDisguiseTitleValue('meeting-notes', 'ja')).toBe('会議メモ')
     expect(
       getTabPresentation({
-        disguiseTitleId: 'analytics',
+        species: 'cat',
         status: 'excited',
+        settings: createTestSettings({
+          titleMode: 'disguise',
+          disguiseTitleId: 'analytics',
+        }),
         locale: 'ko',
+        isDocumentVisible: false,
       }).title,
-    ).toBe('분석 +')
+    ).toBe('분석')
   })
 })
 
@@ -94,3 +119,15 @@ describe('stored pet state parsing', () => {
     expect(parseStoredPetState({ version: PET_STORAGE_VERSION, species: 'bird' })).toBeNull()
   })
 })
+
+function createTestSettings(overrides: Partial<PetSettings> = {}): PetSettings {
+  return {
+    titleMode: 'status',
+    titleVisibility: 'inactive-only',
+    disguiseTitleId: 'project-dashboard',
+    customDisguiseTitle: '',
+    titleAnimationEnabled: false,
+    themeId: 'system',
+    ...overrides,
+  }
+}

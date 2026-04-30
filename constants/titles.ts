@@ -1,5 +1,7 @@
-import type { DisguiseTitleId, DisguiseTitlePreset, PetStatus } from '~/types/pet'
 import type { AppLocale } from '~/types/i18n'
+import type { DisguiseTitleId, DisguiseTitlePreset, PetStatus } from '~/types/pet'
+
+export const APP_DEFAULT_TITLE = 'Tab Pet'
 
 export const DEFAULT_DISGUISE_TITLE_ID: DisguiseTitleId = 'project-dashboard'
 
@@ -62,11 +64,12 @@ export function getDisguiseTitleLabel(titleId: DisguiseTitleId, locale: AppLocal
   )
 }
 
-export const STATUS_TITLE_SIGNALS: Record<PetStatus, string> = {
-  happy: '',
-  hungry: '*',
-  sleepy: '...',
-  bored: '-',
-  sad: '!',
-  excited: '+',
+export const STATUS_TITLE_MESSAGES: Record<PetStatus, Record<AppLocale, string>> = {
+  fine: { en: 'Tab Pet', ko: 'Tab Pet', ja: 'Tab Pet' },
+  happy: { en: 'Tab Pet', ko: 'Tab Pet', ja: 'Tab Pet' },
+  excited: { en: 'Feeling great', ko: '기분 좋아요', ja: '元気です' },
+  hungry: { en: 'I am hungry', ko: '배고파요', ja: 'お腹すいた' },
+  sleepy: { en: 'I am sleepy', ko: '졸려요', ja: '眠いです' },
+  dirty: { en: 'Please clean me', ko: '씻겨주세요', ja: 'きれいにして' },
+  bored: { en: 'Please play', ko: '놀아주세요', ja: '遊んで' },
 }
