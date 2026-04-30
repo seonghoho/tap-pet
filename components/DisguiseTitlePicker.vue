@@ -11,6 +11,10 @@ const { locale, messages } = useLocale()
 const emit = defineEmits<{
   select: [titleId: DisguiseTitleId]
 }>()
+
+function getTitleLabel(titleId: DisguiseTitleId): string {
+  return getDisguiseTitleLabel(titleId, locale.value)
+}
 </script>
 
 <template>
@@ -31,7 +35,7 @@ const emit = defineEmits<{
         :aria-pressed="selectedId === title.id"
         @click="emit('select', title.id)"
       >
-        {{ getDisguiseTitleLabel(title.id, locale) }}
+        {{ getTitleLabel(title.id) }}
       </button>
     </div>
   </section>

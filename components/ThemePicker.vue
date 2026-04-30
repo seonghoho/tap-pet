@@ -27,7 +27,7 @@ const { messages } = useLocale()
         class="theme-button"
         :class="{ 'theme-button--active': selectedId === theme.id }"
         type="button"
-        :disabled="disabled || theme.premium"
+        :disabled="disabled"
         :aria-pressed="selectedId === theme.id"
         @click="emit('select', theme.id)"
       >
@@ -43,7 +43,7 @@ const { messages } = useLocale()
         </span>
         <span>
           <strong>{{ messages.themes[theme.id].name }}</strong>
-          <small>{{ theme.premium ? messages.themes.premiumMock : messages.themes[theme.id].description }}</small>
+          <small>{{ messages.themes[theme.id].description }}</small>
         </span>
       </button>
     </div>

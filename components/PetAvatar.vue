@@ -85,7 +85,7 @@ const contrastColor = computed(() => theme.value.colors.petContrast)
       <path d="M67 107 C75 113 85 113 93 107" fill="none" :stroke="contrastColor" stroke-width="6" stroke-linecap="round" />
     </template>
 
-    <template v-else-if="status === 'sad'">
+    <template v-else-if="status === 'dirty'">
       <circle cx="58" cy="77" r="6" :fill="contrastColor" />
       <circle cx="102" cy="77" r="6" :fill="contrastColor" />
       <path d="M61 112 C71 99 89 99 99 112" fill="none" :stroke="contrastColor" stroke-width="6" stroke-linecap="round" />

@@ -5,7 +5,7 @@ import {
   STATUS_HABITAT_BOUNDS,
   STATUS_HABITAT_MOTION,
 } from '~/constants/habitat'
-import type { PetSpecies, PetStatus, ThemeId } from '~/types/pet'
+import type { PetAction, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
 import { getThemeById } from '~/utils/theme'
 
 type Direction = 'left' | 'right'
@@ -20,6 +20,7 @@ const props = defineProps<{
   status: PetStatus
   themeId: ThemeId
   avatarLabel: string
+  activeReaction?: PetAction | null
 }>()
 
 const theme = computed(() => getThemeById(props.themeId))
@@ -106,7 +107,12 @@ function randomWithin(min: number, max: number): number {
 <template>
   <div
     class="pet-habitat"
-    :class="[`pet-habitat--${status}`, { 'pet-habitat--bounce': shouldBounce }]"
+    :class="[
+      `pet-habitat--${status}`,
+      activeReaction ? `pet-habitat--reaction-${activeReaction}` : null,
+      { 'pet-habitat--bounce': shouldBounce },
+    ]"
+    :data-reaction="activeReaction ?? undefined"
     :style="habitatStyle"
   >
     <div class="pet-habitat__back-wall" aria-hidden="true">
