@@ -60,6 +60,28 @@ function createTestSettings(overrides: Partial<PetSettings> = {}): PetSettings {
   }
 }
 
+function readComponentTemplate(componentPath: string): string {
+  const filename = resolve(componentPath)
+  const source = readFileSync(filename, 'utf8')
+  const descriptor = parse(source, { filename }).descriptor
+
+  return descriptor.template?.content ?? ''
+}
+
+function getComponentPropExpression(template: string, componentName: string, propName: string): string | undefined {
+  const match = template.match(new RegExp(`<${componentName}[\\s\\S]*?/>`))
+
+  return match?.[0].match(new RegExp(`:${propName}="([^"]+)"`))?.[1]
+}
+
+describe('pet side panel status preview', () => {
+  it('passes the resolved status theme to the nested status panel', () => {
+    const template = readComponentTemplate('components/PetSidePanel.vue')
+
+    expect(getComponentPropExpression(template, 'PetStatusPanel', 'theme-id')).toBe('statusThemeId')
+  })
+})
+
 describe('pet settings panel controls', () => {
   afterEach(() => {
     vi.unstubAllGlobals()

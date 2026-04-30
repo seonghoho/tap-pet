@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PetAction, PetSettings, PetSpecies, PetStats, PetStatus } from '~/types/pet'
+import type { PetAction, PetSettings, PetSpecies, PetStats, PetStatus, ThemeId } from '~/types/pet'
 import type { ProgressInfo, AffinityProgressInfo } from '~/utils/petGrowth'
 
 defineProps<{
@@ -12,6 +12,7 @@ defineProps<{
   levelProgress: ProgressInfo
   affinityProgress: AffinityProgressInfo
   settings: PetSettings
+  statusThemeId: Exclude<ThemeId, 'system'>
   activeReaction?: PetAction | null
 }>()
 
@@ -58,7 +59,7 @@ const { messages } = useLocale()
         :species="species"
         :stats="stats"
         :status="status"
-        :theme-id="settings.themeId"
+        :theme-id="statusThemeId"
         :active-reaction="activeReaction"
       />
 
