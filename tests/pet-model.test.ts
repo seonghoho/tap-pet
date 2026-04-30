@@ -8,16 +8,21 @@ import { getDisguiseTitleValue, getTabPresentation, getTabTitle } from '~/utils/
 import { parseStoredPetState, toStoredPetState } from '~/utils/petValidation'
 
 describe('pet status model', () => {
-  it('prioritizes hungry before other low stats', () => {
-    expect(getPetStatus({ fullness: 10, mood: 10, energy: 10 })).toBe('hungry')
+  it('prioritizes the most severe need', () => {
+    expect(getPetStatus({ fullness: 10, energy: 80, cleanliness: 80 }, 0, 0)).toBe('hungry')
+    expect(getPetStatus({ fullness: 80, energy: 10, cleanliness: 80 }, 0, 0)).toBe('sleepy')
+    expect(getPetStatus({ fullness: 80, energy: 80, cleanliness: 10 }, 0, 0)).toBe('dirty')
   })
 
-  it('detects sleepy, sad, bored, excited, and happy states', () => {
-    expect(getPetStatus({ fullness: 50, mood: 50, energy: 10 })).toBe('sleepy')
-    expect(getPetStatus({ fullness: 50, mood: 10, energy: 50 })).toBe('sad')
-    expect(getPetStatus({ fullness: 50, mood: 40, energy: 50 })).toBe('bored')
-    expect(getPetStatus({ fullness: 90, mood: 90, energy: 90 })).toBe('excited')
-    expect(getPetStatus({ fullness: 70, mood: 70, energy: 70 })).toBe('happy')
+  it('detects bored from last played time', () => {
+    const now = 1000 * 60 * 60 * 3
+
+    expect(getPetStatus({ fullness: 80, energy: 80, cleanliness: 80 }, 0, now)).toBe('bored')
+  })
+
+  it('detects excited and happy display states', () => {
+    expect(getPetStatus({ fullness: 90, energy: 90, cleanliness: 90 }, Date.now(), Date.now())).toBe('excited')
+    expect(getPetStatus({ fullness: 70, energy: 70, cleanliness: 70 }, Date.now(), Date.now())).toBe('happy')
   })
 })
 
