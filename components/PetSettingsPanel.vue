@@ -78,6 +78,15 @@ function commitCustomTitle(): void {
   })
 }
 
+function setCustomTitle(event: Event): void {
+  const customDisguiseTitle = (event.target as HTMLInputElement | null)?.value ?? ''
+  draftCustomTitle.value = customDisguiseTitle
+
+  if (customDisguiseTitle === props.settings.customDisguiseTitle) return
+
+  emit('updateSettings', { customDisguiseTitle })
+}
+
 function setTitleMode(titleMode: TitleMode): void {
   emit('updateSettings', { titleMode })
 }
@@ -174,6 +183,7 @@ function setTheme(themeId: ThemeId): void {
         class="settings-input"
         type="text"
         autocomplete="off"
+        @input="setCustomTitle"
         @blur="commitCustomTitle"
         @change="commitCustomTitle"
       >

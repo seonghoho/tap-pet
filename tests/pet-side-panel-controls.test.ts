@@ -12,7 +12,9 @@ type SetupComponent<T> = {
 
 type PetSettingsPanelSetup = {
   draftName: { value: string }
+  draftCustomTitle: { value: string }
   commitName: () => void
+  setCustomTitle: (event: Event) => void
   setDisguiseTitle: (disguiseTitleId: PetSettings['disguiseTitleId']) => void
 }
 
@@ -113,6 +115,33 @@ describe('pet settings panel controls', () => {
     expect(emitted).toEqual([
       ['updateSettings', { disguiseTitleId: 'analytics', customDisguiseTitle: '' }],
     ])
+  })
+
+  it('emits custom disguise title changes as the user types', () => {
+    vi.stubGlobal('useLocale', () => ({ locale: 'en', messages: {} }))
+    const component = loadScriptSetupComponent<PetSettingsPanelSetup>('components/PetSettingsPanel.vue')
+    const emitted: unknown[][] = []
+    const setup = component.setup(
+      {
+        name: 'Momo',
+        settings: createTestSettings({
+          titleMode: 'disguise',
+          disguiseTitleId: 'inbox',
+          customDisguiseTitle: '',
+        }),
+      },
+      {
+        emit: (...args) => {
+          emitted.push(args)
+        },
+        expose: vi.fn(),
+      },
+    )
+
+    setup.setCustomTitle({ target: { value: 'Focus mode' } } as unknown as Event)
+
+    expect(emitted).toEqual([['updateSettings', { customDisguiseTitle: 'Focus mode' }]])
+    expect(setup.draftCustomTitle.value).toBe('Focus mode')
   })
 
   it('resets an empty draft name without emitting', () => {
