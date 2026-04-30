@@ -89,6 +89,24 @@ describe('tab title policy', () => {
     ).toBe('Tab Pet')
   })
 
+  it('uses status title while hidden for inactive-only status mode', () => {
+    expect(
+      getTabTitle({
+        status: 'hungry',
+        locale: 'ko',
+        settings: {
+          titleMode: 'status',
+          titleVisibility: 'inactive-only',
+          disguiseTitleId: 'project-dashboard',
+          customDisguiseTitle: '',
+          titleAnimationEnabled: false,
+          themeId: 'system',
+        },
+        isDocumentVisible: false,
+      }),
+    ).toBe('배고파요')
+  })
+
   it('keeps favicon state even when title is disguised', () => {
     const presentation = getTabPresentation({
       species: 'cat',
