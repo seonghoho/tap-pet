@@ -1,13 +1,6 @@
-import { ACTION_EFFECTS } from '~/constants/pet'
-import type { PetAction, PetStats } from '~/types/pet'
-import { clampStat } from '~/utils/petValidation'
+import type { PetAction, PetGrowth, PetStats } from '~/types/pet'
+import { applyCareAction } from '~/utils/petCare'
 
-export function applyPetAction(stats: PetStats, action: PetAction): PetStats {
-  const effect = ACTION_EFFECTS[action]
-
-  return {
-    fullness: clampStat(stats.fullness + effect.fullness),
-    mood: clampStat(stats.mood + effect.mood),
-    energy: clampStat(stats.energy + effect.energy),
-  }
+export function applyPetAction(stats: PetStats, action: PetAction, growth: PetGrowth): PetStats {
+  return applyCareAction({ stats, action, growth }).stats
 }

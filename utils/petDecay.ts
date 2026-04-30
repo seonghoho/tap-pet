@@ -19,7 +19,7 @@ export function applyOfflineDecay(
 
   return {
     fullness: clampStat(stats.fullness + DECAY_PER_HOUR.fullness * decayHours),
-    mood: clampStat(stats.mood + DECAY_PER_HOUR.mood * decayHours),
     energy: clampStat(stats.energy + DECAY_PER_HOUR.energy * decayHours),
+    cleanliness: clampStat(stats.cleanliness + DECAY_PER_HOUR.cleanliness * decayHours),
   }
 }

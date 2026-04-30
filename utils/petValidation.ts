@@ -35,8 +35,8 @@ export function normalizeStats(value: unknown): PetStats {
 
   return {
     fullness: clampStat(Number(stats.fullness ?? 0)),
-    mood: clampStat(Number(stats.mood ?? 0)),
     energy: clampStat(Number(stats.energy ?? 0)),
+    cleanliness: clampStat(Number(stats.cleanliness ?? 70)),
   }
 }
 

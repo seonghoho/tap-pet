@@ -28,10 +28,16 @@ describe('pet status model', () => {
 
 describe('pet actions', () => {
   it('applies action effects and clamps stat bounds', () => {
-    expect(applyPetAction({ fullness: 90, mood: 98, energy: 2 }, 'feed')).toEqual({
+    expect(
+      applyPetAction(
+        { fullness: 90, energy: 2, cleanliness: 99 },
+        'feed',
+        { level: 1, exp: 0, affinityExp: 0 },
+      ),
+    ).toEqual({
       fullness: 100,
-      mood: 100,
       energy: 0,
+      cleanliness: 97,
     })
   })
 })
@@ -40,18 +46,18 @@ describe('offline decay', () => {
   it('caps offline decay at the configured maximum', () => {
     const now = 1000 * 60 * 60 * 48
 
-    expect(applyOfflineDecay({ fullness: 100, mood: 100, energy: 100 }, 0, now)).toEqual({
+    expect(applyOfflineDecay({ fullness: 100, energy: 100, cleanliness: 100 }, 0, now)).toEqual({
       fullness: 0,
-      mood: 4,
       energy: 28,
+      cleanliness: 4,
     })
   })
 
   it('ignores negative elapsed time', () => {
-    expect(applyOfflineDecay({ fullness: 70, mood: 70, energy: 70 }, 2000, 1000)).toEqual({
+    expect(applyOfflineDecay({ fullness: 70, energy: 70, cleanliness: 70 }, 2000, 1000)).toEqual({
       fullness: 70,
-      mood: 70,
       energy: 70,
+      cleanliness: 70,
     })
   })
 })

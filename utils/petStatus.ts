@@ -1,16 +1,16 @@
-import { STATUS_THRESHOLDS } from '~/constants/pet'
+import { NEED_THRESHOLDS } from '~/constants/pet'
 import type { PetStats, PetStatus } from '~/types/pet'
+import { getPrimaryAlert } from '~/utils/petAlert'
 
-export function getPetStatus(stats: PetStats): PetStatus {
-  if (stats.fullness <= STATUS_THRESHOLDS.hungryFullness) return 'hungry'
-  if (stats.energy <= STATUS_THRESHOLDS.sleepyEnergy) return 'sleepy'
-  if (stats.mood <= STATUS_THRESHOLDS.sadMood) return 'sad'
-  if (stats.mood <= STATUS_THRESHOLDS.boredMood) return 'bored'
+export function getPetStatus(stats: PetStats, lastPlayedAt = Date.now(), now = Date.now()): PetStatus {
+  const alert = getPrimaryAlert({ stats, lastPlayedAt, now })
+
+  if (alert.status !== 'fine') return alert.status
 
   const isExcited =
-    stats.mood >= STATUS_THRESHOLDS.excitedMood &&
-    stats.fullness >= STATUS_THRESHOLDS.excitedFullness &&
-    stats.energy >= STATUS_THRESHOLDS.excitedEnergy
+    stats.fullness >= NEED_THRESHOLDS.excitedFullness &&
+    stats.energy >= NEED_THRESHOLDS.excitedEnergy &&
+    stats.cleanliness >= NEED_THRESHOLDS.excitedCleanliness
 
   return isExcited ? 'excited' : 'happy'
 }
