@@ -43,7 +43,7 @@ export const I18N_MESSAGES = {
     species: {
       cat: {
         label: 'Cat',
-        description: 'Quiet signals and sharper tab moods.',
+        description: 'Quiet signals and sharper tab status changes.',
       },
       dog: {
         label: 'Dog',
@@ -52,52 +52,76 @@ export const I18N_MESSAGES = {
     },
     status: {
       labels: {
+        fine: 'Stable',
         happy: 'Stable',
         hungry: 'Needs food',
         sleepy: 'Needs rest',
+        dirty: 'Needs cleaning',
         bored: 'Needs play',
-        sad: 'Needs care',
         excited: 'Excellent',
       },
       messages: {
+        fine: 'Everything is stable. Keep the tab open and check back later.',
         happy: 'The tab is calm. Keep it open and check back later.',
-        hungry: 'Fullness is low. Feed will move the tab back toward normal.',
+        hungry: 'Fullness is low. Feed your pet to bring the tab back toward normal.',
         sleepy: 'Energy is low. Sleep restores the strongest amount.',
-        bored: 'Mood is drifting down. Play is the fastest fix.',
-        sad: 'Mood is critical. A few care actions should stabilize the tab.',
+        dirty: 'Cleanliness is low. Wash your pet to refresh the tab.',
+        bored: 'It has been idle for a while. Play helps your pet reconnect.',
         excited: 'Everything is high. The tab gets a brighter signal.',
       },
       aria: {
+        fine: 'fine',
         happy: 'happy',
         hungry: 'hungry',
         sleepy: 'sleepy',
+        dirty: 'dirty',
         bored: 'bored',
-        sad: 'sad',
         excited: 'excited',
       },
     },
     stats: {
       fullness: 'Fullness',
-      mood: 'Mood',
       energy: 'Energy',
+      cleanliness: 'Cleanliness',
+      level: 'Level',
+      exp: 'EXP',
+      affinity: 'Affinity',
     },
     actions: {
       feed: {
         label: 'Feed',
-        detail: '+30 fullness',
+        detail: 'Restores fullness',
       },
       play: {
         label: 'Play',
-        detail: '+25 mood',
+        detail: 'Increases affinity and EXP',
       },
       sleep: {
         label: 'Sleep',
-        detail: '+35 energy',
+        detail: 'Restores energy',
+      },
+      wash: {
+        label: 'Wash',
+        detail: 'Restores cleanliness',
       },
     },
     titles: {
       heading: 'Disguise title',
       description: 'Pick the base browser tab label.',
+    },
+    settings: {
+      statusTab: 'Status',
+      settingsTab: 'Settings',
+      petName: 'Pet name',
+      titleMode: 'Title mode',
+      titleModeStatus: 'Status alert',
+      titleModeDisguise: 'Disguise title',
+      titleVisibility: 'Alert timing',
+      inactiveOnly: 'Inactive tab only',
+      always: 'Always',
+      customTitle: 'Custom disguise title',
+      titleAnimation: 'Title animation',
+      themeMode: 'Theme',
     },
     guide: {
       heading: 'How to use',
@@ -108,20 +132,25 @@ export const I18N_MESSAGES = {
           title: 'Tab signals',
           items: [
             'The selected disguise title becomes the base tab title.',
-            'Status symbols are added after the title.',
+            'Status alerts can replace the title when your pet needs care.',
             'The favicon changes color and expression with the pet status.',
           ],
         },
         signals: {
-          title: 'Title symbols',
-          items: ['Normal: no symbol', 'Hungry: *', 'Sleepy: ...', 'Bored: -', 'Sad: !', 'Excited: +'],
+          title: 'Status alerts',
+          items: [
+            'Stable: the normal Tab Pet title stays in place.',
+            'Hungry, sleepy, dirty, and bored states show care prompts.',
+            'Excited appears when fullness, energy, and cleanliness are high.',
+          ],
         },
         care: {
           title: 'Care loop',
           items: [
             'Feed restores fullness.',
-            'Play restores mood but spends energy and fullness.',
+            'Play increases affinity and EXP but spends energy and fullness.',
             'Sleep restores energy.',
+            'Wash restores cleanliness.',
             'Closed time is reflected when you return.',
           ],
         },
@@ -131,21 +160,17 @@ export const I18N_MESSAGES = {
       heading: 'Theme',
       description: 'Change the page skin and favicon palette.',
       premiumMock: 'Premium mock',
-      default: {
-        name: 'Default',
+      system: {
+        name: 'System',
+        description: 'Follows your browser color scheme when available.',
+      },
+      light: {
+        name: 'Light',
         description: 'Clean workday colors with warm pet accents.',
       },
-      focus: {
-        name: 'Focus',
-        description: 'Muted office palette for quiet desks.',
-      },
-      night: {
-        name: 'Night',
+      dark: {
+        name: 'Dark',
         description: 'Dark workspace with high contrast controls.',
-      },
-      pastel: {
-        name: 'Pastel',
-        description: 'Soft color set reserved for premium skins.',
       },
     },
     monetization: {
@@ -188,7 +213,7 @@ export const I18N_MESSAGES = {
     species: {
       cat: {
         label: '고양이',
-        description: '조용한 신호와 더 섬세한 탭 기분 변화.',
+        description: '조용한 신호와 더 섬세한 탭 상태 변화.',
       },
       dog: {
         label: '강아지',
@@ -197,52 +222,76 @@ export const I18N_MESSAGES = {
     },
     status: {
       labels: {
+        fine: '안정적',
         happy: '안정적',
-        hungry: '밥이 필요함',
-        sleepy: '휴식 필요',
+        hungry: '배고픔',
+        sleepy: '졸림',
+        dirty: '씻기 필요',
         bored: '놀이 필요',
-        sad: '돌봄 필요',
         excited: '최상',
       },
       messages: {
+        fine: '모든 상태가 안정적입니다. 탭을 열어두고 나중에 다시 확인하세요.',
         happy: '탭이 차분합니다. 열어두고 나중에 다시 확인하세요.',
-        hungry: '포만감이 낮습니다. 먹이 주기로 탭 상태를 안정시킬 수 있습니다.',
-        sleepy: '에너지가 낮습니다. 잠자기는 가장 크게 회복합니다.',
-        bored: '기분이 내려가고 있습니다. 놀아주기가 가장 빠른 해결책입니다.',
-        sad: '기분이 위험 수준입니다. 몇 번 돌보면 다시 안정됩니다.',
+        hungry: '배부름이 낮습니다. 밥 주기로 탭 상태를 안정시킬 수 있습니다.',
+        sleepy: '에너지가 낮습니다. 재우기로 가장 크게 회복합니다.',
+        dirty: '청결이 낮습니다. 씻기기로 탭을 산뜻하게 만들 수 있습니다.',
+        bored: '오랫동안 돌봄이 없었습니다. 놀아주기로 다시 교감하세요.',
         excited: '모든 수치가 높습니다. 탭 신호가 더 밝아집니다.',
       },
       aria: {
+        fine: '안정적인',
         happy: '행복한',
         hungry: '배고픈',
         sleepy: '졸린',
+        dirty: '씻겨야 하는',
         bored: '지루한',
-        sad: '슬픈',
         excited: '신난',
       },
     },
     stats: {
-      fullness: '포만감',
-      mood: '기분',
+      fullness: '배부름',
       energy: '에너지',
+      cleanliness: '청결',
+      level: '레벨',
+      exp: '경험치',
+      affinity: '친밀도',
     },
     actions: {
       feed: {
-        label: '먹이',
-        detail: '포만감 +30',
+        label: '밥 주기',
+        detail: '배부름 회복',
       },
       play: {
-        label: '놀이',
-        detail: '기분 +25',
+        label: '놀아주기',
+        detail: '친밀도와 경험치 증가',
       },
       sleep: {
-        label: '잠자기',
-        detail: '에너지 +35',
+        label: '재우기',
+        detail: '에너지 회복',
+      },
+      wash: {
+        label: '씻기기',
+        detail: '청결 회복',
       },
     },
     titles: {
       heading: '위장 타이틀',
       description: '브라우저 탭에 표시될 기본 문구를 고르세요.',
+    },
+    settings: {
+      statusTab: '상태',
+      settingsTab: '설정',
+      petName: '펫 이름',
+      titleMode: '타이틀 모드',
+      titleModeStatus: '상태 알림',
+      titleModeDisguise: '위장 타이틀',
+      titleVisibility: '알림 표시',
+      inactiveOnly: '비활성 탭에서만',
+      always: '항상',
+      customTitle: '커스텀 위장 타이틀',
+      titleAnimation: '타이틀 애니메이션',
+      themeMode: '테마',
     },
     guide: {
       heading: '이용 안내',
@@ -253,20 +302,25 @@ export const I18N_MESSAGES = {
           title: '탭 신호',
           items: [
             '선택한 위장 타이틀이 탭 제목의 기본 문구가 됩니다.',
-            '상태 기호가 타이틀 뒤에 붙습니다.',
+            '펫에게 돌봄이 필요하면 상태 알림이 타이틀을 대신할 수 있습니다.',
             '파비콘은 펫 상태에 따라 색상과 표정이 바뀝니다.',
           ],
         },
         signals: {
-          title: '타이틀 기호',
-          items: ['정상: 기호 없음', '배고픔: *', '졸림: ...', '지루함: -', '슬픔: !', '신남: +'],
+          title: '상태 알림',
+          items: [
+            '안정 상태에서는 기본 Tab Pet 타이틀이 유지됩니다.',
+            '배고픔, 졸림, 씻기 필요, 지루함 상태에서는 돌봄 요청이 표시됩니다.',
+            '배부름, 에너지, 청결이 높으면 최상 상태가 표시됩니다.',
+          ],
         },
         care: {
           title: '돌봄 루프',
           items: [
-            '먹이는 포만감을 회복합니다.',
-            '놀이는 기분을 회복하지만 에너지와 포만감을 씁니다.',
-            '잠자기는 에너지를 회복합니다.',
+            '밥 주기는 배부름을 회복합니다.',
+            '놀아주기는 친밀도와 경험치를 올리지만 에너지와 배부름을 씁니다.',
+            '재우기는 에너지를 회복합니다.',
+            '씻기기는 청결을 회복합니다.',
             '앱을 닫아둔 시간은 다시 열 때 상태에 반영됩니다.',
           ],
         },
@@ -276,21 +330,17 @@ export const I18N_MESSAGES = {
       heading: '테마',
       description: '본문 스킨과 파비콘 팔레트를 바꿉니다.',
       premiumMock: '프리미엄 목업',
-      default: {
-        name: '기본',
+      system: {
+        name: '시스템',
+        description: '가능하면 브라우저 색상 설정을 따릅니다.',
+      },
+      light: {
+        name: '라이트',
         description: '따뜻한 펫 포인트가 있는 깔끔한 업무 색상.',
       },
-      focus: {
-        name: '집중',
-        description: '조용한 데스크에 맞춘 낮은 채도의 사무실 팔레트.',
-      },
-      night: {
-        name: '나이트',
+      dark: {
+        name: '다크',
         description: '대비가 높은 어두운 작업 공간.',
-      },
-      pastel: {
-        name: '파스텔',
-        description: '프리미엄 스킨용 부드러운 색상 세트.',
       },
     },
     monetization: {
@@ -333,7 +383,7 @@ export const I18N_MESSAGES = {
     species: {
       cat: {
         label: '猫',
-        description: '静かな合図と、より細かなタブ気分の変化。',
+        description: '静かな合図と、より細かなタブ状態の変化。',
       },
       dog: {
         label: '犬',
@@ -342,52 +392,76 @@ export const I18N_MESSAGES = {
     },
     status: {
       labels: {
+        fine: '安定',
         happy: '安定',
         hungry: 'ごはんが必要',
         sleepy: '休憩が必要',
+        dirty: 'お手入れが必要',
         bored: '遊びが必要',
-        sad: 'ケアが必要',
         excited: '最高',
       },
       messages: {
+        fine: 'すべて安定しています。タブを開いたまま後で確認してください。',
         happy: 'タブは落ち着いています。開いたまま後で確認してください。',
         hungry: '満腹度が低いです。ごはんでタブ状態を安定させられます。',
         sleepy: 'エネルギーが低いです。睡眠が最も大きく回復します。',
-        bored: '気分が下がっています。遊ぶのが一番早い対処です。',
-        sad: '気分が危険域です。何度かケアすると安定します。',
+        dirty: '清潔度が低いです。洗ってタブをすっきりさせましょう。',
+        bored: 'しばらくお世話がありません。遊ぶとまたつながれます。',
         excited: 'すべての数値が高いです。タブの合図が明るくなります。',
       },
       aria: {
+        fine: '安定した',
         happy: '元気な',
         hungry: 'お腹が空いた',
         sleepy: '眠い',
+        dirty: '汚れた',
         bored: '退屈な',
-        sad: '悲しい',
         excited: 'わくわくした',
       },
     },
     stats: {
       fullness: '満腹度',
-      mood: '気分',
       energy: 'エネルギー',
+      cleanliness: '清潔度',
+      level: 'レベル',
+      exp: '経験値',
+      affinity: '親密度',
     },
     actions: {
       feed: {
-        label: 'ごはん',
-        detail: '満腹度 +30',
+        label: 'ごはんをあげる',
+        detail: '満腹度を回復',
       },
       play: {
         label: '遊ぶ',
-        detail: '気分 +25',
+        detail: '親密度と経験値が増加',
       },
       sleep: {
-        label: '眠る',
-        detail: 'エネルギー +35',
+        label: '寝かせる',
+        detail: 'エネルギーを回復',
+      },
+      wash: {
+        label: '洗ってあげる',
+        detail: '清潔度を回復',
       },
     },
     titles: {
       heading: '偽装タイトル',
       description: 'ブラウザタブに表示する基本文言を選びます。',
+    },
+    settings: {
+      statusTab: 'ステータス',
+      settingsTab: '設定',
+      petName: 'ペット名',
+      titleMode: 'タイトルモード',
+      titleModeStatus: 'ステータス通知',
+      titleModeDisguise: '偽装タイトル',
+      titleVisibility: '通知タイミング',
+      inactiveOnly: '非アクティブタブのみ',
+      always: '常に',
+      customTitle: 'カスタム偽装タイトル',
+      titleAnimation: 'タイトルアニメーション',
+      themeMode: 'テーマ',
     },
     guide: {
       heading: '使い方',
@@ -398,20 +472,25 @@ export const I18N_MESSAGES = {
           title: 'タブの合図',
           items: [
             '選んだ偽装タイトルがタブタイトルの基本文言になります。',
-            '状態記号がタイトルの後ろに付きます。',
+            'ペットにお世話が必要なときは、ステータス通知がタイトルの代わりに表示されます。',
             'ファビコンはペット状態に合わせて色と表情が変わります。',
           ],
         },
         signals: {
-          title: 'タイトル記号',
-          items: ['通常: 記号なし', '空腹: *', '眠い: ...', '退屈: -', '悲しい: !', 'わくわく: +'],
+          title: 'ステータス通知',
+          items: [
+            '安定しているときは通常の Tab Pet タイトルが表示されます。',
+            '空腹、眠い、汚れた、退屈な状態ではお世話の通知が表示されます。',
+            '満腹度、エネルギー、清潔度が高いと最高状態が表示されます。',
+          ],
         },
         care: {
           title: 'ケアループ',
           items: [
-            'ごはんは満腹度を回復します。',
-            '遊ぶと気分が回復しますが、エネルギーと満腹度を使います。',
-            '眠るとエネルギーが回復します。',
+            'ごはんをあげると満腹度が回復します。',
+            '遊ぶと親密度と経験値が増えますが、エネルギーと満腹度を使います。',
+            '寝かせるとエネルギーが回復します。',
+            '洗ってあげると清潔度が回復します。',
             '閉じていた時間は、戻ったときに状態へ反映されます。',
           ],
         },
@@ -421,21 +500,17 @@ export const I18N_MESSAGES = {
       heading: 'テーマ',
       description: '本文スキンとファビコンのパレットを変更します。',
       premiumMock: 'プレミアムモック',
-      default: {
-        name: 'デフォルト',
+      system: {
+        name: 'システム',
+        description: '利用できる場合はブラウザの配色設定に合わせます。',
+      },
+      light: {
+        name: 'ライト',
         description: '温かいペットのアクセントを持つ清潔な仕事用カラー。',
       },
-      focus: {
-        name: '集中',
-        description: '静かなデスク向けの落ち着いたオフィスパレット。',
-      },
-      night: {
-        name: 'ナイト',
+      dark: {
+        name: 'ダーク',
         description: '高コントラストの暗いワークスペース。',
-      },
-      pastel: {
-        name: 'パステル',
-        description: 'プレミアムスキン用の柔らかいカラーセット。',
       },
     },
     monetization: {
