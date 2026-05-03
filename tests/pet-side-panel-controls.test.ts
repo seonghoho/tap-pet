@@ -76,11 +76,21 @@ function getComponentPropExpression(template: string, componentName: string, pro
   return match?.[0].match(new RegExp(`:${propName}="([^"]+)"`))?.[1]
 }
 
-describe('pet side panel status preview', () => {
-  it('passes the resolved status theme to the nested status panel', () => {
+describe('pet side panel progress summary', () => {
+  it('does not duplicate the main pet status panel', () => {
     const template = readComponentTemplate('components/PetSidePanel.vue')
 
-    expect(getComponentPropExpression(template, 'PetStatusPanel', 'theme-id')).toBe('statusThemeId')
+    expect(template).not.toContain('<PetStatusPanel')
+  })
+
+  it('keeps duplicated status props out of the side panel mount', () => {
+    const template = readComponentTemplate('app.vue')
+
+    expect(getComponentPropExpression(template, 'PetSidePanel', 'species')).toBeUndefined()
+    expect(getComponentPropExpression(template, 'PetSidePanel', 'status')).toBeUndefined()
+    expect(getComponentPropExpression(template, 'PetSidePanel', 'stats')).toBeUndefined()
+    expect(getComponentPropExpression(template, 'PetSidePanel', 'status-theme-id')).toBeUndefined()
+    expect(getComponentPropExpression(template, 'PetSidePanel', 'level-progress')).toBe('pet.levelProgress.value')
   })
 })
 

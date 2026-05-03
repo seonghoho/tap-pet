@@ -257,16 +257,6 @@ button:disabled {
   gap: 18px;
 }
 
-.pet-side-panel .pet-status {
-  gap: 16px;
-  grid-template-columns: 1fr;
-  min-height: auto;
-}
-
-.pet-side-panel .pet-habitat {
-  max-width: 240px;
-}
-
 .progress-list {
   display: grid;
   gap: 14px;

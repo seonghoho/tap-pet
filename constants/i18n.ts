@@ -110,7 +110,7 @@ export const I18N_MESSAGES = {
       description: 'Pick the base browser tab label.',
     },
     settings: {
-      statusTab: 'Status',
+      statusTab: 'Progress',
       settingsTab: 'Settings',
       petName: 'Pet name',
       titleMode: 'Title mode',
@@ -280,7 +280,7 @@ export const I18N_MESSAGES = {
       description: '브라우저 탭에 표시될 기본 문구를 고르세요.',
     },
     settings: {
-      statusTab: '상태',
+      statusTab: '성장',
       settingsTab: '설정',
       petName: '펫 이름',
       titleMode: '타이틀 모드',
@@ -450,7 +450,7 @@ export const I18N_MESSAGES = {
       description: 'ブラウザタブに表示する基本文言を選びます。',
     },
     settings: {
-      statusTab: 'ステータス',
+      statusTab: '成長',
       settingsTab: '設定',
       petName: 'ペット名',
       titleMode: 'タイトルモード',

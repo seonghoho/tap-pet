@@ -1,19 +1,14 @@
 <script setup lang="ts">
-import type { PetAction, PetSettings, PetSpecies, PetStats, PetStatus, ThemeId } from '~/types/pet'
+import type { PetSettings } from '~/types/pet'
 import type { ProgressInfo, AffinityProgressInfo } from '~/utils/petGrowth'
 
 defineProps<{
   mode: 'status' | 'settings'
-  species: PetSpecies
   name: string
-  status: PetStatus
-  stats: PetStats
   level: number
   levelProgress: ProgressInfo
   affinityProgress: AffinityProgressInfo
   settings: PetSettings
-  statusThemeId: Exclude<ThemeId, 'system'>
-  activeReaction?: PetAction | null
 }>()
 
 const emit = defineEmits<{
@@ -50,18 +45,13 @@ const { messages } = useLocale()
 
     <div v-if="mode === 'status'" class="pet-side-panel__body">
       <div class="section-heading">
-        <p class="eyebrow">{{ messages.species[species].label }}</p>
+        <p class="eyebrow">{{ messages.settings.statusTab }}</p>
         <h2>{{ name }}</h2>
-        <p>{{ messages.status.labels[status] }}</p>
+        <p>
+          {{ messages.stats.level }} {{ level }} ·
+          {{ messages.stats.affinity }} {{ affinityProgress.level }}
+        </p>
       </div>
-
-      <PetStatusPanel
-        :species="species"
-        :stats="stats"
-        :status="status"
-        :theme-id="statusThemeId"
-        :active-reaction="activeReaction"
-      />
 
       <div class="progress-list">
         <div class="stat-row">
