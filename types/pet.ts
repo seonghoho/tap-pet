@@ -2,17 +2,13 @@ import type { AppLocale } from '~/types/i18n'
 
 export type PetSpecies = 'cat' | 'dog'
 
-export type PetStatus =
-  | 'happy'
-  | 'hungry'
-  | 'sleepy'
-  | 'bored'
-  | 'sad'
-  | 'excited'
+export type PetNeedStatus = 'fine' | 'hungry' | 'sleepy' | 'dirty' | 'bored'
+export type PetDisplayStatus = PetNeedStatus | 'happy' | 'excited'
+export type PetStatus = PetDisplayStatus
 
-export type PetAction = 'feed' | 'play' | 'sleep'
+export type PetAction = 'feed' | 'play' | 'sleep' | 'wash'
 
-export type ThemeId = 'default' | 'focus' | 'night' | 'pastel'
+export type ThemeId = 'system' | 'light' | 'dark'
 
 export type DisguiseTitleId =
   | 'project-dashboard'
@@ -22,18 +18,38 @@ export type DisguiseTitleId =
   | 'untitled-document'
   | 'meeting-notes'
 
+export type TitleMode = 'status' | 'disguise'
+export type TitleVisibility = 'inactive-only' | 'always'
+
 export type PetStats = {
   fullness: number
-  mood: number
   energy: number
+  cleanliness: number
+}
+
+export type PetGrowth = {
+  level: number
+  exp: number
+  affinityExp: number
+}
+
+export type PetSettings = {
+  titleMode: TitleMode
+  titleVisibility: TitleVisibility
+  disguiseTitleId: DisguiseTitleId
+  customDisguiseTitle: string
+  titleAnimationEnabled: boolean
+  themeId: ThemeId
 }
 
 export type PetState = {
   species: PetSpecies
+  name: string
   stats: PetStats
-  disguiseTitleId: DisguiseTitleId
-  themeId: ThemeId
+  growth: PetGrowth
+  settings: PetSettings
   lastUpdatedAt: number
+  lastPlayedAt: number
 }
 
 export type StoredPetState = PetState & {

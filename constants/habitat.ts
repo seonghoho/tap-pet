@@ -18,6 +18,12 @@ export const DEFAULT_HABITAT_POSITION = {
 } as const
 
 export const STATUS_HABITAT_BOUNDS: Record<PetStatus, HabitatBounds> = {
+  fine: {
+    minX: 18,
+    maxX: 82,
+    minY: 34,
+    maxY: 67,
+  },
   happy: {
     minX: 18,
     maxX: 82,
@@ -42,7 +48,7 @@ export const STATUS_HABITAT_BOUNDS: Record<PetStatus, HabitatBounds> = {
     minY: 48,
     maxY: 68,
   },
-  sad: {
+  dirty: {
     minX: 18,
     maxX: 40,
     minY: 58,
@@ -57,6 +63,10 @@ export const STATUS_HABITAT_BOUNDS: Record<PetStatus, HabitatBounds> = {
 }
 
 export const STATUS_HABITAT_MOTION: Record<PetStatus, HabitatMotion> = {
+  fine: {
+    intervalMs: 2800,
+    speedMs: 1200,
+  },
   happy: {
     intervalMs: 2800,
     speedMs: 1200,
@@ -73,7 +83,7 @@ export const STATUS_HABITAT_MOTION: Record<PetStatus, HabitatMotion> = {
     intervalMs: 4200,
     speedMs: 1500,
   },
-  sad: {
+  dirty: {
     intervalMs: 4600,
     speedMs: 1600,
   },

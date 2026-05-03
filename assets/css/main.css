@@ -199,12 +199,175 @@ button:disabled {
 }
 
 .side-stack {
+  align-content: start;
   display: grid;
   gap: 14px;
 }
 
 .control-panel {
   padding: 16px;
+}
+
+.pet-side-panel {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  box-shadow: 0 14px 40px color-mix(in srgb, var(--app-text) 9%, transparent);
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+}
+
+.panel-tabs,
+.pet-side-panel__tabs {
+  background: var(--app-surface-strong);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 3px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 3px;
+}
+
+.panel-tab,
+.pet-side-panel__tab {
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--app-muted);
+  font-weight: 800;
+  min-height: 34px;
+  padding: 6px 8px;
+}
+
+.panel-tab:hover,
+.pet-side-panel__tab:hover {
+  color: var(--app-text);
+}
+
+.panel-tab--active,
+.pet-side-panel__tab--active {
+  background: var(--app-surface);
+  color: var(--app-text);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--app-text) 8%, transparent);
+}
+
+.pet-side-panel__body {
+  display: grid;
+  gap: 18px;
+}
+
+.pet-side-panel .pet-status {
+  gap: 16px;
+  grid-template-columns: 1fr;
+  min-height: auto;
+}
+
+.pet-side-panel .pet-habitat {
+  max-width: 240px;
+}
+
+.progress-list {
+  display: grid;
+  gap: 14px;
+}
+
+.settings-panel,
+.pet-settings-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.field-row,
+.settings-field {
+  color: var(--app-text);
+  display: grid;
+  gap: 7px;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.text-input,
+.settings-input {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  color: var(--app-text);
+  min-height: 40px;
+  padding: 8px 10px;
+  width: 100%;
+}
+
+.text-input:focus,
+.settings-input:focus {
+  border-color: var(--app-accent);
+  outline: 2px solid color-mix(in srgb, var(--app-accent) 22%, transparent);
+  outline-offset: 1px;
+}
+
+.settings-fieldset {
+  border: 0;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.settings-fieldset legend {
+  color: var(--app-text);
+  font-size: 0.92rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.toggle-row,
+.settings-checkbox {
+  align-items: center;
+  background: var(--app-surface-strong);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  color: var(--app-text);
+  display: flex;
+  gap: 10px;
+  min-height: 42px;
+  padding: 9px 10px;
+}
+
+.toggle-row input,
+.settings-checkbox input {
+  accent-color: var(--app-accent);
+}
+
+.segmented-control {
+  background: var(--app-surface-strong);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 3px;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  padding: 3px;
+}
+
+.segmented-button {
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--app-muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+  min-height: 34px;
+  padding: 6px 8px;
+}
+
+.segmented-button:hover {
+  color: var(--app-text);
+}
+
+.segmented-button--active {
+  background: var(--app-surface);
+  color: var(--app-text);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--app-text) 8%, transparent);
 }
 
 .control-panel__header,
@@ -416,7 +579,7 @@ button:disabled {
   opacity: 0.86;
 }
 
-.pet-habitat--sad {
+.pet-habitat--dirty {
   filter: saturate(0.82);
 }
 
@@ -495,7 +658,7 @@ button:disabled {
 .action-panel {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-top: 24px;
 }
 
@@ -521,6 +684,10 @@ button:disabled {
 
 .action-button small {
   color: color-mix(in srgb, var(--app-accent-text) 82%, transparent);
+}
+
+.action-button:disabled {
+  opacity: 0.58;
 }
 
 .choice-list,
@@ -757,7 +924,7 @@ button:disabled {
   }
 
   .side-stack {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 }
 

@@ -39,7 +39,7 @@ const options: Array<{
         <PetAvatar
           :species="option.species"
           status="happy"
-          theme-id="default"
+          theme-id="system"
           :aria-label="`${messages.species[option.species].label} ${messages.status.aria.happy}`"
           compact
         />

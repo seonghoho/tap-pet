@@ -1,37 +1,53 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useHead } from '#app'
-import { DEFAULT_DISGUISE_TITLE_ID } from '~/constants/titles'
-import { DEFAULT_THEME_ID } from '~/constants/themes'
+import { DEFAULT_SETTINGS } from '~/constants/pet'
 import type { AppLocale } from '~/types/i18n'
-import type { DisguiseTitleId, PetAction, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
+import type { PetAction, PetSettings, PetSpecies, PetStatus } from '~/types/pet'
 import { getTabPresentation } from '~/utils/tabPresentation'
-import { getThemeById } from '~/utils/theme'
+import { getThemeById, resolveThemeId } from '~/utils/theme'
 
 const pet = usePetStore()
 const { locale, messages, restoreLocale, setLocale } = useLocale()
+const prefersDark = ref(false)
+const isDocumentVisible = ref(true)
+
+let colorSchemeQuery: MediaQueryList | null = null
 
 onMounted(() => {
   restoreLocale()
   pet.restorePet()
+  isDocumentVisible.value = document.visibilityState === 'visible'
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+
+  colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  prefersDark.value = colorSchemeQuery.matches
+  colorSchemeQuery.addEventListener('change', handleColorSchemeChange)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
+  colorSchemeQuery?.removeEventListener('change', handleColorSchemeChange)
+  colorSchemeQuery = null
 })
 
 const currentPet = computed(() => pet.petState.value)
 const effectiveStatus = computed<PetStatus>(() => pet.petStatus.value ?? 'happy')
-const effectiveTitleId = computed<DisguiseTitleId>(
-  () => currentPet.value?.disguiseTitleId ?? pet.draftDisguiseTitleId.value ?? DEFAULT_DISGUISE_TITLE_ID,
-)
-const effectiveThemeId = computed<ThemeId>(
-  () => currentPet.value?.themeId ?? pet.draftThemeId.value ?? DEFAULT_THEME_ID,
-)
-const activeTheme = computed(() => getThemeById(effectiveThemeId.value))
+const effectiveSettings = computed<PetSettings>(() => currentPet.value?.settings ?? {
+  ...DEFAULT_SETTINGS,
+  disguiseTitleId: pet.draftDisguiseTitleId.value,
+  themeId: pet.draftThemeId.value,
+})
+const resolvedThemeId = computed(() => resolveThemeId(effectiveSettings.value.themeId, prefersDark.value))
+const activeTheme = computed(() => getThemeById(resolvedThemeId.value))
 const tabPresentation = computed(() =>
   getTabPresentation({
     species: currentPet.value?.species,
     status: effectiveStatus.value,
-    disguiseTitleId: effectiveTitleId.value,
-    themeId: effectiveThemeId.value,
+    settings: effectiveSettings.value,
+    themeId: resolvedThemeId.value,
     locale: locale.value,
+    isDocumentVisible: isDocumentVisible.value,
   }),
 )
 const themeStyle = computed<Record<string, string>>(() => {
@@ -51,7 +67,11 @@ const themeStyle = computed<Record<string, string>>(() => {
   }
 })
 
-useTabTitle(computed(() => tabPresentation.value.title))
+useTabTitle({
+  title: computed(() => tabPresentation.value.title),
+  animationEnabled: computed(() => effectiveSettings.value.titleAnimationEnabled),
+  isDocumentVisible,
+})
 useFavicon(computed(() => tabPresentation.value.faviconSvg))
 useHead(() => ({
   htmlAttrs: {
@@ -67,16 +87,16 @@ function handleAction(action: PetAction): void {
   pet.performAction(action)
 }
 
-function handleTitleSelect(titleId: DisguiseTitleId): void {
-  pet.setDisguiseTitle(titleId)
-}
-
-function handleThemeSelect(themeId: ThemeId): void {
-  pet.setTheme(themeId)
-}
-
 function handleLocaleSelect(nextLocale: AppLocale): void {
   setLocale(nextLocale)
+}
+
+function handleVisibilityChange(): void {
+  isDocumentVisible.value = document.visibilityState === 'visible'
+}
+
+function handleColorSchemeChange(event: MediaQueryListEvent): void {
+  prefersDark.value = event.matches
 }
 </script>
 
@@ -130,24 +150,37 @@ function handleLocaleSelect(nextLocale: AppLocale): void {
             :species="currentPet.species"
             :stats="currentPet.stats"
             :status="effectiveStatus"
-            :theme-id="currentPet.themeId"
+            :theme-id="resolvedThemeId"
+            :active-reaction="pet.activeReaction.value"
           />
-          <PetActions @action="handleAction" />
+          <PetActions
+            :cooldowns="pet.actionCooldowns.value"
+            :active-reaction="pet.activeReaction.value"
+            @action="handleAction"
+          />
         </template>
       </section>
 
       <aside class="side-stack" :aria-label="messages.app.settingsLabel">
-        <DisguiseTitlePicker
-          :selected-id="effectiveTitleId"
-          @select="handleTitleSelect"
+        <PetSidePanel
+          v-if="currentPet && pet.levelProgress.value && pet.affinityProgress.value"
+          :mode="pet.sidePanelMode.value"
+          :species="currentPet.species"
+          :name="currentPet.name"
+          :status="effectiveStatus"
+          :stats="currentPet.stats"
+          :level="currentPet.growth.level"
+          :level-progress="pet.levelProgress.value"
+          :affinity-progress="pet.affinityProgress.value"
+          :settings="currentPet.settings"
+          :status-theme-id="resolvedThemeId"
+          :active-reaction="pet.activeReaction.value"
+          @set-mode="pet.setSidePanelMode"
+          @update-name="pet.updatePetName"
+          @update-settings="pet.updatePetSettings"
         />
-        <ThemePicker
-          :selected-id="effectiveThemeId"
-          @select="handleThemeSelect"
-        />
-        <GuidePanel />
-        <MonetizationMock />
-        <EmojiCopyPanel />
+        <GuidePanel v-if="currentPet" />
+        <MonetizationMock v-if="currentPet" />
       </aside>
     </main>
 
