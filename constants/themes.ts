@@ -13,6 +13,8 @@ const LIGHT_THEME_COLORS: PetTheme['colors'] = {
   accentText: '#ffffff',
   warning: '#b45309',
   success: '#047857',
+  statFillStart: '#7daee8',
+  statFillEnd: '#74c6a3',
   petBase: '#f3b15f',
   petContrast: '#2f241b',
 }
@@ -38,6 +40,8 @@ const DARK_THEME_COLORS: PetTheme['colors'] = {
   accentText: '#07131d',
   warning: '#f59e0b',
   success: '#34d399',
+  statFillStart: '#38bdf8',
+  statFillEnd: '#34d399',
   petBase: '#f3b15f',
   petContrast: '#2f241b',
 }

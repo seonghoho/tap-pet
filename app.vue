@@ -64,6 +64,8 @@ const themeStyle = computed<Record<string, string>>(() => {
     '--app-accent-text': colors.accentText,
     '--app-warning': colors.warning,
     '--app-success': colors.success,
+    '--app-stat-fill-start': colors.statFillStart,
+    '--app-stat-fill-end': colors.statFillEnd,
   }
 })
 

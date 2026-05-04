@@ -75,6 +75,10 @@ function readComponentTemplate(componentPath: string): string {
   return descriptor.template?.content ?? ''
 }
 
+function readSource(sourcePath: string): string {
+  return readFileSync(resolve(sourcePath), 'utf8')
+}
+
 function getComponentPropExpression(template: string, componentName: string, propName: string): string | undefined {
   const match = template.match(new RegExp(`<${componentName}[\\s\\S]*?/>`))
 
@@ -96,6 +100,17 @@ describe('pet side panel progress summary', () => {
     expect(getComponentPropExpression(template, 'PetSidePanel', 'stats')).toBeUndefined()
     expect(getComponentPropExpression(template, 'PetSidePanel', 'status-theme-id')).toBeUndefined()
     expect(getComponentPropExpression(template, 'PetSidePanel', 'level-progress')).toBe('pet.levelProgress.value')
+  })
+
+  it('uses softer dedicated gauge colors instead of the primary action colors', () => {
+    const appSource = readSource('app.vue')
+    const css = readSource('assets/css/main.css')
+
+    expect(appSource).toContain("'--app-stat-fill-start': colors.statFillStart")
+    expect(appSource).toContain("'--app-stat-fill-end': colors.statFillEnd")
+    expect(css).toContain('var(--app-stat-fill-start)')
+    expect(css).toContain('var(--app-stat-fill-end)')
+    expect(css).not.toContain('linear-gradient(90deg, var(--app-accent), var(--app-success))')
   })
 })
 

@@ -92,6 +92,8 @@ export type PetTheme = {
     accentText: string
     warning: string
     success: string
+    statFillStart: string
+    statFillEnd: string
     petBase: string
     petContrast: string
   }
