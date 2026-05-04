@@ -9,6 +9,7 @@ export const STAT_MAX = 100
 export const DEFAULT_PET_NAMES = {
   cat: '몽이',
   dog: '초코',
+  hedgehog: '밤이',
 } as const
 
 export const DEFAULT_STATS: PetStats = {

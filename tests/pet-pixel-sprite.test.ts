@@ -4,7 +4,7 @@ import type { PetSpecies, PetStatus } from '~/types/pet'
 import { getFaviconSvg } from '~/utils/tabPresentation'
 import { getPetPixelSpriteCells, renderPetPixelSpriteSvg } from '~/utils/petPixelSprite'
 
-const SPECIES: PetSpecies[] = ['cat', 'dog']
+const SPECIES: PetSpecies[] = ['cat', 'dog', 'hedgehog']
 const STATUSES: PetStatus[] = ['fine', 'hungry', 'sleepy', 'dirty', 'bored', 'happy', 'excited']
 
 describe('pet pixel sprite', () => {
@@ -57,6 +57,24 @@ describe('pet pixel sprite', () => {
     expect(Math.max(...catTailCells.map((cell) => cell.x + cell.width))).toBeGreaterThanOrEqual(21)
     expect(Math.max(...dogEarCells.map((cell) => cell.y + cell.height))).toBeGreaterThanOrEqual(15)
     expect(dogMuzzleCells.length).toBeGreaterThan(0)
+  })
+
+  it('keeps hedgehog identity readable with a spiky side silhouette', () => {
+    const hedgehogCells = getPetPixelSpriteCells({
+      species: 'hedgehog',
+      status: 'happy',
+    })
+    const backSpikeCells = hedgehogCells.filter(
+      (cell) => cell.role === 'spine' && cell.color === 'outline',
+    )
+    const muzzleCells = hedgehogCells.filter((cell) => cell.role === 'muzzle')
+    const tailCells = hedgehogCells.filter((cell) => cell.role === 'tail')
+
+    expect(backSpikeCells.length).toBeGreaterThanOrEqual(3)
+    expect(Math.min(...backSpikeCells.map((cell) => cell.y))).toBeLessThanOrEqual(6)
+    expect(muzzleCells.length).toBeGreaterThan(0)
+    expect(Math.max(...muzzleCells.map((cell) => cell.x + cell.width))).toBeGreaterThanOrEqual(20)
+    expect(tailCells.length).toBeGreaterThan(0)
   })
 
   it('gives the cat a softer cat-specific silhouette instead of a dog-like face', () => {

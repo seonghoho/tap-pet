@@ -49,6 +49,10 @@ export const I18N_MESSAGES = {
         label: 'Dog',
         description: 'Warm signals and more obvious energy shifts.',
       },
+      hedgehog: {
+        label: 'Hedgehog',
+        description: 'Small signals and careful tab status changes.',
+      },
     },
     status: {
       labels: {
@@ -228,6 +232,10 @@ export const I18N_MESSAGES = {
         label: '강아지',
         description: '따뜻한 신호와 더 분명한 에너지 변화.',
       },
+      hedgehog: {
+        label: '고슴도치',
+        description: '작은 신호와 더 신중한 탭 상태 변화.',
+      },
     },
     status: {
       labels: {
@@ -406,6 +414,10 @@ export const I18N_MESSAGES = {
       dog: {
         label: '犬',
         description: '温かい合図と、より分かりやすいエネルギー変化。',
+      },
+      hedgehog: {
+        label: 'ハリネズミ',
+        description: '小さな合図と、より慎重なタブ状態の変化。',
       },
     },
     status: {

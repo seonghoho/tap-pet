@@ -83,6 +83,14 @@ describe('pet storage validation', () => {
     })
   })
 
+  it('round-trips a hedgehog pet state', () => {
+    const state = createInitialPetState('hedgehog', 1000)
+    const stored = toStoredPetState(state, PET_STORAGE_VERSION)
+
+    expect(parseStoredPetState(stored, 2000)).toEqual(state)
+    expect(state.name).toBe('밤이')
+  })
+
   it('preserves valid new theme ids when migrating v1 state', () => {
     const migrated = parseStoredPetState(
       {

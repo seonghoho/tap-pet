@@ -22,7 +22,7 @@ import type {
 import { normalizeActionLimit } from '~/utils/petActionLimit'
 import { normalizeGrowth } from '~/utils/petGrowth'
 
-const PET_SPECIES = ['cat', 'dog'] as const
+const PET_SPECIES = ['cat', 'dog', 'hedgehog'] as const
 
 export function clampStat(value: number): number {
   if (!Number.isFinite(value)) return STAT_MIN

@@ -1,6 +1,6 @@
 import type { AppLocale } from '~/types/i18n'
 
-export type PetSpecies = 'cat' | 'dog'
+export type PetSpecies = 'cat' | 'dog' | 'hedgehog'
 
 export type PetNeedStatus = 'fine' | 'hungry' | 'sleepy' | 'dirty' | 'bored'
 export type PetDisplayStatus = PetNeedStatus | 'happy' | 'excited'

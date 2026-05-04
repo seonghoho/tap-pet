@@ -15,6 +15,9 @@ const options: Array<{
   {
     species: 'dog',
   },
+  {
+    species: 'hedgehog',
+  },
 ]
 </script>
 
