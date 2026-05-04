@@ -13,6 +13,7 @@ type AdSenseDisplaySetup = {
   adWasRequested: { value: boolean }
   canRequestAd: { value: boolean }
   pushAdRequest: () => void
+  requestAd: () => void
 }
 
 const requireModule = createRequire(import.meta.url)
@@ -65,7 +66,15 @@ describe('adsense display configuration', () => {
     expect(nuxtConfig).toContain('NUXT_PUBLIC_ADSENSE_CLIENT')
     expect(nuxtConfig).toContain('ca-pub-6884620250599904')
     expect(nuxtConfig).toContain('NUXT_PUBLIC_ADSENSE_SIDEBAR_SLOT')
+    expect(nuxtConfig).toContain('2040518208')
     expect(nuxtConfig).toContain('NUXT_PUBLIC_ADSENSE_ENABLED')
+  })
+
+  it('does not inject AdSense script through Nuxt head attributes', () => {
+    const appSource = readSource('app.vue')
+
+    expect(appSource).not.toContain('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
+    expect(appSource).not.toContain("key: 'adsense'")
   })
 
   it('places the display ad in the side stack instead of the monetization mock', () => {
@@ -87,8 +96,26 @@ describe('AdSenseDisplay', () => {
 
   it('pushes one ad request when enabled with a client and slot', () => {
     const adsbygoogle: unknown[] = []
-    vi.stubGlobal('window', { adsbygoogle })
+    const appendedScripts: HTMLScriptElement[] = []
+    const existingScripts = new Map<string, HTMLScriptElement>()
     const component = loadScriptSetupComponent<AdSenseDisplaySetup>('components/AdSenseDisplay.vue')
+    vi.stubGlobal('window', { adsbygoogle })
+    vi.stubGlobal('document', {
+      createElement: (tagName: string) => {
+        expect(tagName).toBe('script')
+
+        return { dataset: {} } as HTMLScriptElement
+      },
+      getElementById: (id: string) => existingScripts.get(id) ?? null,
+      head: {
+        appendChild: (script: HTMLScriptElement) => {
+          appendedScripts.push(script)
+          existingScripts.set(script.id, script)
+
+          return script
+        },
+      },
+    })
     const setup = component.setup(
       {
         client: 'ca-pub-6884620250599904',
@@ -100,10 +127,18 @@ describe('AdSenseDisplay', () => {
 
     expect(setup.canRequestAd.value).toBe(true)
 
-    setup.pushAdRequest()
-    setup.pushAdRequest()
+    setup.requestAd()
+    setup.requestAd()
 
     expect(adsbygoogle).toHaveLength(1)
+    expect(appendedScripts).toHaveLength(1)
+    expect(appendedScripts[0].id).toBe('adsense-script-ca-pub-6884620250599904')
+    expect(appendedScripts[0].async).toBe(true)
+    expect(appendedScripts[0].crossOrigin).toBe('anonymous')
+    expect(appendedScripts[0].src).toBe(
+      'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6884620250599904',
+    )
+    expect(appendedScripts[0].dataset).not.toHaveProperty('hid')
     expect(setup.adWasRequested.value).toBe(true)
   })
 
