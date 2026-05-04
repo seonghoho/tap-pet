@@ -87,16 +87,6 @@ useHead(() => ({
   htmlAttrs: {
     lang: locale.value,
   },
-  script: adsenseEnabled.value && adsenseClient.value
-    ? [
-        {
-          async: true,
-          crossorigin: 'anonymous',
-          key: 'adsense',
-          src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient.value}`,
-        },
-      ]
-    : [],
 }))
 
 function handleSpeciesSelect(species: PetSpecies): void {

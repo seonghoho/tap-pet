@@ -22,7 +22,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       adsenseClient: process.env.NUXT_PUBLIC_ADSENSE_CLIENT ?? 'ca-pub-6884620250599904',
-      adsenseSidebarSlot: process.env.NUXT_PUBLIC_ADSENSE_SIDEBAR_SLOT ?? '',
+      adsenseSidebarSlot: process.env.NUXT_PUBLIC_ADSENSE_SIDEBAR_SLOT ?? '2040518208',
       adsenseEnabled: process.env.NUXT_PUBLIC_ADSENSE_ENABLED === 'true',
     },
   },
