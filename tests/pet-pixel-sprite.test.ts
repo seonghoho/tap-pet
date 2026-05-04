@@ -59,6 +59,34 @@ describe('pet pixel sprite', () => {
     expect(dogMuzzleCells.length).toBeGreaterThan(0)
   })
 
+  it('gives the cat a softer cat-specific silhouette instead of a dog-like face', () => {
+    const catCells = getPetPixelSpriteCells({ species: 'cat', status: 'happy' })
+    const catHeadCells = catCells.filter((cell) => cell.role === 'head')
+    const catTailCells = catCells.filter((cell) => cell.role === 'tail')
+    const catInnerEarCells = catCells.filter(
+      (cell) => cell.role === 'ear' && cell.color === 'cheek',
+    )
+    const catFaceCells = catCells.filter(
+      (cell) => cell.role === 'face' && cell.color === 'contrast',
+    )
+    const headLeft = Math.min(...catHeadCells.map((cell) => cell.x))
+    const headRight = Math.max(...catHeadCells.map((cell) => cell.x + cell.width))
+
+    expect(headRight - headLeft).toBeGreaterThanOrEqual(18)
+    expect(catInnerEarCells.length).toBeGreaterThan(0)
+    expect(Math.min(...catTailCells.map((cell) => cell.y))).toBeGreaterThanOrEqual(13)
+    expect(catFaceCells).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ x: 10, y: 14, width: 1 }),
+        expect.objectContaining({ x: 11, y: 15, width: 1 }),
+        expect.objectContaining({ x: 12, y: 14, width: 1 }),
+        expect.objectContaining({ x: 13, y: 15, width: 1 }),
+        expect.objectContaining({ x: 14, y: 14, width: 1 }),
+      ]),
+    )
+    expect(catFaceCells.some((cell) => cell.y === 15 && cell.width > 1)).toBe(false)
+  })
+
   it('keeps every sprite inside a readable 24px full-body silhouette', () => {
     for (const species of SPECIES) {
       for (const status of STATUSES) {
