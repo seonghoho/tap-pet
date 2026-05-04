@@ -70,6 +70,16 @@ describe('adsense display configuration', () => {
     expect(nuxtConfig).toContain('NUXT_PUBLIC_ADSENSE_ENABLED')
   })
 
+  it('places the AdSense publisher script in the Nuxt head config', () => {
+    const nuxtConfig = readSource('nuxt.config.ts')
+
+    expect(nuxtConfig).toContain('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
+    expect(nuxtConfig).toContain('client=ca-pub-6884620250599904')
+    expect(nuxtConfig).toContain("crossorigin: 'anonymous'")
+    expect(nuxtConfig).not.toContain("key: 'adsense'")
+    expect(nuxtConfig).not.toContain('data-hid')
+  })
+
   it('does not inject AdSense script through Nuxt head attributes', () => {
     const appSource = readSource('app.vue')
 
@@ -87,6 +97,12 @@ describe('adsense display configuration', () => {
     expect(appTemplate).toContain(':slot="adsenseSidebarSlot"')
     expect(appTemplate).toContain(':enabled="adsenseEnabled"')
   })
+
+  it('publishes an ads.txt file for the AdSense publisher ID', () => {
+    const adsTxt = readSource('public/ads.txt')
+
+    expect(adsTxt.trim()).toBe('google.com, pub-6884620250599904, DIRECT, f08c47fec0942fa0')
+  })
 })
 
 describe('AdSenseDisplay', () => {
@@ -96,26 +112,8 @@ describe('AdSenseDisplay', () => {
 
   it('pushes one ad request when enabled with a client and slot', () => {
     const adsbygoogle: unknown[] = []
-    const appendedScripts: HTMLScriptElement[] = []
-    const existingScripts = new Map<string, HTMLScriptElement>()
     const component = loadScriptSetupComponent<AdSenseDisplaySetup>('components/AdSenseDisplay.vue')
     vi.stubGlobal('window', { adsbygoogle })
-    vi.stubGlobal('document', {
-      createElement: (tagName: string) => {
-        expect(tagName).toBe('script')
-
-        return { dataset: {} } as HTMLScriptElement
-      },
-      getElementById: (id: string) => existingScripts.get(id) ?? null,
-      head: {
-        appendChild: (script: HTMLScriptElement) => {
-          appendedScripts.push(script)
-          existingScripts.set(script.id, script)
-
-          return script
-        },
-      },
-    })
     const setup = component.setup(
       {
         client: 'ca-pub-6884620250599904',
@@ -131,14 +129,6 @@ describe('AdSenseDisplay', () => {
     setup.requestAd()
 
     expect(adsbygoogle).toHaveLength(1)
-    expect(appendedScripts).toHaveLength(1)
-    expect(appendedScripts[0].id).toBe('adsense-script-ca-pub-6884620250599904')
-    expect(appendedScripts[0].async).toBe(true)
-    expect(appendedScripts[0].crossOrigin).toBe('anonymous')
-    expect(appendedScripts[0].src).toBe(
-      'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6884620250599904',
-    )
-    expect(appendedScripts[0].dataset).not.toHaveProperty('hid')
     expect(setup.adWasRequested.value).toBe(true)
   })
 

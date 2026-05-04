@@ -14,6 +14,15 @@ export default defineNuxtConfig({
           content: 'A browser-tab pet MVP that reacts through title and favicon.',
         },
       ],
+      script: process.env.NUXT_PUBLIC_ADSENSE_ENABLED === 'true'
+        ? [
+            {
+              async: true,
+              crossorigin: 'anonymous',
+              src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6884620250599904',
+            },
+          ]
+        : [],
     },
   },
   typescript: {
