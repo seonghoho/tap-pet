@@ -18,7 +18,6 @@ const props = withDefaults(defineProps<{
 
 const adWasRequested = ref(false)
 const canRequestAd = computed(() => props.enabled && props.client.length > 0 && props.slot.length > 0)
-const scriptId = computed(() => `adsense-script-${props.client}`)
 
 onMounted(() => {
   void nextTick(requestAd)
@@ -29,19 +28,6 @@ watch(canRequestAd, (isReady) => {
 
   void nextTick(requestAd)
 })
-
-function ensureAdSenseScript(): void {
-  if (!canRequestAd.value || typeof document === 'undefined') return
-  if (document.getElementById(scriptId.value)) return
-
-  const script = document.createElement('script')
-  script.id = scriptId.value
-  script.async = true
-  script.crossOrigin = 'anonymous'
-  script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${props.client}`
-
-  document.head.appendChild(script)
-}
 
 function getAdQueue(): unknown[] | null {
   if (typeof window === 'undefined') return null
@@ -66,7 +52,6 @@ function pushAdRequest(): void {
 }
 
 function requestAd(): void {
-  ensureAdSenseScript()
   pushAdRequest()
 }
 </script>
