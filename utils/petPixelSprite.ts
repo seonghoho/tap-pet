@@ -9,6 +9,8 @@ export type PetPixelRole =
   | 'ear'
   | 'face'
   | 'foot'
+  | 'head'
+  | 'muzzle'
   | 'outline'
   | 'shade'
   | 'tail'
@@ -91,65 +93,59 @@ export function renderPetPixelSpriteSvg(input: {
 
 function getCatSpriteBase(): PetPixelCell[] {
   return [
-    cell(20, 11, 2, 4, 'outline', 'tail'),
-    cell(18, 14, 4, 2, 'outline', 'tail'),
-    cell(19, 10, 2, 2, 'outline', 'tail'),
-    cell(20, 12, 1, 3, 'body', 'tail'),
-    cell(18, 14, 3, 1, 'body', 'tail'),
-    cell(19, 10, 1, 1, 'shade', 'tail'),
+    cell(19, 12, 3, 6, 'outline', 'tail'),
+    cell(20, 13, 1, 4, 'body', 'tail'),
+    cell(18, 15, 4, 2, 'outline', 'tail'),
+    cell(18, 15, 3, 1, 'body', 'tail'),
+    cell(20, 11, 2, 2, 'outline', 'tail'),
+    cell(20, 11, 1, 1, 'body', 'tail'),
 
-    cell(6, 12, 12, 8, 'outline', 'body'),
-    cell(5, 14, 14, 5, 'outline', 'body'),
-    cell(7, 13, 10, 6, 'body', 'body'),
-    cell(6, 15, 12, 3, 'body', 'body'),
-    cell(7, 18, 10, 1, 'shade', 'shade'),
+    cell(8, 17, 8, 3, 'outline', 'body'),
+    cell(9, 17, 6, 2, 'body', 'body'),
+    cell(9, 18, 6, 1, 'shade', 'shade'),
 
     cell(6, 20, 5, 2, 'outline', 'foot'),
-    cell(13, 20, 5, 2, 'outline', 'foot'),
+    cell(14, 20, 5, 2, 'outline', 'foot'),
     cell(7, 20, 3, 1, 'body', 'foot'),
-    cell(14, 20, 3, 1, 'body', 'foot'),
+    cell(15, 20, 3, 1, 'body', 'foot'),
 
-    cell(6, 3, 3, 5, 'outline', 'ear'),
-    cell(15, 3, 3, 5, 'outline', 'ear'),
-    cell(7, 4, 1, 3, 'body', 'ear'),
-    cell(16, 4, 1, 3, 'body', 'ear'),
-    cell(8, 5, 1, 2, 'shade', 'ear'),
-    cell(15, 5, 1, 2, 'shade', 'ear'),
+    cell(5, 3, 5, 6, 'outline', 'ear'),
+    cell(14, 3, 5, 6, 'outline', 'ear'),
+    cell(6, 4, 3, 4, 'body', 'ear'),
+    cell(15, 4, 3, 4, 'body', 'ear'),
+    cell(7, 5, 2, 3, 'shade', 'ear'),
+    cell(15, 5, 2, 3, 'shade', 'ear'),
 
-    cell(5, 7, 14, 8, 'outline', 'outline'),
-    cell(6, 5, 12, 4, 'outline', 'outline'),
-    cell(6, 8, 12, 7, 'body', 'body'),
-    cell(7, 6, 10, 3, 'body', 'body'),
-    cell(6, 13, 12, 2, 'shade', 'shade'),
+    cell(4, 8, 16, 9, 'outline', 'head'),
+    cell(5, 7, 14, 2, 'outline', 'head'),
+    cell(5, 8, 14, 8, 'body', 'head'),
+    cell(6, 7, 12, 2, 'body', 'head'),
+    cell(6, 14, 12, 2, 'shade', 'head'),
   ]
 }
 
 function getDogSpriteBase(): PetPixelCell[] {
   return [
-    cell(19, 14, 3, 2, 'outline', 'tail'),
-    cell(19, 14, 2, 1, 'body', 'tail'),
+    cell(18, 15, 4, 2, 'outline', 'tail'),
+    cell(19, 15, 2, 1, 'body', 'tail'),
 
-    cell(6, 12, 12, 8, 'outline', 'body'),
-    cell(5, 14, 14, 5, 'outline', 'body'),
-    cell(7, 13, 10, 6, 'body', 'body'),
-    cell(6, 15, 12, 3, 'body', 'body'),
-    cell(7, 18, 10, 1, 'shade', 'shade'),
+    cell(8, 17, 8, 3, 'outline', 'body'),
+    cell(9, 17, 6, 2, 'body', 'body'),
+    cell(9, 18, 6, 1, 'shade', 'shade'),
 
     cell(6, 20, 5, 2, 'outline', 'foot'),
-    cell(13, 20, 5, 2, 'outline', 'foot'),
+    cell(14, 20, 5, 2, 'outline', 'foot'),
     cell(7, 20, 3, 1, 'body', 'foot'),
-    cell(14, 20, 3, 1, 'body', 'foot'),
+    cell(15, 20, 3, 1, 'body', 'foot'),
 
-    cell(4, 7, 4, 8, 'outline', 'ear'),
-    cell(16, 7, 4, 8, 'outline', 'ear'),
-    cell(5, 8, 2, 6, 'shade', 'ear'),
-    cell(17, 8, 2, 6, 'shade', 'ear'),
+    cell(3, 7, 5, 9, 'outline', 'ear'),
+    cell(16, 7, 5, 9, 'outline', 'ear'),
+    cell(4, 8, 3, 7, 'shade', 'ear'),
+    cell(17, 8, 3, 7, 'shade', 'ear'),
 
-    cell(6, 6, 12, 9, 'outline', 'outline'),
-    cell(7, 5, 10, 3, 'outline', 'outline'),
-    cell(7, 7, 10, 8, 'body', 'body'),
-    cell(8, 6, 8, 3, 'body', 'body'),
-    cell(8, 12, 8, 3, 'shade', 'shade'),
+    cell(5, 6, 14, 11, 'outline', 'head'),
+    cell(6, 7, 12, 10, 'body', 'head'),
+    cell(8, 12, 8, 4, 'shade', 'muzzle'),
   ]
 }
 

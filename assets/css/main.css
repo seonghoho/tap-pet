@@ -573,8 +573,490 @@ button:disabled {
   filter: saturate(0.82);
 }
 
+.pet-habitat__reaction {
+  pointer-events: none;
+  position: absolute;
+  z-index: 3;
+}
+
+.pet-habitat__reaction--feed {
+  bottom: 38px;
+  display: block;
+  height: 30px;
+  left: calc(13% + 8px);
+  width: 46px;
+}
+
+.pet-habitat__food {
+  background: #8b5a2b;
+  border: 1px solid color-mix(in srgb, var(--app-text) 22%, transparent);
+  border-radius: 3px;
+  height: 8px;
+  position: absolute;
+  width: 8px;
+}
+
+.pet-habitat__food--one {
+  animation: habitat-food-pop 620ms ease-in-out infinite;
+  left: 4px;
+  top: 15px;
+}
+
+.pet-habitat__food--two {
+  animation: habitat-food-pop 620ms 120ms ease-in-out infinite;
+  left: 18px;
+  top: 8px;
+}
+
+.pet-habitat__food--three {
+  animation: habitat-food-pop 620ms 240ms ease-in-out infinite;
+  left: 31px;
+  top: 16px;
+}
+
+.pet-habitat__reaction--play-dog {
+  height: 54px;
+  left: 12%;
+  top: 53%;
+  width: 196px;
+}
+
+.pet-habitat__play-ball {
+  animation: habitat-play-roll 1260ms linear infinite;
+  background:
+    linear-gradient(90deg, transparent 44%, var(--app-surface) 44% 56%, transparent 56%),
+    linear-gradient(180deg, transparent 44%, var(--app-surface) 44% 56%, transparent 56%),
+    var(--habitat-accent);
+  border: 2px solid color-mix(in srgb, var(--app-text) 48%, transparent);
+  border-radius: 999px;
+  height: 18px;
+  position: absolute;
+  width: 18px;
+}
+
+.pet-habitat__play-trail {
+  animation: habitat-play-trail 1260ms ease-in-out infinite;
+  background: color-mix(in srgb, var(--habitat-accent) 58%, transparent);
+  border-radius: 999px;
+  height: 4px;
+  position: absolute;
+  top: 35px;
+  width: 12px;
+}
+
+.pet-habitat__play-trail--one {
+  left: 34px;
+}
+
+.pet-habitat__play-trail--two {
+  animation-delay: 120ms;
+  left: 76px;
+  width: 18px;
+}
+
+.pet-habitat__reaction--play-cat {
+  height: 104px;
+  left: 17%;
+  top: 12%;
+  width: 192px;
+}
+
+.pet-habitat__play-string {
+  animation: habitat-play-teaser 1140ms ease-in-out infinite;
+  background: color-mix(in srgb, var(--app-text) 38%, transparent);
+  height: 78px;
+  left: 94px;
+  position: absolute;
+  top: 0;
+  transform-origin: top center;
+  width: 2px;
+}
+
+.pet-habitat__play-mouse {
+  animation: habitat-play-mouse 760ms ease-in-out infinite;
+  background: #8b5a2b;
+  border: 1px solid color-mix(in srgb, var(--app-text) 38%, transparent);
+  border-radius: 12px 12px 10px 10px;
+  height: 16px;
+  position: absolute;
+  transform-origin: center;
+  width: 28px;
+}
+
+.pet-habitat__play-string .pet-habitat__play-mouse {
+  left: -13px;
+  top: 68px;
+}
+
+.pet-habitat__play-mouse-ear {
+  background: #c9a66b;
+  border-radius: 999px;
+  height: 7px;
+  position: absolute;
+  top: -4px;
+  width: 7px;
+}
+
+.pet-habitat__play-mouse-ear--left {
+  left: 4px;
+}
+
+.pet-habitat__play-mouse-ear--right {
+  right: 4px;
+}
+
+.pet-habitat__play-mouse-tail {
+  background: color-mix(in srgb, #8b5a2b 80%, var(--app-text));
+  border-radius: 999px;
+  height: 2px;
+  position: absolute;
+  right: -11px;
+  top: 9px;
+  transform: rotate(-18deg);
+  width: 13px;
+}
+
+.pet-habitat__reaction--sleep {
+  height: 58px;
+  right: 16%;
+  top: 27%;
+  width: 58px;
+}
+
+.pet-habitat__sleep-mark {
+  color: color-mix(in srgb, var(--habitat-accent) 70%, var(--app-text));
+  font-size: 0.86rem;
+  font-weight: 900;
+  line-height: 1;
+  position: absolute;
+  text-shadow: 0 1px 0 var(--app-surface);
+}
+
+.pet-habitat__sleep-mark--one {
+  animation: habitat-sleep-float 1120ms ease-in-out infinite;
+  bottom: 8px;
+  left: 8px;
+}
+
+.pet-habitat__sleep-mark--two {
+  animation: habitat-sleep-float 1120ms 260ms ease-in-out infinite;
+  font-size: 1.05rem;
+  right: 10px;
+  top: 4px;
+}
+
+.pet-habitat__reaction--wash {
+  height: 90px;
+  left: 50%;
+  top: 38%;
+  transform: translateX(-50%);
+  width: 96px;
+}
+
+.pet-habitat__wash-bubble,
+.pet-habitat__wash-sparkle {
+  position: absolute;
+}
+
+.pet-habitat__wash-bubble {
+  animation: habitat-wash-bubble 960ms ease-in-out infinite;
+  background: color-mix(in srgb, var(--app-surface) 78%, var(--habitat-accent));
+  border: 1px solid color-mix(in srgb, var(--habitat-accent) 42%, var(--app-surface));
+  border-radius: 999px;
+  box-shadow: inset -2px -2px 0 color-mix(in srgb, var(--habitat-accent) 16%, transparent);
+  height: 16px;
+  width: 16px;
+}
+
+.pet-habitat__wash-bubble--one {
+  bottom: 10px;
+  left: 12px;
+}
+
+.pet-habitat__wash-bubble--two {
+  animation-delay: 160ms;
+  bottom: 28px;
+  height: 22px;
+  left: 38px;
+  width: 22px;
+}
+
+.pet-habitat__wash-bubble--three {
+  animation-delay: 320ms;
+  bottom: 8px;
+  right: 14px;
+}
+
+.pet-habitat__wash-sparkle {
+  animation: habitat-wash-sparkle 780ms ease-in-out infinite;
+  background: var(--app-surface);
+  height: 3px;
+  width: 14px;
+}
+
+.pet-habitat__wash-sparkle::after {
+  background: inherit;
+  content: "";
+  height: 14px;
+  left: 5px;
+  position: absolute;
+  top: -5px;
+  width: 3px;
+}
+
+.pet-habitat__wash-sparkle--one {
+  left: 20px;
+  top: 18px;
+}
+
+.pet-habitat__wash-sparkle--two {
+  animation-delay: 220ms;
+  right: 18px;
+  top: 34px;
+}
+
+.pet-habitat--reaction-feed .pet-habitat__pet {
+  left: 28%;
+  top: 61%;
+}
+
+.pet-habitat--reaction-feed .pet-avatar {
+  animation: habitat-feed-nod 520ms ease-in-out infinite;
+}
+
+.pet-habitat--reaction-play .pet-habitat__pet {
+  left: 62%;
+  top: 58%;
+}
+
+.pet-habitat--reaction-play .pet-avatar {
+  animation: habitat-play-hop 680ms ease-in-out infinite;
+}
+
+.pet-habitat--reaction-sleep .pet-habitat__pet {
+  left: 74%;
+  top: 65%;
+  opacity: 0.9;
+}
+
+.pet-habitat--reaction-sleep .pet-avatar {
+  animation: habitat-sleep-breathe 1320ms ease-in-out infinite;
+  transform: rotate(88deg);
+}
+
+.pet-habitat--reaction-wash .pet-habitat__pet {
+  left: 50%;
+  top: 59%;
+}
+
+.pet-habitat--reaction-wash .pet-avatar {
+  animation: habitat-wash-shake 560ms ease-in-out infinite;
+  filter:
+    drop-shadow(0 7px 10px color-mix(in srgb, var(--app-text) 18%, transparent))
+    saturate(1.12)
+    brightness(1.04);
+}
+
 .pet-habitat--bounce .pet-avatar {
   animation: habitat-bounce 720ms ease-in-out infinite;
+}
+
+@keyframes habitat-feed-nod {
+  0%,
+  100% {
+    rotate: 0deg;
+    translate: 0 0;
+  }
+
+  45% {
+    rotate: 5deg;
+    translate: -4px 6px;
+  }
+}
+
+@keyframes habitat-food-pop {
+  0%,
+  100% {
+    opacity: 0.7;
+    scale: 1;
+    translate: 0 0;
+  }
+
+  50% {
+    opacity: 1;
+    scale: 1.14;
+    translate: 0 -4px;
+  }
+}
+
+@keyframes habitat-play-hop {
+  0%,
+  100% {
+    rotate: 0deg;
+    translate: 0 0;
+  }
+
+  35% {
+    rotate: -5deg;
+    translate: -7px -9px;
+  }
+
+  68% {
+    rotate: 4deg;
+    translate: 8px -2px;
+  }
+}
+
+@keyframes habitat-play-roll {
+  0% {
+    rotate: 0deg;
+    translate: 0 30px;
+  }
+
+  36% {
+    rotate: 150deg;
+    translate: 54px 28px;
+  }
+
+  72% {
+    rotate: 300deg;
+    translate: 112px 31px;
+  }
+
+  100% {
+    rotate: 420deg;
+    translate: 154px 30px;
+  }
+}
+
+@keyframes habitat-play-trail {
+  0%,
+  28% {
+    opacity: 0;
+    scale: 0.7;
+  }
+
+  46%,
+  70% {
+    opacity: 0.75;
+    scale: 1;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 0.7;
+  }
+}
+
+@keyframes habitat-play-teaser {
+  0%,
+  100% {
+    rotate: -10deg;
+    translate: -5px 0;
+  }
+
+  50% {
+    rotate: 10deg;
+    translate: 5px 2px;
+  }
+}
+
+@keyframes habitat-play-mouse {
+  0%,
+  100% {
+    rotate: -7deg;
+    translate: 0 0;
+  }
+
+  50% {
+    rotate: 8deg;
+    translate: 0 2px;
+  }
+}
+
+@keyframes habitat-sleep-breathe {
+  0%,
+  100% {
+    scale: 1;
+    translate: 0 0;
+  }
+
+  50% {
+    scale: 0.96 1.03;
+    translate: 0 2px;
+  }
+}
+
+@keyframes habitat-sleep-float {
+  0% {
+    opacity: 0;
+    translate: 0 8px;
+  }
+
+  35%,
+  75% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    translate: 6px -10px;
+  }
+}
+
+@keyframes habitat-wash-shake {
+  0%,
+  100% {
+    rotate: 0deg;
+    translate: 0 0;
+  }
+
+  25% {
+    rotate: -4deg;
+    translate: -2px 1px;
+  }
+
+  50% {
+    rotate: 3deg;
+    translate: 2px -1px;
+  }
+
+  75% {
+    rotate: -2deg;
+    translate: -1px 1px;
+  }
+}
+
+@keyframes habitat-wash-bubble {
+  0% {
+    opacity: 0;
+    scale: 0.72;
+    translate: 0 12px;
+  }
+
+  35%,
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 1.12;
+    translate: 0 -22px;
+  }
+}
+
+@keyframes habitat-wash-sparkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    scale: 0.78;
+  }
+
+  50% {
+    opacity: 1;
+    scale: 1.08;
+  }
 }
 
 @keyframes habitat-bounce {
@@ -590,7 +1072,9 @@ button:disabled {
 
 @media (prefers-reduced-motion: reduce) {
   .pet-habitat__pet,
-  .pet-habitat__pet .pet-avatar {
+  .pet-habitat__pet .pet-avatar,
+  .pet-habitat__reaction,
+  .pet-habitat__reaction * {
     animation: none;
     transition: none;
   }
@@ -645,11 +1129,35 @@ button:disabled {
   transition: width 180ms ease;
 }
 
+.action-section {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.action-limit {
+  align-items: center;
+  background: var(--app-surface-strong);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  color: var(--app-muted);
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  min-height: 46px;
+  padding: 10px 12px;
+}
+
+.action-limit--locked {
+  background: color-mix(in srgb, var(--app-warning) 10%, var(--app-surface));
+  border-color: color-mix(in srgb, var(--app-warning) 42%, var(--app-border));
+  color: var(--app-text);
+}
+
 .action-panel {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: 24px;
 }
 
 .action-button {

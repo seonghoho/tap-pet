@@ -1,7 +1,7 @@
 import { computed, getCurrentInstance, onBeforeUnmount, onMounted, readonly } from 'vue'
 import type { Ref } from 'vue'
 import { useState } from '#app'
-import { ACTION_COOLDOWN_MS, DEFAULT_SETTINGS } from '~/constants/pet'
+import { ACTION_COOLDOWN_MS, ACTION_REACTION_HOLD_MS, DEFAULT_SETTINGS } from '~/constants/pet'
 import type {
   DisguiseTitleId,
   PetAction,
@@ -11,6 +11,11 @@ import type {
   ThemeId,
 } from '~/types/pet'
 import { applyCareAction } from '~/utils/petCare'
+import {
+  consumeActionLimitUse,
+  getActionLimitInfo,
+  grantRewardedActionUses,
+} from '~/utils/petActionLimit'
 import { createInitialPetState } from '~/utils/petFactory'
 import { getAffinityProgress, getLevelProgress } from '~/utils/petGrowth'
 import { getPetStatus } from '~/utils/petStatus'
@@ -22,7 +27,6 @@ type PetStoreOptions = {
   scheduleAction?: ActionScheduler
 }
 
-const ACTION_REACTION_DELAY_MS = 900
 const CLOCK_UPDATE_INTERVAL_MS = 1000 * 60
 
 let clockIntervalId: number | null = null
@@ -65,6 +69,18 @@ export function usePetStore(options: PetStoreOptions = {}) {
   const affinityProgress = computed(() =>
     petState.value ? getAffinityProgress(petState.value.growth.affinityExp) : null,
   )
+  const actionLimitInfo = computed(() => {
+    if (petState.value) return getActionLimitInfo(petState.value.actionLimit, now.value)
+
+    return getActionLimitInfo(
+      {
+        windowStartedAt: now.value,
+        used: 0,
+        bonusUses: 0,
+      },
+      now.value,
+    )
+  })
 
   function restorePet(): void {
     if (!import.meta.client || hasRestored.value) return
@@ -93,10 +109,17 @@ export function usePetStore(options: PetStoreOptions = {}) {
     if (!petState.value || isActionCoolingDown(action)) return
 
     const startedAt = Date.now()
+    const consumedLimit = consumeActionLimitUse(petState.value.actionLimit, startedAt)
+    if (!consumedLimit) return
+
     actionCooldowns.value = {
       ...actionCooldowns.value,
       [action]: startedAt + ACTION_COOLDOWN_MS[action],
     }
+    commitState({
+      ...petState.value,
+      actionLimit: consumedLimit,
+    })
     activeReaction.value = action
     const pendingGeneration = actionGeneration.value
     const actionRunId = latestActionRunId.value + 1
@@ -175,6 +198,15 @@ export function usePetStore(options: PetStoreOptions = {}) {
     updatePetSettings({ themeId })
   }
 
+  function grantRewardedAdActions(): void {
+    if (!petState.value) return
+
+    commitState({
+      ...petState.value,
+      actionLimit: grantRewardedActionUses(petState.value.actionLimit, Date.now()),
+    })
+  }
+
   function resetPet(): void {
     actionGeneration.value += 1
     latestActionRunId.value += 1
@@ -210,7 +242,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     }
 
     if (import.meta.client) {
-      window.setTimeout(callback, ACTION_REACTION_DELAY_MS)
+      window.setTimeout(callback, ACTION_REACTION_HOLD_MS)
       return
     }
 
@@ -225,6 +257,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     petStatus,
     levelProgress,
     affinityProgress,
+    actionLimitInfo,
     actionCooldowns: readonly(actionCooldowns),
     activeReaction: readonly(activeReaction),
     sidePanelMode: readonly(sidePanelMode),
@@ -238,6 +271,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     isActionCoolingDown,
     setDisguiseTitle,
     setTheme,
+    grantRewardedAdActions,
     resetPet,
   }
 }

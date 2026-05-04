@@ -28,9 +28,9 @@ const pixelPalette = computed(() =>
   getPetPixelPalette({
     body: baseColor.value,
     contrast: contrastColor.value,
-    accent: theme.value.colors.accent,
+    accent: theme.value.statusColors.excited,
     dirt: theme.value.colors.warning,
-    bubble: theme.value.colors.accent,
+    bubble: theme.value.statusColors.sleepy,
   }),
 )
 const pixelCells = computed(() =>

@@ -20,6 +20,7 @@ type PetSettingsPanelSetup = {
 
 type PetActionsSetup = {
   isActionDisabled: (action: PetAction) => boolean
+  isLimitReached: { value: boolean }
 }
 
 const requireModule = createRequire(import.meta.url)
@@ -226,6 +227,13 @@ describe('pet action controls', () => {
           wash: 0,
         },
         activeReaction: 'feed',
+        actionLimitInfo: {
+          used: 4,
+          limit: 5,
+          remaining: 1,
+          resetAt: 31 * 60 * 1000,
+          windowMs: 30 * 60 * 1000,
+        },
       },
       {
         emit: vi.fn(),
@@ -236,5 +244,40 @@ describe('pet action controls', () => {
     expect(setup.isActionDisabled('feed')).toBe(true)
     expect(setup.isActionDisabled('play')).toBe(false)
     expect(setup.isActionDisabled('sleep')).toBe(true)
+  })
+
+  it('disables care actions and emits ad reward requests when the action limit is reached', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1000)
+    vi.stubGlobal('useLocale', () => ({ messages: {} }))
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const component = loadScriptSetupComponent<PetActionsSetup>('components/PetActions.vue')
+
+    const setup = component.setup(
+      {
+        cooldowns: {
+          feed: 0,
+          play: 0,
+          sleep: 0,
+          wash: 0,
+        },
+        activeReaction: null,
+        actionLimitInfo: {
+          used: 5,
+          limit: 5,
+          remaining: 0,
+          resetAt: 31 * 60 * 1000,
+          windowMs: 30 * 60 * 1000,
+        },
+      },
+      {
+        emit: vi.fn(),
+        expose: vi.fn(),
+      },
+    )
+
+    expect(setup.isLimitReached.value).toBe(true)
+    expect(setup.isActionDisabled('feed')).toBe(true)
+    expect(setup.isActionDisabled('play')).toBe(true)
   })
 })
