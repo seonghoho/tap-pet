@@ -1342,6 +1342,44 @@ button:disabled {
   color: var(--app-warning);
 }
 
+.ad-panel {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  box-shadow: 0 14px 40px color-mix(in srgb, var(--app-text) 9%, transparent);
+  display: grid;
+  gap: 8px;
+  min-height: 290px;
+  padding: 12px;
+}
+
+.ad-panel__label {
+  color: var(--app-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.ad-panel__slot,
+.ad-panel__placeholder {
+  border-radius: 6px;
+  display: block;
+  min-height: 250px;
+  width: 100%;
+}
+
+.ad-panel__placeholder {
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      color-mix(in srgb, var(--app-border) 46%, transparent) 0 10px,
+      transparent 10px 20px
+    ),
+    var(--app-surface-strong);
+  border: 1px dashed var(--app-border);
+}
+
 .manual-copy-token {
   background: var(--app-surface-strong);
   border: 1px solid var(--app-border);

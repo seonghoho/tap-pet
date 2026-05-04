@@ -19,4 +19,11 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
   },
+  runtimeConfig: {
+    public: {
+      adsenseClient: process.env.NUXT_PUBLIC_ADSENSE_CLIENT ?? 'ca-pub-6884620250599904',
+      adsenseSidebarSlot: process.env.NUXT_PUBLIC_ADSENSE_SIDEBAR_SLOT ?? '',
+      adsenseEnabled: process.env.NUXT_PUBLIC_ADSENSE_ENABLED === 'true',
+    },
+  },
 })

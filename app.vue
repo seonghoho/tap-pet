@@ -9,6 +9,7 @@ import { getThemeById, resolveThemeId } from '~/utils/theme'
 
 const pet = usePetStore()
 const { locale, messages, restoreLocale, setLocale } = useLocale()
+const runtimeConfig = useRuntimeConfig()
 const prefersDark = ref(false)
 const isDocumentVisible = ref(true)
 
@@ -40,6 +41,13 @@ const effectiveSettings = computed<PetSettings>(() => currentPet.value?.settings
 })
 const resolvedThemeId = computed(() => resolveThemeId(effectiveSettings.value.themeId, prefersDark.value))
 const activeTheme = computed(() => getThemeById(resolvedThemeId.value))
+const adsenseClient = computed(() => String(runtimeConfig.public.adsenseClient || ''))
+const adsenseSidebarSlot = computed(() => String(runtimeConfig.public.adsenseSidebarSlot || ''))
+const adsenseConfigEnabled = computed(() => String(runtimeConfig.public.adsenseEnabled) === 'true')
+const adsenseEnabled = computed(() =>
+  adsenseConfigEnabled.value && adsenseClient.value.length > 0 && adsenseSidebarSlot.value.length > 0,
+)
+const shouldShowAdPlacement = computed(() => adsenseEnabled.value || import.meta.dev)
 const tabPresentation = computed(() =>
   getTabPresentation({
     species: currentPet.value?.species,
@@ -79,6 +87,16 @@ useHead(() => ({
   htmlAttrs: {
     lang: locale.value,
   },
+  script: adsenseEnabled.value && adsenseClient.value
+    ? [
+        {
+          async: true,
+          crossorigin: 'anonymous',
+          key: 'adsense',
+          src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient.value}`,
+        },
+      ]
+    : [],
 }))
 
 function handleSpeciesSelect(species: PetSpecies): void {
@@ -172,7 +190,12 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
           @reset="pet.resetPet"
         />
         <GuidePanel v-if="currentPet" />
-        <MonetizationMock v-if="currentPet" />
+        <AdSenseDisplay
+          v-if="currentPet && shouldShowAdPlacement"
+          :client="adsenseClient"
+          :slot="adsenseSidebarSlot"
+          :enabled="adsenseEnabled"
+        />
       </aside>
     </main>
 
