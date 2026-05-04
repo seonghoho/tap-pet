@@ -111,7 +111,7 @@ export const I18N_MESSAGES = {
     },
     settings: {
       statusTab: 'Progress',
-      settingsTab: 'Settings',
+      settingsTab: 'Tab settings',
       petName: 'Pet name',
       titleMode: 'Title mode',
       titleModeStatus: 'Status alert',
@@ -122,6 +122,10 @@ export const I18N_MESSAGES = {
       customTitle: 'Custom disguise title',
       titleAnimation: 'Title animation',
       themeMode: 'Theme',
+      resetHeading: 'Reset pet',
+      resetDescription: 'Start over with a new pet and default tab settings.',
+      resetConfirmMessage: 'This clears the current pet, growth, and settings on this browser.',
+      resetCancel: 'Cancel',
     },
     guide: {
       heading: 'How to use',
@@ -281,7 +285,7 @@ export const I18N_MESSAGES = {
     },
     settings: {
       statusTab: '성장',
-      settingsTab: '설정',
+      settingsTab: '탭 설정',
       petName: '펫 이름',
       titleMode: '타이틀 모드',
       titleModeStatus: '상태 알림',
@@ -292,6 +296,10 @@ export const I18N_MESSAGES = {
       customTitle: '커스텀 위장 타이틀',
       titleAnimation: '타이틀 애니메이션',
       themeMode: '테마',
+      resetHeading: '펫 초기화',
+      resetDescription: '새 펫과 기본 탭 설정으로 다시 시작합니다.',
+      resetConfirmMessage: '현재 펫, 성장 상태, 설정이 이 브라우저에서 삭제됩니다.',
+      resetCancel: '취소',
     },
     guide: {
       heading: '이용 안내',
@@ -451,7 +459,7 @@ export const I18N_MESSAGES = {
     },
     settings: {
       statusTab: '成長',
-      settingsTab: '設定',
+      settingsTab: 'タブ設定',
       petName: 'ペット名',
       titleMode: 'タイトルモード',
       titleModeStatus: 'ステータス通知',
@@ -462,6 +470,10 @@ export const I18N_MESSAGES = {
       customTitle: 'カスタム偽装タイトル',
       titleAnimation: 'タイトルアニメーション',
       themeMode: 'テーマ',
+      resetHeading: 'ペットをリセット',
+      resetDescription: '新しいペットと標準のタブ設定でやり直します。',
+      resetConfirmMessage: '現在のペット、成長状態、設定がこのブラウザから削除されます。',
+      resetCancel: 'キャンセル',
     },
     guide: {
       heading: '使い方',

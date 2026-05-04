@@ -177,6 +177,33 @@ button:disabled {
   background: var(--app-surface-strong);
 }
 
+.danger-button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--app-warning) 68%, var(--app-border));
+  border-radius: 8px;
+  color: var(--app-warning);
+  display: inline-flex;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 12px;
+}
+
+.danger-button:hover {
+  background: color-mix(in srgb, var(--app-warning) 10%, transparent);
+}
+
+.danger-button--solid {
+  background: var(--app-warning);
+  border-color: color-mix(in srgb, var(--app-warning) 82%, #000);
+  color: var(--app-accent-text);
+}
+
+.danger-button--solid:hover {
+  background: color-mix(in srgb, var(--app-warning) 88%, #000);
+}
+
 .app-grid {
   display: grid;
   gap: 18px;
@@ -327,6 +354,35 @@ button:disabled {
 .toggle-row input,
 .settings-checkbox input {
   accent-color: var(--app-accent);
+}
+
+.settings-danger-zone {
+  border-top: 1px solid var(--app-border);
+  display: grid;
+  gap: 10px;
+  padding-top: 14px;
+}
+
+.settings-danger-zone strong {
+  display: block;
+  font-size: 0.94rem;
+  line-height: 1.25;
+}
+
+.settings-danger-zone p {
+  color: var(--app-muted);
+  margin: 4px 0 0;
+}
+
+.settings-danger-zone p.settings-danger-zone__confirm {
+  color: var(--app-warning);
+  font-size: 0.9rem;
+}
+
+.settings-danger-zone__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .segmented-control {
