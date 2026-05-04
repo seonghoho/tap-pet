@@ -13,9 +13,13 @@ type SetupComponent<T> = {
 type PetSettingsPanelSetup = {
   draftName: { value: string }
   draftCustomTitle: { value: string }
+  isResetConfirming: { value: boolean }
   commitName: () => void
   setCustomTitle: (event: Event) => void
   setDisguiseTitle: (disguiseTitleId: PetSettings['disguiseTitleId']) => void
+  requestReset: () => void
+  confirmReset: () => void
+  cancelReset: () => void
 }
 
 type PetActionsSetup = {
@@ -92,6 +96,19 @@ describe('pet side panel progress summary', () => {
     expect(getComponentPropExpression(template, 'PetSidePanel', 'stats')).toBeUndefined()
     expect(getComponentPropExpression(template, 'PetSidePanel', 'status-theme-id')).toBeUndefined()
     expect(getComponentPropExpression(template, 'PetSidePanel', 'level-progress')).toBe('pet.levelProgress.value')
+  })
+})
+
+describe('pet reset placement', () => {
+  it('moves reset out of the topbar and into the settings panel flow', () => {
+    const appTemplate = readComponentTemplate('app.vue')
+    const sidePanelTemplate = readComponentTemplate('components/PetSidePanel.vue')
+    const settingsPanelTemplate = readComponentTemplate('components/PetSettingsPanel.vue')
+
+    expect(appTemplate).not.toContain('@click="pet.resetPet"')
+    expect(appTemplate).toContain('@reset="pet.resetPet"')
+    expect(sidePanelTemplate).toContain('@reset="emit(\'reset\')"')
+    expect(settingsPanelTemplate).toContain('settings-danger-zone')
   })
 })
 
@@ -201,6 +218,40 @@ describe('pet settings panel controls', () => {
 
     expect(emitted).toEqual([['updateName', 'Berry']])
     expect(setup.draftName.value).toBe('Berry')
+  })
+
+  it('requires confirmation before emitting reset', () => {
+    vi.stubGlobal('useLocale', () => ({ locale: 'en', messages: {} }))
+    const component = loadScriptSetupComponent<PetSettingsPanelSetup>('components/PetSettingsPanel.vue')
+    const emitted: unknown[][] = []
+    const setup = component.setup(
+      {
+        name: 'Momo',
+        settings: createTestSettings(),
+      },
+      {
+        emit: (...args) => {
+          emitted.push(args)
+        },
+        expose: vi.fn(),
+      },
+    )
+
+    setup.requestReset()
+
+    expect(setup.isResetConfirming.value).toBe(true)
+    expect(emitted).toEqual([])
+
+    setup.cancelReset()
+
+    expect(setup.isResetConfirming.value).toBe(false)
+    expect(emitted).toEqual([])
+
+    setup.requestReset()
+    setup.confirmReset()
+
+    expect(setup.isResetConfirming.value).toBe(false)
+    expect(emitted).toEqual([['reset']])
   })
 })
 

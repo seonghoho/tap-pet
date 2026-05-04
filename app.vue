@@ -121,14 +121,6 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
           <span class="tab-preview__dot" aria-hidden="true" />
           <span>{{ tabPresentation.title }}</span>
         </div>
-        <button
-          v-if="currentPet"
-          class="ghost-button"
-          type="button"
-          @click="pet.resetPet"
-        >
-          {{ messages.app.reset }}
-        </button>
       </div>
     </header>
 
@@ -175,6 +167,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
           @set-mode="pet.setSidePanelMode"
           @update-name="pet.updatePetName"
           @update-settings="pet.updatePetSettings"
+          @reset="pet.resetPet"
         />
         <GuidePanel v-if="currentPet" />
         <MonetizationMock v-if="currentPet" />

@@ -15,6 +15,7 @@ const emit = defineEmits<{
   setMode: [mode: 'status' | 'settings']
   updateName: [name: string]
   updateSettings: [settings: Partial<PetSettings>]
+  reset: []
 }>()
 
 const { messages } = useLocale()
@@ -83,6 +84,7 @@ const { messages } = useLocale()
       :settings="settings"
       @update-name="emit('updateName', $event)"
       @update-settings="emit('updateSettings', $event)"
+      @reset="emit('reset')"
     />
   </section>
 </template>

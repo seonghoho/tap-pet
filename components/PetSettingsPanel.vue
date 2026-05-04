@@ -18,12 +18,14 @@ const props = defineProps<{
 const emit = defineEmits<{
   updateName: [name: string]
   updateSettings: [settings: Partial<PetSettings>]
+  reset: []
 }>()
 
 const { locale, messages } = useLocale()
 
 const draftName = ref(props.name)
 const draftCustomTitle = ref(props.settings.customDisguiseTitle)
+const isResetConfirming = ref(false)
 
 const titleModeOptions: Array<{
   id: TitleMode
@@ -108,6 +110,19 @@ function setTitleAnimation(event: Event): void {
 
 function setTheme(themeId: ThemeId): void {
   emit('updateSettings', { themeId })
+}
+
+function requestReset(): void {
+  isResetConfirming.value = true
+}
+
+function cancelReset(): void {
+  isResetConfirming.value = false
+}
+
+function confirmReset(): void {
+  isResetConfirming.value = false
+  emit('reset')
 }
 </script>
 
@@ -214,5 +229,30 @@ function setTheme(themeId: ThemeId): void {
         </button>
       </div>
     </fieldset>
+
+    <div class="settings-danger-zone" role="group" :aria-label="messages.settings.resetHeading">
+      <div>
+        <strong>{{ messages.settings.resetHeading }}</strong>
+        <p>{{ messages.settings.resetDescription }}</p>
+      </div>
+
+      <template v-if="isResetConfirming">
+        <p class="settings-danger-zone__confirm">
+          {{ messages.settings.resetConfirmMessage }}
+        </p>
+        <div class="settings-danger-zone__actions">
+          <button class="ghost-button" type="button" @click="cancelReset">
+            {{ messages.settings.resetCancel }}
+          </button>
+          <button class="danger-button danger-button--solid" type="button" @click="confirmReset">
+            {{ messages.app.reset }}
+          </button>
+        </div>
+      </template>
+
+      <button v-else class="danger-button" type="button" @click="requestReset">
+        {{ messages.app.reset }}
+      </button>
+    </div>
   </form>
 </template>
