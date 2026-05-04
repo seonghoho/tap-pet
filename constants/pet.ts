@@ -87,6 +87,11 @@ export const ACTION_COOLDOWN_MS: Record<PetAction, number> = {
   wash: 4000,
 }
 
+export const ACTION_REACTION_HOLD_MS = 4000
+export const ACTION_LIMIT_WINDOW_MS = 1000 * 60 * 30
+export const ACTION_LIMIT_BASE_USES = 5
+export const ACTION_LIMIT_AD_REWARD_USES = 5
+
 export const OVERCARE_THRESHOLD = 90
 export const OVERCARE_REWARD_MULTIPLIER = 0.35
 

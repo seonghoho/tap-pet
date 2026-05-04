@@ -1,6 +1,12 @@
 import type { Ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { PET_STORAGE_VERSION } from '~/constants/pet'
+import {
+  ACTION_LIMIT_AD_REWARD_USES,
+  ACTION_LIMIT_BASE_USES,
+  ACTION_LIMIT_WINDOW_MS,
+  ACTION_REACTION_HOLD_MS,
+  PET_STORAGE_VERSION,
+} from '~/constants/pet'
 import { usePetStore } from '~/composables/usePetStore'
 import { applyPetAction } from '~/utils/petActions'
 import { applyOfflineDecay } from '~/utils/petDecay'
@@ -57,7 +63,11 @@ describe('pet actions', () => {
       fullness: 100,
       energy: 0,
       cleanliness: 97,
-    })
+      })
+  })
+
+  it('holds care reaction animations for four seconds', () => {
+    expect(ACTION_REACTION_HOLD_MS).toBe(4000)
   })
 })
 
@@ -193,6 +203,51 @@ describe('pet store', () => {
     expect(store.activeReaction.value).toBeNull()
   })
 
+  it('limits care actions to five uses per thirty minute window', () => {
+    const store = usePetStore()
+
+    store.initializePet('cat')
+    const actions = ['feed', 'play', 'sleep', 'wash', 'feed'] as const
+
+    actions.forEach((action, index) => {
+      vi.setSystemTime(1000 + index * 6000)
+      store.performAction(action)
+    })
+
+    expect(store.actionLimitInfo.value.limit).toBe(ACTION_LIMIT_BASE_USES)
+    expect(store.actionLimitInfo.value.remaining).toBe(0)
+
+    const limitedState = store.petState.value
+    vi.setSystemTime(1000 + actions.length * 6000)
+    store.performAction('play')
+    expect(store.petState.value).toEqual(limitedState)
+
+    vi.setSystemTime(1000 + ACTION_LIMIT_WINDOW_MS + 1)
+    store.performAction('play')
+    expect(store.actionLimitInfo.value.remaining).toBe(ACTION_LIMIT_BASE_USES - 1)
+  })
+
+  it('grants additional care uses after a rewarded ad hook succeeds', () => {
+    const store = usePetStore()
+
+    store.initializePet('dog')
+
+    ;(['feed', 'play', 'sleep', 'wash', 'feed'] as const).forEach((action, index) => {
+      vi.setSystemTime(1000 + index * 6000)
+      store.performAction(action)
+    })
+
+    expect(store.actionLimitInfo.value.remaining).toBe(0)
+
+    store.grantRewardedAdActions()
+    expect(store.actionLimitInfo.value.remaining).toBe(ACTION_LIMIT_AD_REWARD_USES)
+
+    vi.setSystemTime(1000 + 6000 * 6)
+    store.performAction('play')
+
+    expect(store.actionLimitInfo.value.remaining).toBe(ACTION_LIMIT_AD_REWARD_USES - 1)
+  })
+
   it('reacts to clock changes when deriving pet status', () => {
     const store = usePetStore()
 
@@ -287,7 +342,19 @@ describe('stored pet state parsing', () => {
     const initialState = createInitialPetState('cat', 1000)
     const stored = toStoredPetState(initialState, PET_STORAGE_VERSION)
 
-    expect(parseStoredPetState(stored)).toEqual(initialState)
+    expect(parseStoredPetState(stored, 1000)).toEqual(initialState)
+  })
+
+  it('normalizes missing action limit data from older stored states', () => {
+    const initialState = createInitialPetState('cat', 1000)
+    const storedState = toStoredPetState(initialState, PET_STORAGE_VERSION) as Record<string, unknown>
+    const { actionLimit: _actionLimit, ...legacyState } = storedState
+
+    expect(parseStoredPetState(legacyState, 2000)?.actionLimit).toEqual({
+      windowStartedAt: 2000,
+      used: 0,
+      bonusUses: 0,
+    })
   })
 
   it('rejects invalid versions and invalid species', () => {

@@ -19,12 +19,12 @@ const LIGHT_THEME_COLORS: PetTheme['colors'] = {
 
 const LIGHT_STATUS_COLORS: PetTheme['statusColors'] = {
   fine: '#f3b15f',
-  hungry: '#eab308',
-  sleepy: '#60a5fa',
-  dirty: '#b45309',
-  bored: '#94a3b8',
+  hungry: '#b7791f',
+  sleepy: '#f8d99d',
+  dirty: '#8b5a2b',
+  bored: '#c9a66b',
   happy: '#f3b15f',
-  excited: '#22c55e',
+  excited: '#facc15',
 }
 
 const DARK_THEME_COLORS: PetTheme['colors'] = {
@@ -38,18 +38,18 @@ const DARK_THEME_COLORS: PetTheme['colors'] = {
   accentText: '#07131d',
   warning: '#f59e0b',
   success: '#34d399',
-  petBase: '#c084fc',
-  petContrast: '#111827',
+  petBase: '#f3b15f',
+  petContrast: '#2f241b',
 }
 
 const DARK_STATUS_COLORS: PetTheme['statusColors'] = {
-  fine: '#c084fc',
-  hungry: '#facc15',
-  sleepy: '#38bdf8',
-  dirty: '#f59e0b',
-  bored: '#64748b',
-  happy: '#c084fc',
-  excited: '#2dd4bf',
+  fine: '#f3b15f',
+  hungry: '#b7791f',
+  sleepy: '#f8d99d',
+  dirty: '#8b5a2b',
+  bored: '#c9a66b',
+  happy: '#f3b15f',
+  excited: '#facc15',
 }
 
 export const PET_THEMES: PetTheme[] = [

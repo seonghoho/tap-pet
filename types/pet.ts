@@ -42,12 +42,27 @@ export type PetSettings = {
   themeId: ThemeId
 }
 
+export type PetActionLimit = {
+  windowStartedAt: number
+  used: number
+  bonusUses: number
+}
+
+export type PetActionLimitInfo = {
+  used: number
+  limit: number
+  remaining: number
+  resetAt: number
+  windowMs: number
+}
+
 export type PetState = {
   species: PetSpecies
   name: string
   stats: PetStats
   growth: PetGrowth
   settings: PetSettings
+  actionLimit: PetActionLimit
   lastUpdatedAt: number
   lastPlayedAt: number
 }

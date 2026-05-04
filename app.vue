@@ -156,7 +156,9 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
           <PetActions
             :cooldowns="pet.actionCooldowns.value"
             :active-reaction="pet.activeReaction.value"
+            :action-limit-info="pet.actionLimitInfo.value"
             @action="handleAction"
+            @reward-ad="pet.grantRewardedAdActions"
           />
         </template>
       </section>

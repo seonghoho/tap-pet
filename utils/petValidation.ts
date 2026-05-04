@@ -10,6 +10,7 @@ import { DISGUISE_TITLES } from '~/constants/titles'
 import { PET_THEMES } from '~/constants/themes'
 import type {
   DisguiseTitleId,
+  PetActionLimit,
   PetGrowth,
   PetSettings,
   PetSpecies,
@@ -18,6 +19,7 @@ import type {
   StoredPetState,
   ThemeId,
 } from '~/types/pet'
+import { normalizeActionLimit } from '~/utils/petActionLimit'
 import { normalizeGrowth } from '~/utils/petGrowth'
 
 const PET_SPECIES = ['cat', 'dog'] as const
@@ -89,6 +91,7 @@ export function toStoredPetState(state: PetState, version: number): StoredPetSta
     stats: normalizeStats(state.stats),
     growth: normalizeGrowth(state.growth),
     settings: normalizeSettings(state.settings),
+    actionLimit: normalizeStoredActionLimit(state.actionLimit, state.lastUpdatedAt),
     version,
   }
 }
@@ -103,6 +106,7 @@ function parseStoredPetStateV2(value: Record<string, unknown>, now: number): Pet
     stats: normalizeStats(value.stats),
     growth: normalizeStoredGrowth(value.growth),
     settings: normalizeSettings(getStoredSettingsValue(value)),
+    actionLimit: normalizeStoredActionLimit(value.actionLimit, now),
     lastUpdatedAt,
     lastPlayedAt: normalizeTimestamp(value.lastPlayedAt, now),
   }
@@ -121,6 +125,7 @@ function parseStoredPetStateV1(value: Record<string, unknown>, now: number): Pet
       disguiseTitleId: value.disguiseTitleId,
       themeId: normalizeLegacyThemeId(value.themeId),
     }),
+    actionLimit: normalizeStoredActionLimit(value.actionLimit, now),
     lastUpdatedAt,
     lastPlayedAt: normalizeTimestamp(value.lastPlayedAt, lastUpdatedAt),
   }
@@ -140,6 +145,10 @@ function normalizeStoredGrowth(value: unknown): PetGrowth {
   if (!isRecord(value)) return { ...DEFAULT_GROWTH }
 
   return normalizeGrowth(value as Partial<PetGrowth>)
+}
+
+function normalizeStoredActionLimit(value: unknown, now: number): PetActionLimit {
+  return normalizeActionLimit(value, now)
 }
 
 function normalizeTimestamp(value: unknown, fallback: number): number {

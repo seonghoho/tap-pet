@@ -105,6 +105,11 @@ export const I18N_MESSAGES = {
         detail: 'Restores cleanliness',
       },
     },
+    actionLimit: {
+      remaining: '{remaining}/{limit} care actions left in this 30-minute window.',
+      locked: 'Care limit reached. Come back in {time}, or watch an ad for more actions.',
+      rewardAd: 'Watch ad',
+    },
     titles: {
       heading: 'Disguise title',
       description: 'Pick the base browser tab label.',
@@ -275,6 +280,11 @@ export const I18N_MESSAGES = {
         detail: '청결 회복',
       },
     },
+    actionLimit: {
+      remaining: '30분 돌봄 가능 횟수 {remaining}/{limit}회 남음',
+      locked: '돌봄 횟수를 모두 사용했습니다. {time} 후 다시 가능하거나 광고를 보고 추가할 수 있습니다.',
+      rewardAd: '광고 보기',
+    },
     titles: {
       heading: '위장 타이틀',
       description: '브라우저 탭에 표시될 기본 문구를 고르세요.',
@@ -444,6 +454,11 @@ export const I18N_MESSAGES = {
         label: '洗ってあげる',
         detail: '清潔度を回復',
       },
+    },
+    actionLimit: {
+      remaining: '30分のお世話回数が {remaining}/{limit} 回残っています。',
+      locked: 'お世話回数を使い切りました。{time} 後に戻るか、広告を見ると追加できます。',
+      rewardAd: '広告を見る',
     },
     titles: {
       heading: '偽装タイトル',

@@ -125,6 +125,61 @@ function randomWithin(min: number, max: number): number {
       <span class="pet-habitat__cushion" />
     </div>
 
+    <span
+      v-if="activeReaction === 'feed'"
+      class="pet-habitat__reaction pet-habitat__reaction--feed"
+      aria-hidden="true"
+    >
+      <span class="pet-habitat__food pet-habitat__food--one" />
+      <span class="pet-habitat__food pet-habitat__food--two" />
+      <span class="pet-habitat__food pet-habitat__food--three" />
+    </span>
+
+    <span
+      v-if="activeReaction === 'play' && species === 'dog'"
+      class="pet-habitat__reaction pet-habitat__reaction--play-dog"
+      aria-hidden="true"
+    >
+      <span class="pet-habitat__play-ball" />
+      <span class="pet-habitat__play-trail pet-habitat__play-trail--one" />
+      <span class="pet-habitat__play-trail pet-habitat__play-trail--two" />
+    </span>
+
+    <span
+      v-if="activeReaction === 'play' && species === 'cat'"
+      class="pet-habitat__reaction pet-habitat__reaction--play-cat"
+      aria-hidden="true"
+    >
+      <span class="pet-habitat__play-string">
+        <span class="pet-habitat__play-mouse">
+          <span class="pet-habitat__play-mouse-ear pet-habitat__play-mouse-ear--left" />
+          <span class="pet-habitat__play-mouse-ear pet-habitat__play-mouse-ear--right" />
+          <span class="pet-habitat__play-mouse-tail" />
+        </span>
+      </span>
+    </span>
+
+    <span
+      v-if="activeReaction === 'sleep'"
+      class="pet-habitat__reaction pet-habitat__reaction--sleep"
+      aria-hidden="true"
+    >
+      <span class="pet-habitat__sleep-mark pet-habitat__sleep-mark--one">Z</span>
+      <span class="pet-habitat__sleep-mark pet-habitat__sleep-mark--two">Z</span>
+    </span>
+
+    <span
+      v-if="activeReaction === 'wash'"
+      class="pet-habitat__reaction pet-habitat__reaction--wash"
+      aria-hidden="true"
+    >
+      <span class="pet-habitat__wash-bubble pet-habitat__wash-bubble--one" />
+      <span class="pet-habitat__wash-bubble pet-habitat__wash-bubble--two" />
+      <span class="pet-habitat__wash-bubble pet-habitat__wash-bubble--three" />
+      <span class="pet-habitat__wash-sparkle pet-habitat__wash-sparkle--one" />
+      <span class="pet-habitat__wash-sparkle pet-habitat__wash-sparkle--two" />
+    </span>
+
     <div
       class="pet-habitat__pet"
       :class="{ 'pet-habitat__pet--left': position.direction === 'left' }"

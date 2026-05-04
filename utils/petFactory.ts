@@ -5,6 +5,7 @@ import {
   DEFAULT_STATS,
 } from '~/constants/pet'
 import type { PetSettings, PetSpecies, PetState } from '~/types/pet'
+import { createPetActionLimit } from '~/utils/petActionLimit'
 
 export function createInitialPetState(
   species: PetSpecies,
@@ -23,6 +24,7 @@ export function createInitialPetState(
       ...DEFAULT_SETTINGS,
       ...options.settings,
     },
+    actionLimit: createPetActionLimit(now),
     lastUpdatedAt: now,
     lastPlayedAt: now,
   }

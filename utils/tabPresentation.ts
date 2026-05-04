@@ -95,9 +95,9 @@ export function getFaviconSvg(
     palette: getPetPixelPalette({
       body: baseColor,
       contrast,
-      accent: theme.colors.accent,
+      accent: theme.statusColors.excited,
       dirt: theme.colors.warning,
-      bubble: theme.colors.accent,
+      bubble: theme.statusColors.sleepy,
     }),
   })
 }
