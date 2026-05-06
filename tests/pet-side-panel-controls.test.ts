@@ -25,6 +25,8 @@ type PetSettingsPanelSetup = {
 type PetActionsSetup = {
   isActionDisabled: (action: PetAction) => boolean
   isLimitReached: { value: boolean }
+  getActionDetail: (action: PetAction) => string
+  getActionAriaLabel: (action: PetAction) => string
 }
 
 const requireModule = createRequire(import.meta.url)
@@ -64,6 +66,35 @@ function createTestSettings(overrides: Partial<PetSettings> = {}): PetSettings {
     titleAnimationEnabled: false,
     themeId: 'system',
     ...overrides,
+  }
+}
+
+function createActionMessages() {
+  return {
+    actions: {
+      feed: {
+        label: 'Feed',
+        detail: 'Restores fullness',
+      },
+      play: {
+        label: 'Play',
+        detail: 'Increases affinity and EXP',
+      },
+      sleep: {
+        label: 'Sleep',
+        detail: 'Restores energy',
+      },
+      wash: {
+        label: 'Wash',
+        detail: 'Restores cleanliness',
+      },
+    },
+    actionState: {
+      cooldown: 'Ready in {time}',
+      inProgress: 'Finishing action',
+      limitReached: 'Care limit reached',
+      ariaLabel: '{action}: {state}',
+    },
   }
 }
 
@@ -117,6 +148,14 @@ describe('pet side panel progress summary', () => {
     expect(css).toContain('var(--app-stat-fill-start)')
     expect(css).toContain('var(--app-stat-fill-end)')
     expect(css).not.toContain('linear-gradient(90deg, var(--app-accent), var(--app-success))')
+  })
+
+  it('keeps mobile action controls in a two-column grid', () => {
+    const css = readSource('assets/css/main.css')
+
+    expect(css).toMatch(
+      /@media \(max-width: 720px\)[\s\S]*\.action-panel\s*\{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/,
+    )
   })
 })
 
@@ -351,5 +390,100 @@ describe('pet action controls', () => {
     expect(setup.isLimitReached.value).toBe(true)
     expect(setup.isActionDisabled('feed')).toBe(true)
     expect(setup.isActionDisabled('play')).toBe(true)
+  })
+
+  it('describes cooldown remaining time in the action detail', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1000)
+    vi.stubGlobal('useLocale', () => ({ messages: { value: createActionMessages() } }))
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const component = loadScriptSetupComponent<PetActionsSetup>('components/PetActions.vue')
+
+    const setup = component.setup(
+      {
+        cooldowns: {
+          feed: 0,
+          play: 0,
+          sleep: 3100,
+          wash: 0,
+        },
+        activeReaction: null,
+        actionLimitInfo: {
+          used: 4,
+          limit: 5,
+          remaining: 1,
+          resetAt: 31 * 60 * 1000,
+          windowMs: 30 * 60 * 1000,
+        },
+        careFeedback: null,
+      },
+      {
+        emit: vi.fn(),
+        expose: vi.fn(),
+      },
+    )
+
+    expect(setup.getActionDetail('sleep')).toBe('Ready in 3s')
+    expect(setup.getActionAriaLabel('sleep')).toBe('Sleep: Ready in 3s')
+  })
+
+  it('describes active and limit-locked action states', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1000)
+    vi.stubGlobal('useLocale', () => ({ messages: { value: createActionMessages() } }))
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const component = loadScriptSetupComponent<PetActionsSetup>('components/PetActions.vue')
+
+    const activeSetup = component.setup(
+      {
+        cooldowns: {
+          feed: 0,
+          play: 0,
+          sleep: 0,
+          wash: 0,
+        },
+        activeReaction: 'feed',
+        actionLimitInfo: {
+          used: 4,
+          limit: 5,
+          remaining: 1,
+          resetAt: 31 * 60 * 1000,
+          windowMs: 30 * 60 * 1000,
+        },
+        careFeedback: null,
+      },
+      {
+        emit: vi.fn(),
+        expose: vi.fn(),
+      },
+    )
+
+    expect(activeSetup.getActionDetail('feed')).toBe('Finishing action')
+
+    const lockedSetup = component.setup(
+      {
+        cooldowns: {
+          feed: 0,
+          play: 0,
+          sleep: 0,
+          wash: 0,
+        },
+        activeReaction: null,
+        actionLimitInfo: {
+          used: 5,
+          limit: 5,
+          remaining: 0,
+          resetAt: 31 * 60 * 1000,
+          windowMs: 30 * 60 * 1000,
+        },
+        careFeedback: null,
+      },
+      {
+        emit: vi.fn(),
+        expose: vi.fn(),
+      },
+    )
+
+    expect(lockedSetup.getActionDetail('play')).toBe('Care limit reached')
   })
 })

@@ -114,6 +114,12 @@ export const I18N_MESSAGES = {
       locked: 'Care limit reached. Come back in {time}, or watch an ad for more actions.',
       rewardAd: 'Watch ad',
     },
+    actionState: {
+      cooldown: 'Ready in {time}',
+      inProgress: 'Finishing action',
+      limitReached: 'Care limit reached',
+      ariaLabel: '{action}: {state}',
+    },
     careFeedback: {
       title: '{action} complete',
       ariaLabel: 'Care result',
@@ -304,6 +310,12 @@ export const I18N_MESSAGES = {
       locked: '돌봄 횟수를 모두 사용했습니다. {time} 후 다시 가능하거나 광고를 보고 추가할 수 있습니다.',
       rewardAd: '광고 보기',
     },
+    actionState: {
+      cooldown: '{time} 후 가능',
+      inProgress: '돌봄 진행 중',
+      limitReached: '돌봄 횟수 없음',
+      ariaLabel: '{action}: {state}',
+    },
     careFeedback: {
       title: '{action} 완료',
       ariaLabel: '돌봄 결과',
@@ -493,6 +505,12 @@ export const I18N_MESSAGES = {
       remaining: '30分のお世話回数が {remaining}/{limit} 回残っています。',
       locked: 'お世話回数を使い切りました。{time} 後に戻るか、広告を見ると追加できます。',
       rewardAd: '広告を見る',
+    },
+    actionState: {
+      cooldown: '{time} 後に利用可能',
+      inProgress: 'お世話中',
+      limitReached: 'お世話回数なし',
+      ariaLabel: '{action}: {state}',
     },
     careFeedback: {
       title: '{action} 完了',

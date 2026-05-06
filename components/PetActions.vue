@@ -90,6 +90,27 @@ function isActionDisabled(action: PetAction): boolean {
   return isLimitReached.value || props.cooldowns[action] > now.value || props.activeReaction === action
 }
 
+function getActionDetail(action: PetAction): string {
+  if (props.activeReaction === action) return messages.value.actionState.inProgress
+  if (isLimitReached.value) return messages.value.actionState.limitReached
+
+  const remainingCooldown = props.cooldowns[action] - now.value
+  if (remainingCooldown > 0) {
+    return messages.value.actionState.cooldown.replace(
+      '{time}',
+      formatRemainingTime(remainingCooldown),
+    )
+  }
+
+  return messages.value.actions[action].detail
+}
+
+function getActionAriaLabel(action: PetAction): string {
+  return messages.value.actionState.ariaLabel
+    .replace('{action}', messages.value.actions[action].label)
+    .replace('{state}', getActionDetail(action))
+}
+
 function formatRemainingTime(milliseconds: number): string {
   const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000))
   const minutes = Math.floor(totalSeconds / 60)
@@ -128,10 +149,11 @@ function formatSigned(value: number): string {
         class="action-button"
         type="button"
         :disabled="isActionDisabled(action.id)"
+        :aria-label="getActionAriaLabel(action.id)"
         @click="emit('action', action.id)"
       >
         <span>{{ messages.actions[action.id].label }}</span>
-        <small>{{ messages.actions[action.id].detail }}</small>
+        <small>{{ getActionDetail(action.id) }}</small>
       </button>
     </div>
 

@@ -1627,9 +1627,12 @@ button:disabled {
 
   .species-grid,
   .pet-status,
-  .action-panel,
   .side-stack {
     grid-template-columns: 1fr;
+  }
+
+  .action-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .pet-status {
