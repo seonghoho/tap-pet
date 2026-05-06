@@ -33,8 +33,10 @@ describe('pet action progress status', () => {
 
   it('hides recommendations while a care action is in progress', () => {
     const template = readComponentTemplate('components/PetActions.vue')
+    const source = readSource('components/PetActions.vue')
 
-    expect(template).toContain('recommendedCareAction && !isLimitReached && !activeReaction')
+    expect(template).toContain('v-if="shouldShowRecommendation"')
+    expect(source).toContain('!props.activeReaction')
   })
 
   it('keeps progress copy localized for every supported language', () => {

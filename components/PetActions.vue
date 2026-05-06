@@ -56,6 +56,28 @@ const feedbackStatRows = computed(() => {
     }))
     .filter((stat) => stat.value !== 0)
 })
+const careFeedbackSummary = computed(() => {
+  const feedback = props.careFeedback
+  if (!feedback) return ''
+
+  if (feedback.action === 'play' && feedback.gainedAffinityExp > 0) {
+    return messages.value.careFeedback.affinitySummary
+      .replace('{stat}', messages.value.stats.affinity)
+      .replace('{value}', formatSigned(feedback.gainedAffinityExp))
+  }
+
+  const strongestStat = [...feedbackStatRows.value]
+    .filter((stat) => stat.value > 0)
+    .sort((current, next) => next.value - current.value)[0]
+
+  if (strongestStat) {
+    return messages.value.careFeedback.statSummary
+      .replace('{stat}', strongestStat.label)
+      .replace('{value}', formatSigned(strongestStat.value))
+  }
+
+  return messages.value.careFeedback.expSummary.replace('{value}', formatSigned(feedback.gainedExp))
+})
 const careFeedbackTitle = computed(() => {
   const feedback = props.careFeedback
   if (!feedback) return ''
@@ -93,6 +115,21 @@ const recommendationDetail = computed(() => {
 
   return messages.value.careRecommendation.details[recommendation.action]
 })
+const feedbackNextActionTitle = computed(() => {
+  const recommendation = props.recommendedCareAction
+  if (!recommendation) return ''
+
+  return messages.value.careFeedback.nextTitle.replace(
+    '{action}',
+    messages.value.actions[recommendation.action].label,
+  )
+})
+const feedbackNextActionDetail = computed(() => {
+  const recommendation = props.recommendedCareAction
+  if (!recommendation) return ''
+
+  return messages.value.careRecommendation.details[recommendation.action]
+})
 const actionLimitText = computed(() => {
   const limitMessages = messages.value.actionLimit
 
@@ -113,6 +150,22 @@ const actionLimitRewardText = computed(() => {
 
   return messages.value.actionLimit.rewardGranted.replace('{count}', String(feedback.addedUses))
 })
+const shouldShowRecommendation = computed(
+  () => Boolean(
+    props.recommendedCareAction &&
+    !isLimitReached.value &&
+    !props.activeReaction &&
+    !props.careFeedback,
+  ),
+)
+const shouldShowFeedbackNextAction = computed(
+  () => Boolean(
+    props.careFeedback &&
+    props.recommendedCareAction &&
+    !isLimitReached.value &&
+    !props.activeReaction,
+  ),
+)
 
 onMounted(() => {
   now.value = Date.now()
@@ -202,7 +255,7 @@ function formatSigned(value: number): string {
     </div>
 
     <div
-      v-if="recommendedCareAction && !isLimitReached && !activeReaction"
+      v-if="shouldShowRecommendation"
       class="action-recommendation"
       aria-live="polite"
     >
@@ -240,6 +293,11 @@ function formatSigned(value: number): string {
         <strong>+{{ careFeedback.gainedExp }} {{ messages.stats.exp }}</strong>
       </div>
 
+      <div class="care-feedback__summary">
+        <span>{{ messages.careFeedback.summaryLabel }}</span>
+        <strong>{{ careFeedbackSummary }}</strong>
+      </div>
+
       <div class="care-feedback__chips" :aria-label="messages.careFeedback.ariaLabel">
         <span
           v-for="stat in feedbackStatRows"
@@ -261,6 +319,14 @@ function formatSigned(value: number): string {
         >
           {{ messages.careFeedback.affinityUp }}
         </span>
+      </div>
+
+      <div v-if="shouldShowFeedbackNextAction" class="care-feedback__next">
+        <span>{{ messages.careFeedback.nextLabel }}</span>
+        <div>
+          <strong>{{ feedbackNextActionTitle }}</strong>
+          <small>{{ feedbackNextActionDetail }}</small>
+        </div>
       </div>
 
       <p v-if="careFeedback.wasReduced" class="care-feedback__note">
