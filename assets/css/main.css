@@ -1276,6 +1276,41 @@ button:disabled {
   margin-top: 24px;
 }
 
+.action-recommendation {
+  align-items: center;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-accent) 10%, transparent), transparent 84%),
+    var(--app-surface-strong);
+  border: 1px solid color-mix(in srgb, var(--app-accent) 32%, var(--app-border));
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 12px;
+}
+
+.action-recommendation span {
+  color: var(--app-muted);
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.action-recommendation strong {
+  display: block;
+  line-height: 1.25;
+  margin-top: 3px;
+}
+
+.action-recommendation small {
+  color: var(--app-muted);
+  line-height: 1.35;
+  max-width: 300px;
+  text-align: right;
+}
+
 .action-limit {
   align-items: center;
   background: var(--app-surface-strong);
@@ -1312,13 +1347,38 @@ button:disabled {
   padding: 12px;
 }
 
+.action-button--recommended {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-accent) 24%, transparent);
+}
+
 .action-button:hover,
 .small-button:hover:not(:disabled) {
   transform: translateY(-1px);
 }
 
-.action-button span {
+.action-button__label {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
   font-weight: 800;
+  min-width: 0;
+}
+
+.action-button__label span {
+  overflow-wrap: anywhere;
+}
+
+.action-button__badge {
+  background: color-mix(in srgb, var(--app-accent-text) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-accent-text) 34%, transparent);
+  border-radius: 999px;
+  color: var(--app-accent-text);
+  font-size: 0.68rem;
+  font-style: normal;
+  line-height: 1;
+  padding: 3px 6px;
 }
 
 .action-button small {
@@ -1724,6 +1784,16 @@ button:disabled {
 
   .action-panel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .action-recommendation {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .action-recommendation small {
+    max-width: none;
+    text-align: left;
   }
 
   .pet-status {

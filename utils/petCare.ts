@@ -5,7 +5,14 @@ import {
   OVERCARE_REWARD_MULTIPLIER,
   OVERCARE_THRESHOLD,
 } from '~/constants/pet'
-import type { PetAction, PetGrowth, PetStats } from '~/types/pet'
+import type {
+  PetAction,
+  PetCareRecommendation,
+  PetGrowth,
+  PetStatKey,
+  PetStats,
+  PetStatus,
+} from '~/types/pet'
 import {
   addAffinityExp,
   addLevelExp,
@@ -29,6 +36,50 @@ export type CareActionResult = {
   rewardMultiplier: number
   wasReduced: boolean
 }
+
+const STATUS_RECOMMENDATIONS: Partial<Record<PetStatus, PetCareRecommendation>> = {
+  hungry: {
+    action: 'feed',
+    reason: 'need',
+    status: 'hungry',
+    statKey: 'fullness',
+  },
+  sleepy: {
+    action: 'sleep',
+    reason: 'need',
+    status: 'sleepy',
+    statKey: 'energy',
+  },
+  dirty: {
+    action: 'wash',
+    reason: 'need',
+    status: 'dirty',
+    statKey: 'cleanliness',
+  },
+  bored: {
+    action: 'play',
+    reason: 'need',
+    status: 'bored',
+  },
+}
+
+const STAT_RECOMMENDATION_ORDER: Array<{
+  key: PetStatKey
+  action: PetAction
+}> = [
+  {
+    key: 'fullness',
+    action: 'feed',
+  },
+  {
+    key: 'energy',
+    action: 'sleep',
+  },
+  {
+    key: 'cleanliness',
+    action: 'wash',
+  },
+]
 
 export function applyCareAction(input: CareActionInput): CareActionResult {
   const effect = ACTION_EFFECTS[input.action]
@@ -58,6 +109,25 @@ export function applyCareAction(input: CareActionInput): CareActionResult {
     gainedAffinityExp,
     rewardMultiplier,
     wasReduced,
+  }
+}
+
+export function getRecommendedCareAction(input: {
+  stats: PetStats
+  status: PetStatus
+}): PetCareRecommendation {
+  const statusRecommendation = STATUS_RECOMMENDATIONS[input.status]
+  if (statusRecommendation) return statusRecommendation
+
+  const lowestStat = STAT_RECOMMENDATION_ORDER.reduce((lowest, current) =>
+    input.stats[current.key] < input.stats[lowest.key] ? current : lowest,
+  )
+
+  return {
+    action: lowestStat.action,
+    reason: 'lowest-stat',
+    status: input.status,
+    statKey: lowestStat.key,
   }
 }
 

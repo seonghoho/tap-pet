@@ -7,6 +7,15 @@ export type PetDisplayStatus = PetNeedStatus | 'happy' | 'excited'
 export type PetStatus = PetDisplayStatus
 
 export type PetAction = 'feed' | 'play' | 'sleep' | 'wash'
+export type PetStatKey = keyof PetStats
+export type PetCareRecommendationReason = 'need' | 'lowest-stat'
+
+export type PetCareRecommendation = {
+  action: PetAction
+  reason: PetCareRecommendationReason
+  status: PetStatus
+  statKey?: PetStatKey
+}
 
 export type ThemeId = 'system' | 'light' | 'dark'
 

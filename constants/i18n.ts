@@ -144,6 +144,17 @@ export const I18N_MESSAGES = {
       limitReached: 'Care limit reached',
       ariaLabel: '{action}: {state}',
     },
+    careRecommendation: {
+      heading: 'Recommended care',
+      title: 'Try {action} next',
+      badge: 'Recommended',
+      details: {
+        feed: 'Fullness is the best stat to recover now.',
+        play: 'It has been idle for a while. Play helps refresh the tab signal.',
+        sleep: 'Energy needs the clearest recovery now.',
+        wash: 'Cleanliness is the best stat to refresh now.',
+      },
+    },
     careFeedback: {
       title: '{action} complete',
       ariaLabel: 'Care result',
@@ -364,6 +375,17 @@ export const I18N_MESSAGES = {
       limitReached: '돌봄 횟수 없음',
       ariaLabel: '{action}: {state}',
     },
+    careRecommendation: {
+      heading: '추천 돌봄',
+      title: '{action}부터 해보세요',
+      badge: '추천',
+      details: {
+        feed: '지금은 배부름을 먼저 회복하는 흐름이 좋습니다.',
+        play: '오래 쉬고 있어 놀아주면 탭 신호가 다시 살아납니다.',
+        sleep: '에너지를 먼저 채우는 것이 가장 필요한 상태입니다.',
+        wash: '청결을 먼저 회복하면 상태가 안정됩니다.',
+      },
+    },
     careFeedback: {
       title: '{action} 완료',
       ariaLabel: '돌봄 결과',
@@ -583,6 +605,17 @@ export const I18N_MESSAGES = {
       inProgress: 'お世話中',
       limitReached: 'お世話回数なし',
       ariaLabel: '{action}: {state}',
+    },
+    careRecommendation: {
+      heading: 'おすすめのお世話',
+      title: '次は{action}',
+      badge: 'おすすめ',
+      details: {
+        feed: 'いまは満腹度を先に回復するのがよさそうです。',
+        play: 'しばらく動きがないため、遊ぶとタブの合図が戻ります。',
+        sleep: 'エネルギーを先に回復する必要があります。',
+        wash: '清潔度を先に整えると状態が安定します。',
+      },
     },
     careFeedback: {
       title: '{action} 完了',

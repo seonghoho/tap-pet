@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import type { PetAction, PetActionLimitInfo, PetCareFeedback } from '~/types/pet'
+import type {
+  PetAction,
+  PetActionLimitInfo,
+  PetCareFeedback,
+  PetCareRecommendation,
+} from '~/types/pet'
 
 const props = defineProps<{
   cooldowns: Record<PetAction, number>
   activeReaction: PetAction | null
   actionLimitInfo: PetActionLimitInfo
   careFeedback: PetCareFeedback | null
+  recommendedCareAction: PetCareRecommendation | null
 }>()
 
 const emit = defineEmits<{
@@ -57,6 +63,21 @@ const careFeedbackTitle = computed(() => {
     messages.value.actions[feedback.action].label,
   )
 })
+const recommendationTitle = computed(() => {
+  const recommendation = props.recommendedCareAction
+  if (!recommendation) return ''
+
+  return messages.value.careRecommendation.title.replace(
+    '{action}',
+    messages.value.actions[recommendation.action].label,
+  )
+})
+const recommendationDetail = computed(() => {
+  const recommendation = props.recommendedCareAction
+  if (!recommendation) return ''
+
+  return messages.value.careRecommendation.details[recommendation.action]
+})
 const actionLimitText = computed(() => {
   const limitMessages = messages.value.actionLimit
 
@@ -88,6 +109,10 @@ onBeforeUnmount(() => {
 
 function isActionDisabled(action: PetAction): boolean {
   return isLimitReached.value || props.cooldowns[action] > now.value || props.activeReaction === action
+}
+
+function isRecommendedAction(action: PetAction): boolean {
+  return props.recommendedCareAction?.action === action
 }
 
 function getActionDetail(action: PetAction): string {
@@ -130,6 +155,14 @@ function formatSigned(value: number): string {
 
 <template>
   <div class="action-section">
+    <div v-if="recommendedCareAction" class="action-recommendation" aria-live="polite">
+      <div>
+        <span>{{ messages.careRecommendation.heading }}</span>
+        <strong>{{ recommendationTitle }}</strong>
+      </div>
+      <small>{{ recommendationDetail }}</small>
+    </div>
+
     <div class="action-limit" :class="{ 'action-limit--locked': isLimitReached }">
       <span>{{ actionLimitText }}</span>
       <button
@@ -147,12 +180,18 @@ function formatSigned(value: number): string {
         v-for="action in actions"
         :key="action.id"
         class="action-button"
+        :class="{ 'action-button--recommended': isRecommendedAction(action.id) }"
         type="button"
         :disabled="isActionDisabled(action.id)"
         :aria-label="getActionAriaLabel(action.id)"
         @click="emit('action', action.id)"
       >
-        <span>{{ messages.actions[action.id].label }}</span>
+        <span class="action-button__label">
+          <span>{{ messages.actions[action.id].label }}</span>
+          <em v-if="isRecommendedAction(action.id)" class="action-button__badge">
+            {{ messages.careRecommendation.badge }}
+          </em>
+        </span>
         <small>{{ getActionDetail(action.id) }}</small>
       </button>
     </div>
