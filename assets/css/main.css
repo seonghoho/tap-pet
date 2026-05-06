@@ -1244,6 +1244,71 @@ button:disabled {
   opacity: 0.58;
 }
 
+.care-feedback {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-success) 12%, transparent), transparent 78%),
+    var(--app-surface-strong);
+  border: 1px solid color-mix(in srgb, var(--app-success) 36%, var(--app-border));
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.care-feedback__header {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.care-feedback__header span {
+  color: var(--app-muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.care-feedback__header strong {
+  color: var(--app-success);
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.care-feedback__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.care-feedback__chip {
+  background: color-mix(in srgb, var(--app-success) 12%, var(--app-surface));
+  border: 1px solid color-mix(in srgb, var(--app-success) 34%, var(--app-border));
+  border-radius: 999px;
+  color: var(--app-text);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.2;
+  padding: 5px 8px;
+}
+
+.care-feedback__chip--negative {
+  background: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--app-muted);
+}
+
+.care-feedback__chip--strong {
+  background: var(--app-success);
+  border-color: color-mix(in srgb, var(--app-success) 78%, #000);
+  color: var(--app-accent-text);
+}
+
+.care-feedback__note {
+  color: var(--app-muted);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
 .choice-list,
 .theme-list,
 .mock-list {

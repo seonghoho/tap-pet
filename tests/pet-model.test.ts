@@ -203,6 +203,47 @@ describe('pet store', () => {
     expect(store.activeReaction.value).toBeNull()
   })
 
+  it('exposes the latest care result feedback after a delayed action resolves', () => {
+    const callbacks: Array<() => void> = []
+    const store = createScheduledStore(callbacks)
+
+    store.initializePet('cat')
+    store.performAction('play')
+
+    expect(store.lastCareFeedback.value).toBeNull()
+
+    callbacks[0]?.()
+
+    expect(store.lastCareFeedback.value).toMatchObject({
+      action: 'play',
+      statChanges: {
+        fullness: -8,
+        energy: -14,
+        cleanliness: -8,
+      },
+      gainedExp: 20,
+      gainedAffinityExp: 14,
+      didLevelUp: false,
+      didAffinityLevelUp: false,
+      wasReduced: false,
+    })
+  })
+
+  it('does not let an older delayed action overwrite newer care feedback', () => {
+    const callbacks: Array<() => void> = []
+    const store = createScheduledStore(callbacks)
+
+    store.initializePet('cat')
+    store.performAction('feed')
+    store.performAction('play')
+
+    callbacks[1]?.()
+    expect(store.lastCareFeedback.value?.action).toBe('play')
+
+    callbacks[0]?.()
+    expect(store.lastCareFeedback.value?.action).toBe('play')
+  })
+
   it('limits care actions to five uses per thirty minute window', () => {
     const store = usePetStore()
 

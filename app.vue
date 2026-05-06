@@ -159,6 +159,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
             :cooldowns="pet.actionCooldowns.value"
             :active-reaction="pet.activeReaction.value"
             :action-limit-info="pet.actionLimitInfo.value"
+            :care-feedback="pet.lastCareFeedback.value"
             @action="handleAction"
             @reward-ad="pet.grantRewardedAdActions"
           />

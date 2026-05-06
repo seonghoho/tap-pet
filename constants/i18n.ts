@@ -114,6 +114,13 @@ export const I18N_MESSAGES = {
       locked: 'Care limit reached. Come back in {time}, or watch an ad for more actions.',
       rewardAd: 'Watch ad',
     },
+    careFeedback: {
+      title: '{action} complete',
+      ariaLabel: 'Care result',
+      levelUp: 'Level up',
+      affinityUp: 'Affinity up',
+      reduced: 'Reward was reduced because this need was already high.',
+    },
     titles: {
       heading: 'Disguise title',
       description: 'Pick the base browser tab label.',
@@ -297,6 +304,13 @@ export const I18N_MESSAGES = {
       locked: '돌봄 횟수를 모두 사용했습니다. {time} 후 다시 가능하거나 광고를 보고 추가할 수 있습니다.',
       rewardAd: '광고 보기',
     },
+    careFeedback: {
+      title: '{action} 완료',
+      ariaLabel: '돌봄 결과',
+      levelUp: '레벨업',
+      affinityUp: '친밀도 상승',
+      reduced: '이미 충분히 돌본 상태라 보상이 줄었습니다.',
+    },
     titles: {
       heading: '위장 타이틀',
       description: '브라우저 탭에 표시될 기본 문구를 고르세요.',
@@ -479,6 +493,13 @@ export const I18N_MESSAGES = {
       remaining: '30分のお世話回数が {remaining}/{limit} 回残っています。',
       locked: 'お世話回数を使い切りました。{time} 後に戻るか、広告を見ると追加できます。',
       rewardAd: '広告を見る',
+    },
+    careFeedback: {
+      title: '{action} 完了',
+      ariaLabel: 'お世話の結果',
+      levelUp: 'レベルアップ',
+      affinityUp: '親密度アップ',
+      reduced: 'このニーズはすでに高いため、報酬が少なくなりました。',
     },
     titles: {
       heading: '偽装タイトル',

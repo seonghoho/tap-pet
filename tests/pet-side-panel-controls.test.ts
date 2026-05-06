@@ -102,6 +102,12 @@ describe('pet side panel progress summary', () => {
     expect(getComponentPropExpression(template, 'PetSidePanel', 'level-progress')).toBe('pet.levelProgress.value')
   })
 
+  it('passes recent care feedback into the action controls', () => {
+    const template = readComponentTemplate('app.vue')
+
+    expect(getComponentPropExpression(template, 'PetActions', 'care-feedback')).toBe('pet.lastCareFeedback.value')
+  })
+
   it('uses softer dedicated gauge colors instead of the primary action colors', () => {
     const appSource = readSource('app.vue')
     const css = readSource('assets/css/main.css')

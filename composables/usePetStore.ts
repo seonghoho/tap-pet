@@ -5,8 +5,10 @@ import { ACTION_COOLDOWN_MS, ACTION_REACTION_HOLD_MS, DEFAULT_SETTINGS } from '~
 import type {
   DisguiseTitleId,
   PetAction,
+  PetCareFeedback,
   PetSettings,
   PetSpecies,
+  PetStats,
   PetState,
   ThemeId,
 } from '~/types/pet'
@@ -17,7 +19,7 @@ import {
   grantRewardedActionUses,
 } from '~/utils/petActionLimit'
 import { createInitialPetState } from '~/utils/petFactory'
-import { getAffinityProgress, getLevelProgress } from '~/utils/petGrowth'
+import { getAffinityLevel, getAffinityProgress, getLevelProgress } from '~/utils/petGrowth'
 import { getPetStatus } from '~/utils/petStatus'
 import { isDisguiseTitleId, isPetSpecies, isThemeId } from '~/utils/petValidation'
 
@@ -51,6 +53,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
   const sidePanelMode = useState<SidePanelMode>('tab-pet:side-panel-mode', () => 'status')
   const actionGeneration = useState<number>('tab-pet:action-generation', () => 0)
   const latestActionRunId = useState<number>('tab-pet:latest-action-run-id', () => 0)
+  const lastCareFeedback = useState<PetCareFeedback | null>('tab-pet:last-care-feedback', () => null)
 
   usePetClock(now)
 
@@ -96,6 +99,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     actionGeneration.value += 1
     latestActionRunId.value += 1
     activeReaction.value = null
+    lastCareFeedback.value = null
     commitState(
       createInitialPetState(species, Date.now(), {
         settings: {
@@ -112,6 +116,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     const consumedLimit = consumeActionLimitUse(petState.value.actionLimit, startedAt)
     if (!consumedLimit) return
 
+    lastCareFeedback.value = null
     actionCooldowns.value = {
       ...actionCooldowns.value,
       [action]: startedAt + ACTION_COOLDOWN_MS[action],
@@ -128,19 +133,34 @@ export function usePetStore(options: PetStoreOptions = {}) {
     const resolveAction = () => {
       if (!petState.value || actionGeneration.value !== pendingGeneration) return
 
+      const previousState = petState.value
+      const previousAffinityLevel = getAffinityLevel(previousState.growth.affinityExp)
       const result = applyCareAction({
-        stats: petState.value.stats,
-        growth: petState.value.growth,
+        stats: previousState.stats,
+        growth: previousState.growth,
         action,
       })
       const resolvedAt = Date.now()
+      const nextAffinityLevel = getAffinityLevel(result.growth.affinityExp)
 
       commitState({
-        ...petState.value,
+        ...previousState,
         stats: result.stats,
         growth: result.growth,
-        lastPlayedAt: action === 'play' ? resolvedAt : petState.value.lastPlayedAt,
+        lastPlayedAt: action === 'play' ? resolvedAt : previousState.lastPlayedAt,
       })
+      if (latestActionRunId.value === actionRunId) {
+        lastCareFeedback.value = {
+          action,
+          statChanges: getStatChanges(previousState.stats, result.stats),
+          gainedExp: result.gainedExp,
+          gainedAffinityExp: result.gainedAffinityExp,
+          didLevelUp: result.growth.level > previousState.growth.level,
+          didAffinityLevelUp: nextAffinityLevel > previousAffinityLevel,
+          wasReduced: result.wasReduced,
+          createdAt: resolvedAt,
+        }
+      }
       if (latestActionRunId.value === actionRunId && activeReaction.value === action) {
         activeReaction.value = null
       }
@@ -219,6 +239,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
       wash: 0,
     }
     activeReaction.value = null
+    lastCareFeedback.value = null
     sidePanelMode.value = 'status'
     storage.clearPetState()
   }
@@ -260,6 +281,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     actionLimitInfo,
     actionCooldowns: readonly(actionCooldowns),
     activeReaction: readonly(activeReaction),
+    lastCareFeedback: readonly(lastCareFeedback),
     sidePanelMode: readonly(sidePanelMode),
     storageError: storage.storageError,
     restorePet,
@@ -301,6 +323,14 @@ function usePetClock(now: Ref<number>): void {
 
 function isSidePanelMode(mode: unknown): mode is SidePanelMode {
   return mode === 'status' || mode === 'settings'
+}
+
+function getStatChanges(before: PetStats, after: PetStats): PetStats {
+  return {
+    fullness: after.fullness - before.fullness,
+    energy: after.energy - before.energy,
+    cleanliness: after.cleanliness - before.cleanliness,
+  }
 }
 
 function getValidSettingsPatch(settings: Partial<PetSettings>): Partial<PetSettings> {

@@ -56,6 +56,17 @@ export type PetActionLimitInfo = {
   windowMs: number
 }
 
+export type PetCareFeedback = {
+  action: PetAction
+  statChanges: PetStats
+  gainedExp: number
+  gainedAffinityExp: number
+  didLevelUp: boolean
+  didAffinityLevelUp: boolean
+  wasReduced: boolean
+  createdAt: number
+}
+
 export type PetState = {
   species: PetSpecies
   name: string

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import type { PetAction, PetActionLimitInfo } from '~/types/pet'
+import type { PetAction, PetActionLimitInfo, PetCareFeedback } from '~/types/pet'
 
 const props = defineProps<{
   cooldowns: Record<PetAction, number>
   activeReaction: PetAction | null
   actionLimitInfo: PetActionLimitInfo
+  careFeedback: PetCareFeedback | null
 }>()
 
 const emit = defineEmits<{
@@ -35,6 +36,27 @@ const actions: Array<{
 ]
 
 const isLimitReached = computed(() => props.actionLimitInfo.remaining <= 0)
+const feedbackStatRows = computed(() => {
+  const feedback = props.careFeedback
+  if (!feedback) return []
+
+  return (['fullness', 'energy', 'cleanliness'] as const)
+    .map((key) => ({
+      key,
+      label: messages.value.stats[key],
+      value: feedback.statChanges[key],
+    }))
+    .filter((stat) => stat.value !== 0)
+})
+const careFeedbackTitle = computed(() => {
+  const feedback = props.careFeedback
+  if (!feedback) return ''
+
+  return messages.value.careFeedback.title.replace(
+    '{action}',
+    messages.value.actions[feedback.action].label,
+  )
+})
 const actionLimitText = computed(() => {
   const limitMessages = messages.value.actionLimit
 
@@ -77,6 +99,12 @@ function formatRemainingTime(milliseconds: number): string {
 
   return `${minutes}m ${seconds.toString().padStart(2, '0')}s`
 }
+
+function formatSigned(value: number): string {
+  if (value > 0) return `+${value}`
+
+  return String(value)
+}
 </script>
 
 <template>
@@ -105,6 +133,40 @@ function formatRemainingTime(milliseconds: number): string {
         <span>{{ messages.actions[action.id].label }}</span>
         <small>{{ messages.actions[action.id].detail }}</small>
       </button>
+    </div>
+
+    <div v-if="careFeedback" class="care-feedback" aria-live="polite">
+      <div class="care-feedback__header">
+        <span>{{ careFeedbackTitle }}</span>
+        <strong>+{{ careFeedback.gainedExp }} {{ messages.stats.exp }}</strong>
+      </div>
+
+      <div class="care-feedback__chips" :aria-label="messages.careFeedback.ariaLabel">
+        <span
+          v-for="stat in feedbackStatRows"
+          :key="stat.key"
+          class="care-feedback__chip"
+          :class="{ 'care-feedback__chip--negative': stat.value < 0 }"
+        >
+          {{ stat.label }} {{ formatSigned(stat.value) }}
+        </span>
+        <span v-if="careFeedback.gainedAffinityExp > 0" class="care-feedback__chip">
+          {{ messages.stats.affinity }} +{{ careFeedback.gainedAffinityExp }}
+        </span>
+        <span v-if="careFeedback.didLevelUp" class="care-feedback__chip care-feedback__chip--strong">
+          {{ messages.careFeedback.levelUp }}
+        </span>
+        <span
+          v-if="careFeedback.didAffinityLevelUp"
+          class="care-feedback__chip care-feedback__chip--strong"
+        >
+          {{ messages.careFeedback.affinityUp }}
+        </span>
+      </div>
+
+      <p v-if="careFeedback.wasReduced" class="care-feedback__note">
+        {{ messages.careFeedback.reduced }}
+      </p>
     </div>
   </div>
 </template>
