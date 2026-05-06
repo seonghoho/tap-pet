@@ -320,6 +320,79 @@ button:disabled {
   gap: 14px;
 }
 
+.first-care-goal {
+  border-block: 1px solid var(--app-border);
+  display: grid;
+  gap: 11px;
+  padding: 12px 0;
+}
+
+.first-care-goal__copy {
+  display: grid;
+  gap: 4px;
+}
+
+.first-care-goal__copy span {
+  color: var(--app-accent);
+  font-size: 0.74rem;
+  font-weight: 900;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.first-care-goal__copy strong {
+  display: block;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.first-care-goal__copy small {
+  color: var(--app-muted);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.first-care-goal__list {
+  counter-reset: first-care-step;
+  display: grid;
+  gap: 7px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.first-care-goal__step {
+  align-items: center;
+  color: var(--app-text);
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 24px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.first-care-goal__step::before {
+  align-items: center;
+  background: color-mix(in srgb, var(--app-accent) 12%, var(--app-surface-strong));
+  border: 1px solid color-mix(in srgb, var(--app-accent) 34%, var(--app-border));
+  border-radius: 999px;
+  color: var(--app-accent);
+  content: counter(first-care-step);
+  counter-increment: first-care-step;
+  display: inline-flex;
+  font-size: 0.74rem;
+  font-weight: 900;
+  height: 24px;
+  justify-content: center;
+  width: 24px;
+}
+
+.first-care-goal__step span {
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
 .settings-panel,
 .pet-settings-panel {
   display: grid;
@@ -1949,6 +2022,15 @@ button:disabled {
 
   .setup-tab-demo {
     grid-template-columns: 1fr;
+  }
+
+  .first-care-goal__step {
+    grid-template-columns: 22px minmax(0, 1fr);
+  }
+
+  .first-care-goal__step::before {
+    height: 22px;
+    width: 22px;
   }
 
   .action-panel {

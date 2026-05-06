@@ -181,6 +181,25 @@ export const I18N_MESSAGES = {
       affinityUp: 'Affinity up',
       reduced: 'Reward was reduced because this need was already high.',
     },
+    firstCareGoal: {
+      eyebrow: 'First care loop',
+      title: 'Complete one simple loop',
+      description: 'Use the recommended care, read the result card, then watch growth move.',
+      steps: [
+        {
+          id: 'recommend',
+          label: 'Pick the recommended care',
+        },
+        {
+          id: 'result',
+          label: 'Check the result card',
+        },
+        {
+          id: 'growth',
+          label: 'Watch growth and affinity',
+        },
+      ],
+    },
     titles: {
       heading: 'Disguise title',
       description: 'Pick the base browser tab label.',
@@ -432,6 +451,25 @@ export const I18N_MESSAGES = {
       affinityUp: '친밀도 상승',
       reduced: '이미 충분히 돌본 상태라 보상이 줄었습니다.',
     },
+    firstCareGoal: {
+      eyebrow: '첫 돌봄 루프',
+      title: '한 번의 돌봄 흐름을 완료하세요',
+      description: '추천 행동을 누르고 결과 카드를 확인한 뒤 성장 변화를 보세요.',
+      steps: [
+        {
+          id: 'recommend',
+          label: '추천 돌봄 선택',
+        },
+        {
+          id: 'result',
+          label: '결과 카드 확인',
+        },
+        {
+          id: 'growth',
+          label: '성장/친밀도 변화 보기',
+        },
+      ],
+    },
     titles: {
       heading: '위장 타이틀',
       description: '브라우저 탭에 표시될 기본 문구를 고르세요.',
@@ -682,6 +720,25 @@ export const I18N_MESSAGES = {
       levelUp: 'レベルアップ',
       affinityUp: '親密度アップ',
       reduced: 'このニーズはすでに高いため、報酬が少なくなりました。',
+    },
+    firstCareGoal: {
+      eyebrow: '最初のケアループ',
+      title: '一度のお世話の流れを完了',
+      description: 'おすすめのお世話を選び、結果カードを確認し、成長の変化を見ます。',
+      steps: [
+        {
+          id: 'recommend',
+          label: 'おすすめのお世話を選択',
+        },
+        {
+          id: 'result',
+          label: '結果カードを確認',
+        },
+        {
+          id: 'growth',
+          label: '成長と親密度を見る',
+        },
+      ],
     },
     titles: {
       heading: '偽装タイトル',

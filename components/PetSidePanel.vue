@@ -54,6 +54,24 @@ const { messages } = useLocale()
         </p>
       </div>
 
+      <section class="first-care-goal" aria-labelledby="first-care-goal-title">
+        <div class="first-care-goal__copy">
+          <span>{{ messages.firstCareGoal.eyebrow }}</span>
+          <strong id="first-care-goal-title">{{ messages.firstCareGoal.title }}</strong>
+          <small>{{ messages.firstCareGoal.description }}</small>
+        </div>
+
+        <ol class="first-care-goal__list" role="list">
+          <li
+            v-for="step in messages.firstCareGoal.steps"
+            :key="step.id"
+            class="first-care-goal__step"
+          >
+            <span>{{ step.label }}</span>
+          </li>
+        </ol>
+      </section>
+
       <div class="progress-list">
         <div class="stat-row">
           <div class="stat-row__label">
