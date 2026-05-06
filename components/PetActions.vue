@@ -7,6 +7,7 @@ import type {
   PetCareFeedback,
   PetCareRecommendation,
 } from '~/types/pet'
+import type { ProgressInfo } from '~/utils/petGrowth'
 
 const props = defineProps<{
   cooldowns: Record<PetAction, number>
@@ -15,6 +16,7 @@ const props = defineProps<{
   careFeedback: PetCareFeedback | null
   actionLimitRewardFeedback: PetActionLimitRewardFeedback | null
   recommendedCareAction: PetCareRecommendation | null
+  levelProgress?: ProgressInfo | null
 }>()
 
 const emit = defineEmits<{
@@ -80,6 +82,38 @@ const careFeedbackSummary = computed(() => {
   }
 
   return messages.value.careFeedback.expSummary.replace('{value}', formatSigned(feedback.gainedExp))
+})
+const shouldShowFeedbackGrowth = computed(() => Boolean(props.careFeedback && props.levelProgress))
+const feedbackGrowthCurrent = computed(() => props.levelProgress?.current ?? 0)
+const feedbackGrowthRequired = computed(() => props.levelProgress?.required ?? 0)
+const feedbackGrowthRemaining = computed(() =>
+  Math.max(0, feedbackGrowthRequired.value - feedbackGrowthCurrent.value),
+)
+const feedbackGrowthPercent = computed(() =>
+  Math.min(100, Math.max(0, props.levelProgress?.percent ?? 0)),
+)
+const feedbackGrowthTitle = computed(() => {
+  const feedback = props.careFeedback
+  if (!feedback || !props.levelProgress) return ''
+
+  if (feedback.didLevelUp) return messages.value.careFeedback.growthComplete
+
+  return messages.value.careFeedback.growthRemaining
+    .replace('{remaining}', String(feedbackGrowthRemaining.value))
+    .replace('{exp}', messages.value.stats.exp)
+})
+const feedbackGrowthDetail = computed(() => {
+  const feedback = props.careFeedback
+  if (!feedback || !props.levelProgress) return ''
+
+  const template = feedback.didLevelUp
+    ? messages.value.careFeedback.growthCompleteDetail
+    : messages.value.careFeedback.growthDetail
+
+  return template
+    .replace('{current}', String(feedbackGrowthCurrent.value))
+    .replace('{required}', String(feedbackGrowthRequired.value))
+    .replace('{exp}', messages.value.stats.exp)
 })
 const careFeedbackTitle = computed(() => {
   const feedback = props.careFeedback
@@ -339,6 +373,27 @@ function formatSigned(value: number): string {
       <div class="care-feedback__summary">
         <span>{{ messages.careFeedback.summaryLabel }}</span>
         <strong>{{ careFeedbackSummary }}</strong>
+      </div>
+
+      <div v-if="shouldShowFeedbackGrowth" class="care-feedback__growth">
+        <span>{{ messages.careFeedback.growthLabel }}</span>
+        <div>
+          <strong>{{ feedbackGrowthTitle }}</strong>
+          <small>{{ feedbackGrowthDetail }}</small>
+          <div
+            class="care-feedback__growth-track"
+            role="progressbar"
+            :aria-label="messages.careFeedback.growthLabel"
+            :aria-valuemin="0"
+            :aria-valuenow="feedbackGrowthCurrent"
+            :aria-valuemax="feedbackGrowthRequired"
+          >
+            <span
+              class="care-feedback__growth-fill"
+              :style="{ width: `${feedbackGrowthPercent}%` }"
+            />
+          </div>
+        </div>
       </div>
 
       <div class="care-feedback__chips" :aria-label="messages.careFeedback.ariaLabel">
