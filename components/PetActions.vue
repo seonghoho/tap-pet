@@ -65,6 +65,19 @@ const careFeedbackTitle = computed(() => {
     messages.value.actions[feedback.action].label,
   )
 })
+const activeReactionTitle = computed(() => {
+  if (!props.activeReaction) return ''
+
+  return messages.value.careProgress.title.replace(
+    '{action}',
+    messages.value.actions[props.activeReaction].label,
+  )
+})
+const activeReactionDetail = computed(() => {
+  if (!props.activeReaction) return ''
+
+  return messages.value.careProgress.detail
+})
 const recommendationTitle = computed(() => {
   const recommendation = props.recommendedCareAction
   if (!recommendation) return ''
@@ -120,7 +133,7 @@ function isActionDisabled(action: PetAction): boolean {
 }
 
 function isRecommendedAction(action: PetAction): boolean {
-  return !isLimitReached.value && props.recommendedCareAction?.action === action
+  return !isLimitReached.value && !props.activeReaction && props.recommendedCareAction?.action === action
 }
 
 function getActionDetail(action: PetAction): string {
@@ -179,8 +192,17 @@ function formatSigned(value: number): string {
       {{ actionLimitRewardText }}
     </div>
 
+    <div v-if="activeReaction" class="care-progress" role="status">
+      <div>
+        <span>{{ messages.careProgress.heading }}</span>
+        <strong>{{ activeReactionTitle }}</strong>
+      </div>
+      <small>{{ activeReactionDetail }}</small>
+      <span class="care-progress__bar" aria-hidden="true" />
+    </div>
+
     <div
-      v-if="recommendedCareAction && !isLimitReached"
+      v-if="recommendedCareAction && !isLimitReached && !activeReaction"
       class="action-recommendation"
       aria-live="polite"
     >

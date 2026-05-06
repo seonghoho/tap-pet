@@ -49,7 +49,7 @@ describe('pet action limit reward feedback', () => {
     const source = readSource('components/PetActions.vue')
 
     expect(template).toContain('recommendedCareAction && !isLimitReached')
-    expect(source).toContain('return !isLimitReached.value && props.recommendedCareAction?.action === action')
+    expect(source).toContain('return !isLimitReached.value && !props.activeReaction')
   })
 
   it('keeps reward grant copy localized for every supported language', () => {

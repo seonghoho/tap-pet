@@ -1366,6 +1366,54 @@ button:disabled {
   padding: 10px 12px;
 }
 
+.care-progress {
+  align-items: center;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-accent) 9%, transparent), transparent 82%),
+    var(--app-surface-strong);
+  border: 1px solid color-mix(in srgb, var(--app-accent) 30%, var(--app-border));
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 0.45fr);
+  overflow: hidden;
+  padding: 12px;
+}
+
+.care-progress span {
+  color: var(--app-muted);
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.care-progress strong {
+  display: block;
+  line-height: 1.25;
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+}
+
+.care-progress small {
+  color: var(--app-muted);
+  line-height: 1.35;
+}
+
+.care-progress__bar {
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--app-accent) 54%, transparent),
+      transparent
+    );
+  border-radius: 999px;
+  grid-column: 1 / -1;
+  height: 4px;
+  overflow: hidden;
+}
+
 .action-panel {
   display: grid;
   gap: 12px;
@@ -1835,6 +1883,11 @@ button:disabled {
   .action-recommendation small {
     max-width: none;
     text-align: left;
+  }
+
+  .care-progress {
+    align-items: flex-start;
+    grid-template-columns: 1fr;
   }
 
   .pet-status {

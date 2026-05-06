@@ -145,6 +145,11 @@ export const I18N_MESSAGES = {
       limitReached: 'Care limit reached',
       ariaLabel: '{action}: {state}',
     },
+    careProgress: {
+      heading: 'Care in progress',
+      title: '{action} is running',
+      detail: 'Hold on. The result and stat changes will appear shortly.',
+    },
     careRecommendation: {
       heading: 'Recommended care',
       title: 'Try {action} next',
@@ -378,6 +383,11 @@ export const I18N_MESSAGES = {
       limitReached: '돌봄 횟수 없음',
       ariaLabel: '{action}: {state}',
     },
+    careProgress: {
+      heading: '돌봄 진행 중',
+      title: '{action} 처리 중',
+      detail: '잠시 후 결과와 상태 변화가 표시됩니다.',
+    },
     careRecommendation: {
       heading: '추천 돌봄',
       title: '{action}부터 해보세요',
@@ -610,6 +620,11 @@ export const I18N_MESSAGES = {
       inProgress: 'お世話中',
       limitReached: 'お世話回数なし',
       ariaLabel: '{action}: {state}',
+    },
+    careProgress: {
+      heading: 'お世話中',
+      title: '{action}を実行中',
+      detail: 'まもなく結果とステータスの変化が表示されます。',
     },
     careRecommendation: {
       heading: 'おすすめのお世話',
