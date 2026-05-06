@@ -59,21 +59,26 @@ describe('pet pixel sprite', () => {
     expect(dogMuzzleCells.length).toBeGreaterThan(0)
   })
 
-  it('keeps hedgehog identity readable with a spiky side silhouette', () => {
+  it('keeps hedgehog identity cute with a rounded curled silhouette', () => {
     const hedgehogCells = getPetPixelSpriteCells({
       species: 'hedgehog',
       status: 'happy',
     })
-    const backSpikeCells = hedgehogCells.filter(
+    const spineCells = hedgehogCells.filter(
       (cell) => cell.role === 'spine' && cell.color === 'outline',
     )
+    const headCells = hedgehogCells.filter((cell) => cell.role === 'head')
     const muzzleCells = hedgehogCells.filter((cell) => cell.role === 'muzzle')
+    const cheekCells = hedgehogCells.filter((cell) => cell.role === 'cheek')
     const tailCells = hedgehogCells.filter((cell) => cell.role === 'tail')
 
-    expect(backSpikeCells.length).toBeGreaterThanOrEqual(3)
-    expect(Math.min(...backSpikeCells.map((cell) => cell.y))).toBeLessThanOrEqual(6)
+    expect(spineCells.length).toBeGreaterThanOrEqual(3)
+    expect(Math.min(...spineCells.map((cell) => cell.y))).toBeGreaterThanOrEqual(6)
+    expect(Math.min(...headCells.map((cell) => cell.x))).toBeLessThanOrEqual(11)
+    expect(Math.max(...headCells.map((cell) => cell.x + cell.width))).toBeLessThanOrEqual(19)
     expect(muzzleCells.length).toBeGreaterThan(0)
-    expect(Math.max(...muzzleCells.map((cell) => cell.x + cell.width))).toBeGreaterThanOrEqual(20)
+    expect(Math.max(...muzzleCells.map((cell) => cell.x + cell.width))).toBeLessThanOrEqual(18)
+    expect(cheekCells.length).toBeGreaterThan(0)
     expect(tailCells.length).toBeGreaterThan(0)
   })
 
