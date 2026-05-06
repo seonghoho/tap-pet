@@ -12,6 +12,7 @@ const { locale, messages, restoreLocale, setLocale } = useLocale()
 const runtimeConfig = useRuntimeConfig()
 const prefersDark = ref(false)
 const isDocumentVisible = ref(true)
+const sidePanelElement = ref<HTMLElement | null>(null)
 
 let colorSchemeQuery: MediaQueryList | null = null
 
@@ -101,6 +102,14 @@ function handleLocaleSelect(nextLocale: AppLocale): void {
   setLocale(nextLocale)
 }
 
+function openTabSettings(): void {
+  pet.setSidePanelMode('settings')
+  sidePanelElement.value?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start',
+  })
+}
+
 function handleVisibilityChange(): void {
   isDocumentVisible.value = document.visibilityState === 'visible'
 }
@@ -131,6 +140,14 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
           <span class="tab-preview__dot" aria-hidden="true" />
           <span>{{ tabPresentation.title }}</span>
         </div>
+        <button
+          v-if="currentPet"
+          class="tab-settings-shortcut"
+          type="button"
+          @click="openTabSettings"
+        >
+          {{ messages.settings.openTabSettings }}
+        </button>
       </div>
     </header>
 
@@ -168,7 +185,12 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
         </template>
       </section>
 
-      <aside class="side-stack" :aria-label="messages.app.settingsLabel">
+      <aside
+        id="tab-settings"
+        ref="sidePanelElement"
+        class="side-stack"
+        :aria-label="messages.app.settingsLabel"
+      >
         <PetSidePanel
           v-if="currentPet && pet.levelProgress.value && pet.affinityProgress.value"
           :mode="pet.sidePanelMode.value"
