@@ -43,7 +43,10 @@ const actions: Array<{
   },
 ]
 
-const isLimitReached = computed(() => props.actionLimitInfo.remaining <= 0)
+const hasActionLimitWindowExpired = computed(() => props.actionLimitInfo.resetAt <= now.value)
+const isLimitReached = computed(
+  () => !hasActionLimitWindowExpired.value && props.actionLimitInfo.remaining <= 0,
+)
 const feedbackStatRows = computed(() => {
   const feedback = props.careFeedback
   if (!feedback) return []
@@ -133,6 +136,10 @@ const feedbackNextActionDetail = computed(() => {
 const actionLimitText = computed(() => {
   const limitMessages = messages.value.actionLimit
 
+  if (hasActionLimitWindowExpired.value) {
+    return limitMessages.resetReady
+  }
+
   if (isLimitReached.value) {
     return limitMessages.locked.replace(
       '{time}',
@@ -144,12 +151,41 @@ const actionLimitText = computed(() => {
     .replace('{remaining}', String(props.actionLimitInfo.remaining))
     .replace('{limit}', String(props.actionLimitInfo.limit))
 })
+const actionLimitMetaText = computed(() => {
+  if (hasActionLimitWindowExpired.value) return messages.value.actionLimit.resetReadyHint
+  if (isLimitReached.value) return messages.value.actionLimit.rewardHint
+
+  return messages.value.actionLimit.resetHint.replace(
+    '{time}',
+    formatRemainingTime(props.actionLimitInfo.resetAt - now.value),
+  )
+})
 const actionLimitRewardText = computed(() => {
   const feedback = props.actionLimitRewardFeedback
   if (!feedback) return ''
 
   return messages.value.actionLimit.rewardGranted.replace('{count}', String(feedback.addedUses))
 })
+const nextCoolingAction = computed(() =>
+  actions
+    .map(({ id }) => ({
+      id,
+      remaining: props.cooldowns[id] - now.value,
+    }))
+    .filter((action) => action.remaining > 0)
+    .sort((current, next) => current.remaining - next.remaining)[0] ?? null,
+)
+const actionAvailabilityText = computed(() => {
+  if (isLimitReached.value || props.activeReaction) return ''
+
+  const coolingAction = nextCoolingAction.value
+  if (!coolingAction) return ''
+
+  return messages.value.actionAvailability.cooldown
+    .replace('{action}', messages.value.actions[coolingAction.id].label)
+    .replace('{time}', formatRemainingTime(coolingAction.remaining))
+})
+const shouldShowActionAvailability = computed(() => Boolean(actionAvailabilityText.value))
 const shouldShowRecommendation = computed(
   () => Boolean(
     props.recommendedCareAction &&
@@ -230,7 +266,10 @@ function formatSigned(value: number): string {
 <template>
   <div class="action-section">
     <div class="action-limit" :class="{ 'action-limit--locked': isLimitReached }">
-      <span>{{ actionLimitText }}</span>
+      <div class="action-limit__copy">
+        <span>{{ actionLimitText }}</span>
+        <small>{{ actionLimitMetaText }}</small>
+      </div>
       <button
         v-if="isLimitReached"
         class="small-button"
@@ -264,6 +303,10 @@ function formatSigned(value: number): string {
         <strong>{{ recommendationTitle }}</strong>
       </div>
       <small>{{ recommendationDetail }}</small>
+    </div>
+
+    <div v-if="shouldShowActionAvailability" class="action-availability" aria-live="polite">
+      {{ actionAvailabilityText }}
     </div>
 
     <div class="action-panel">

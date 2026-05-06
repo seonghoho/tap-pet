@@ -136,8 +136,15 @@ export const I18N_MESSAGES = {
     actionLimit: {
       remaining: '{remaining}/{limit} care actions left in this 30-minute window.',
       locked: 'Care limit reached. Come back in {time}, or watch an ad for more actions.',
+      resetHint: 'Window resets in {time}.',
+      resetReady: 'A new care window is ready.',
+      resetReadyHint: 'Pick an action to continue with fresh care uses.',
+      rewardHint: 'You can add actions immediately with the reward button.',
       rewardAd: 'Get more actions',
       rewardGranted: '+{count} care actions added. You can continue now.',
+    },
+    actionAvailability: {
+      cooldown: '{action} is available again in {time}',
     },
     actionState: {
       cooldown: 'Ready in {time}',
@@ -380,8 +387,15 @@ export const I18N_MESSAGES = {
     actionLimit: {
       remaining: '30분 돌봄 가능 횟수 {remaining}/{limit}회 남음',
       locked: '돌봄 횟수를 모두 사용했습니다. {time} 후 다시 가능하거나 광고를 보고 추가할 수 있습니다.',
+      resetHint: '횟수는 {time} 후 초기화됩니다.',
+      resetReady: '새 돌봄 윈도우가 시작됐습니다.',
+      resetReadyHint: '행동을 선택하면 새 횟수로 이어갈 수 있습니다.',
+      rewardHint: '추가 횟수 버튼으로 바로 이어갈 수 있습니다.',
       rewardAd: '추가 횟수 받기',
       rewardGranted: '돌봄 횟수 +{count}회가 추가됐습니다. 바로 이어서 돌볼 수 있습니다.',
+    },
+    actionAvailability: {
+      cooldown: '{action} {time} 후 다시 가능',
     },
     actionState: {
       cooldown: '{time} 후 가능',
@@ -624,8 +638,15 @@ export const I18N_MESSAGES = {
     actionLimit: {
       remaining: '30分のお世話回数が {remaining}/{limit} 回残っています。',
       locked: 'お世話回数を使い切りました。{time} 後に戻るか、広告を見ると追加できます。',
+      resetHint: '回数は {time} 後にリセットされます。',
+      resetReady: '新しいお世話枠が始まりました。',
+      resetReadyHint: 'アクションを選ぶと新しい回数で続けられます。',
+      rewardHint: '追加回数ボタンですぐに続けられます。',
       rewardAd: '回数を追加',
       rewardGranted: 'お世話回数が +{count} 回追加されました。続けてお世話できます。',
+    },
+    actionAvailability: {
+      cooldown: '{action}は {time} 後に再開できます',
     },
     actionState: {
       cooldown: '{time} 後に利用可能',

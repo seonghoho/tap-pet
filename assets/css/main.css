@@ -1355,6 +1355,24 @@ button:disabled {
   color: var(--app-text);
 }
 
+.action-limit__copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.action-limit__copy span {
+  overflow-wrap: anywhere;
+}
+
+.action-limit small {
+  color: var(--app-muted);
+  display: block;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
 .action-limit-reward {
   background: color-mix(in srgb, var(--app-success) 11%, var(--app-surface-strong));
   border: 1px solid color-mix(in srgb, var(--app-success) 34%, var(--app-border));
@@ -1412,6 +1430,18 @@ button:disabled {
   grid-column: 1 / -1;
   height: 4px;
   overflow: hidden;
+}
+
+.action-availability {
+  background: color-mix(in srgb, var(--app-accent) 8%, var(--app-surface-strong));
+  border: 1px solid color-mix(in srgb, var(--app-accent) 26%, var(--app-border));
+  border-radius: 8px;
+  color: var(--app-muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  padding: 9px 12px;
 }
 
 .action-panel {
@@ -1933,6 +1963,10 @@ button:disabled {
   .action-recommendation small {
     max-width: none;
     text-align: left;
+  }
+
+  .action-limit {
+    align-items: flex-start;
   }
 
   .care-progress {

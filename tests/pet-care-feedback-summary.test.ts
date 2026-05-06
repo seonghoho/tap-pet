@@ -57,6 +57,7 @@ describe('pet care feedback summary', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
+    vi.useRealTimers()
   })
 
   it('renders a key result summary and next-action prompt inside care feedback', () => {
@@ -76,6 +77,8 @@ describe('pet care feedback summary', () => {
   })
 
   it('hides the feedback next action when the action limit is reached', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1000)
     vi.stubGlobal('useLocale', () => ({ messages: { value: I18N_MESSAGES.ko } }))
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     const component = loadScriptSetupComponent<PetActionsSetup>('components/PetActions.vue')
@@ -128,6 +131,8 @@ describe('pet care feedback summary', () => {
   })
 
   it('shows the feedback next action when feedback and remaining actions are both available', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1000)
     vi.stubGlobal('useLocale', () => ({ messages: { value: I18N_MESSAGES.ko } }))
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     const component = loadScriptSetupComponent<PetActionsSetup>('components/PetActions.vue')
