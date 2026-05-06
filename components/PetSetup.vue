@@ -31,6 +31,33 @@ const options: Array<{
       </p>
     </div>
 
+    <div class="setup-flow" :aria-label="messages.setup.title">
+      <div
+        v-for="(step, index) in messages.setup.steps"
+        :key="step.id"
+        class="setup-flow__item"
+      >
+        <span class="setup-flow__index">{{ index + 1 }}</span>
+        <span>
+          <strong>{{ step.title }}</strong>
+          <small>{{ step.description }}</small>
+        </span>
+      </div>
+    </div>
+
+    <div class="setup-tab-demo" :aria-label="messages.setup.tabPreview.label">
+      <div>
+        <strong>{{ messages.setup.tabPreview.label }}</strong>
+        <small>{{ messages.setup.tabPreview.hint }}</small>
+      </div>
+      <div class="setup-tab-demo__tabs" aria-hidden="true">
+        <span>{{ messages.setup.tabPreview.normal }}</span>
+        <span>{{ messages.setup.tabPreview.alert }}</span>
+      </div>
+    </div>
+
+    <p class="setup-save-note">{{ messages.setup.localSave }}</p>
+
     <div class="species-grid">
       <button
         v-for="option in options"

@@ -39,6 +39,30 @@ export const I18N_MESSAGES = {
       eyebrow: 'Setup',
       title: 'Choose your tab companion',
       description: 'The page stays simple; the browser tab carries the main pet reaction.',
+      steps: [
+        {
+          id: 'choose',
+          title: 'Choose a pet',
+          description: 'Start with any companion. You can reset later from settings.',
+        },
+        {
+          id: 'care',
+          title: 'Care in seconds',
+          description: 'Feed, play, sleep, or wash when one stat drops.',
+        },
+        {
+          id: 'tab',
+          title: 'Read the browser tab',
+          description: 'The title and favicon become the quiet status signal.',
+        },
+      ],
+      localSave: 'No account needed. Your pet is saved only in this browser.',
+      tabPreview: {
+        label: 'Tab signal preview',
+        normal: 'Tab Pet',
+        alert: 'I am hungry',
+        hint: 'When the tab is hidden and care is needed, the title and favicon change.',
+      },
     },
     species: {
       cat: {
@@ -235,6 +259,30 @@ export const I18N_MESSAGES = {
       eyebrow: '시작',
       title: '탭 친구를 선택하세요',
       description: '본문은 단순하게 두고, 브라우저 탭이 펫의 핵심 반응을 전달합니다.',
+      steps: [
+        {
+          id: 'choose',
+          title: '펫을 선택',
+          description: '처음엔 아무 친구나 골라도 괜찮습니다. 설정에서 나중에 다시 시작할 수 있어요.',
+        },
+        {
+          id: 'care',
+          title: '몇 초 만에 돌봄',
+          description: '수치가 떨어지면 밥 주기, 놀아주기, 재우기, 씻기기를 누르세요.',
+        },
+        {
+          id: 'tab',
+          title: '브라우저 탭 확인',
+          description: '탭 제목과 파비콘이 조용한 상태 신호가 됩니다.',
+        },
+      ],
+      localSave: '가입은 필요 없습니다. 펫은 이 브라우저에만 저장됩니다.',
+      tabPreview: {
+        label: '탭 신호 미리보기',
+        normal: 'Tab Pet',
+        alert: '배고파요',
+        hint: '탭이 가려져 있고 돌봄이 필요하면 제목과 파비콘이 바뀝니다.',
+      },
     },
     species: {
       cat: {
@@ -431,6 +479,30 @@ export const I18N_MESSAGES = {
       eyebrow: 'セットアップ',
       title: 'タブの相棒を選択',
       description: '本文はシンプルに保ち、ブラウザタブがペットの反応を伝えます。',
+      steps: [
+        {
+          id: 'choose',
+          title: 'ペットを選択',
+          description: '最初はどの相棒でも大丈夫です。設定から後でリセットできます。',
+        },
+        {
+          id: 'care',
+          title: '数秒でお世話',
+          description: '数値が下がったら、ごはん、遊び、睡眠、お手入れを選びます。',
+        },
+        {
+          id: 'tab',
+          title: 'ブラウザタブを見る',
+          description: 'タイトルとファビコンが静かな状態サインになります。',
+        },
+      ],
+      localSave: 'アカウントは不要です。ペットはこのブラウザだけに保存されます。',
+      tabPreview: {
+        label: 'タブサインのプレビュー',
+        normal: 'Tab Pet',
+        alert: 'お腹すいた',
+        hint: 'タブが隠れていてお世話が必要な時、タイトルとファビコンが変わります。',
+      },
     },
     species: {
       cat: {
