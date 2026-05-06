@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import type {
   PetAction,
   PetActionLimitInfo,
+  PetActionLimitRewardFeedback,
   PetCareFeedback,
   PetCareRecommendation,
 } from '~/types/pet'
@@ -12,6 +13,7 @@ const props = defineProps<{
   activeReaction: PetAction | null
   actionLimitInfo: PetActionLimitInfo
   careFeedback: PetCareFeedback | null
+  actionLimitRewardFeedback: PetActionLimitRewardFeedback | null
   recommendedCareAction: PetCareRecommendation | null
 }>()
 
@@ -92,6 +94,12 @@ const actionLimitText = computed(() => {
     .replace('{remaining}', String(props.actionLimitInfo.remaining))
     .replace('{limit}', String(props.actionLimitInfo.limit))
 })
+const actionLimitRewardText = computed(() => {
+  const feedback = props.actionLimitRewardFeedback
+  if (!feedback) return ''
+
+  return messages.value.actionLimit.rewardGranted.replace('{count}', String(feedback.addedUses))
+})
 
 onMounted(() => {
   now.value = Date.now()
@@ -112,7 +120,7 @@ function isActionDisabled(action: PetAction): boolean {
 }
 
 function isRecommendedAction(action: PetAction): boolean {
-  return props.recommendedCareAction?.action === action
+  return !isLimitReached.value && props.recommendedCareAction?.action === action
 }
 
 function getActionDetail(action: PetAction): string {
@@ -155,14 +163,6 @@ function formatSigned(value: number): string {
 
 <template>
   <div class="action-section">
-    <div v-if="recommendedCareAction" class="action-recommendation" aria-live="polite">
-      <div>
-        <span>{{ messages.careRecommendation.heading }}</span>
-        <strong>{{ recommendationTitle }}</strong>
-      </div>
-      <small>{{ recommendationDetail }}</small>
-    </div>
-
     <div class="action-limit" :class="{ 'action-limit--locked': isLimitReached }">
       <span>{{ actionLimitText }}</span>
       <button
@@ -173,6 +173,22 @@ function formatSigned(value: number): string {
       >
         {{ messages.actionLimit.rewardAd }}
       </button>
+    </div>
+
+    <div v-if="actionLimitRewardFeedback" class="action-limit-reward" role="status">
+      {{ actionLimitRewardText }}
+    </div>
+
+    <div
+      v-if="recommendedCareAction && !isLimitReached"
+      class="action-recommendation"
+      aria-live="polite"
+    >
+      <div>
+        <span>{{ messages.careRecommendation.heading }}</span>
+        <strong>{{ recommendationTitle }}</strong>
+      </div>
+      <small>{{ recommendationDetail }}</small>
     </div>
 
     <div class="action-panel">

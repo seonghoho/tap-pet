@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   ACTION_LIMIT_AD_REWARD_USES,
   ACTION_LIMIT_BASE_USES,
+  ACTION_LIMIT_REWARD_FEEDBACK_TTL_MS,
   ACTION_LIMIT_WINDOW_MS,
   ACTION_REACTION_HOLD_MS,
   PET_STORAGE_VERSION,
@@ -280,13 +281,58 @@ describe('pet store', () => {
 
     expect(store.actionLimitInfo.value.remaining).toBe(0)
 
+    vi.setSystemTime(1000 + 6000 * 5)
     store.grantRewardedAdActions()
     expect(store.actionLimitInfo.value.remaining).toBe(ACTION_LIMIT_AD_REWARD_USES)
+    expect(store.actionLimitRewardFeedback.value).toEqual({
+      addedUses: ACTION_LIMIT_AD_REWARD_USES,
+      createdAt: 1000 + 6000 * 5,
+    })
 
     vi.setSystemTime(1000 + 6000 * 6)
     store.performAction('play')
 
     expect(store.actionLimitInfo.value.remaining).toBe(ACTION_LIMIT_AD_REWARD_USES - 1)
+    expect(store.actionLimitRewardFeedback.value).toBeNull()
+  })
+
+  it('hides rewarded action grant feedback after a short confirmation window', () => {
+    const store = usePetStore()
+
+    store.initializePet('dog')
+    store.grantRewardedAdActions()
+    expect(store.actionLimitRewardFeedback.value).toMatchObject({
+      addedUses: ACTION_LIMIT_AD_REWARD_USES,
+    })
+
+    const nowState = nuxtState.get('tab-pet:now') as Ref<number> | undefined
+    expect(nowState).toBeDefined()
+
+    vi.setSystemTime(1000 + ACTION_LIMIT_REWARD_FEEDBACK_TTL_MS + 1)
+    nowState!.value = Date.now()
+
+    expect(store.actionLimitRewardFeedback.value).toBeNull()
+  })
+
+  it('clears rewarded action grant feedback when the pet is replaced or reset', () => {
+    const store = usePetStore()
+
+    store.initializePet('dog')
+    store.grantRewardedAdActions()
+    expect(store.actionLimitRewardFeedback.value).toMatchObject({
+      addedUses: ACTION_LIMIT_AD_REWARD_USES,
+    })
+
+    store.initializePet('cat')
+    expect(store.actionLimitRewardFeedback.value).toBeNull()
+
+    store.grantRewardedAdActions()
+    expect(store.actionLimitRewardFeedback.value).toMatchObject({
+      addedUses: ACTION_LIMIT_AD_REWARD_USES,
+    })
+
+    store.resetPet()
+    expect(store.actionLimitRewardFeedback.value).toBeNull()
   })
 
   it('reacts to clock changes when deriving pet status', () => {

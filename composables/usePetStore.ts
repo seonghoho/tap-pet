@@ -1,10 +1,17 @@
 import { computed, getCurrentInstance, onBeforeUnmount, onMounted, readonly } from 'vue'
 import type { Ref } from 'vue'
 import { useState } from '#app'
-import { ACTION_COOLDOWN_MS, ACTION_REACTION_HOLD_MS, DEFAULT_SETTINGS } from '~/constants/pet'
+import {
+  ACTION_COOLDOWN_MS,
+  ACTION_LIMIT_AD_REWARD_USES,
+  ACTION_LIMIT_REWARD_FEEDBACK_TTL_MS,
+  ACTION_REACTION_HOLD_MS,
+  DEFAULT_SETTINGS,
+} from '~/constants/pet'
 import type {
   DisguiseTitleId,
   PetAction,
+  PetActionLimitRewardFeedback,
   PetCareFeedback,
   PetSettings,
   PetSpecies,
@@ -54,6 +61,10 @@ export function usePetStore(options: PetStoreOptions = {}) {
   const actionGeneration = useState<number>('tab-pet:action-generation', () => 0)
   const latestActionRunId = useState<number>('tab-pet:latest-action-run-id', () => 0)
   const lastCareFeedback = useState<PetCareFeedback | null>('tab-pet:last-care-feedback', () => null)
+  const actionLimitRewardFeedbackState = useState<PetActionLimitRewardFeedback | null>(
+    'tab-pet:action-limit-reward-feedback',
+    () => null,
+  )
 
   usePetClock(now)
 
@@ -92,6 +103,14 @@ export function usePetStore(options: PetStoreOptions = {}) {
       now.value,
     )
   })
+  const actionLimitRewardFeedback = computed(() => {
+    const feedback = actionLimitRewardFeedbackState.value
+    if (!feedback) return null
+
+    if (now.value - feedback.createdAt > ACTION_LIMIT_REWARD_FEEDBACK_TTL_MS) return null
+
+    return feedback
+  })
 
   function restorePet(): void {
     if (!import.meta.client || hasRestored.value) return
@@ -108,6 +127,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     latestActionRunId.value += 1
     activeReaction.value = null
     lastCareFeedback.value = null
+    actionLimitRewardFeedbackState.value = null
     commitState(
       createInitialPetState(species, Date.now(), {
         settings: {
@@ -125,6 +145,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     if (!consumedLimit) return
 
     lastCareFeedback.value = null
+    actionLimitRewardFeedbackState.value = null
     actionCooldowns.value = {
       ...actionCooldowns.value,
       [action]: startedAt + ACTION_COOLDOWN_MS[action],
@@ -229,10 +250,15 @@ export function usePetStore(options: PetStoreOptions = {}) {
   function grantRewardedAdActions(): void {
     if (!petState.value) return
 
+    const grantedAt = Date.now()
     commitState({
       ...petState.value,
-      actionLimit: grantRewardedActionUses(petState.value.actionLimit, Date.now()),
+      actionLimit: grantRewardedActionUses(petState.value.actionLimit, grantedAt),
     })
+    actionLimitRewardFeedbackState.value = {
+      addedUses: ACTION_LIMIT_AD_REWARD_USES,
+      createdAt: grantedAt,
+    }
   }
 
   function resetPet(): void {
@@ -248,6 +274,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     }
     activeReaction.value = null
     lastCareFeedback.value = null
+    actionLimitRewardFeedbackState.value = null
     sidePanelMode.value = 'status'
     storage.clearPetState()
   }
@@ -291,6 +318,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     actionCooldowns: readonly(actionCooldowns),
     activeReaction: readonly(activeReaction),
     lastCareFeedback: readonly(lastCareFeedback),
+    actionLimitRewardFeedback,
     sidePanelMode: readonly(sidePanelMode),
     storageError: storage.storageError,
     restorePet,

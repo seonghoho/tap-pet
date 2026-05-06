@@ -65,6 +65,11 @@ export type PetActionLimitInfo = {
   windowMs: number
 }
 
+export type PetActionLimitRewardFeedback = {
+  addedUses: number
+  createdAt: number
+}
+
 export type PetCareFeedback = {
   action: PetAction
   statChanges: PetStats

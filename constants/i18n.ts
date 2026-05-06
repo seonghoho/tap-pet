@@ -136,7 +136,8 @@ export const I18N_MESSAGES = {
     actionLimit: {
       remaining: '{remaining}/{limit} care actions left in this 30-minute window.',
       locked: 'Care limit reached. Come back in {time}, or watch an ad for more actions.',
-      rewardAd: 'Watch ad',
+      rewardAd: 'Get more actions',
+      rewardGranted: '+{count} care actions added. You can continue now.',
     },
     actionState: {
       cooldown: 'Ready in {time}',
@@ -367,7 +368,8 @@ export const I18N_MESSAGES = {
     actionLimit: {
       remaining: '30분 돌봄 가능 횟수 {remaining}/{limit}회 남음',
       locked: '돌봄 횟수를 모두 사용했습니다. {time} 후 다시 가능하거나 광고를 보고 추가할 수 있습니다.',
-      rewardAd: '광고 보기',
+      rewardAd: '추가 횟수 받기',
+      rewardGranted: '돌봄 횟수 +{count}회가 추가됐습니다. 바로 이어서 돌볼 수 있습니다.',
     },
     actionState: {
       cooldown: '{time} 후 가능',
@@ -598,7 +600,8 @@ export const I18N_MESSAGES = {
     actionLimit: {
       remaining: '30分のお世話回数が {remaining}/{limit} 回残っています。',
       locked: 'お世話回数を使い切りました。{time} 後に戻るか、広告を見ると追加できます。',
-      rewardAd: '広告を見る',
+      rewardAd: '回数を追加',
+      rewardGranted: 'お世話回数が +{count} 回追加されました。続けてお世話できます。',
     },
     actionState: {
       cooldown: '{time} 後に利用可能',
