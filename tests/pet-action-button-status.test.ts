@@ -25,6 +25,7 @@ type PetActionsSetup = {
 type ActionButtonStateMessages = {
   ready: string
   recommended: string
+  recommendedDetail: string
   cooldown: string
   active: string
   locked: string
@@ -121,9 +122,7 @@ describe('pet action button status labels', () => {
     const setup = setupPetActions()
 
     expect(setup.getActionButtonStateLabel('feed')).toBe('추천')
-    expect(setup.getActionButtonDetail('feed')).toBe(
-      '지금은 배부름을 먼저 회복하는 흐름이 좋습니다.',
-    )
+    expect(setup.getActionButtonDetail('feed')).toBe('추천 결과 확인')
     expect(setup.getActionButtonStateClass('feed')).toBe('action-button__badge--recommended')
     expect(setup.getActionButtonStateLabel('play')).toBe('가능')
     expect(setup.getActionButtonDetail('play')).toBe(I18N_MESSAGES.ko.actions.play.detail)
@@ -191,6 +190,7 @@ describe('pet action button status labels', () => {
 
       expect(actionButtonState.ready.length).toBeGreaterThan(0)
       expect(actionButtonState.recommended.length).toBeGreaterThan(0)
+      expect(actionButtonState.recommendedDetail.length).toBeGreaterThan(0)
       expect(actionButtonState.cooldown.length).toBeGreaterThan(0)
       expect(actionButtonState.active.length).toBeGreaterThan(0)
       expect(actionButtonState.locked.length).toBeGreaterThan(0)

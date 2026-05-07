@@ -174,6 +174,7 @@ export const I18N_MESSAGES = {
     actionButtonState: {
       ready: 'Ready',
       recommended: 'Recommended',
+      recommendedDetail: 'Check recommended result',
       cooldown: 'Cooldown',
       active: 'In progress',
       locked: 'Locked',
@@ -496,6 +497,7 @@ export const I18N_MESSAGES = {
     actionButtonState: {
       ready: '가능',
       recommended: '추천',
+      recommendedDetail: '추천 결과 확인',
       cooldown: '대기',
       active: '진행 중',
       locked: '횟수 없음',
@@ -818,6 +820,7 @@ export const I18N_MESSAGES = {
     actionButtonState: {
       ready: '可能',
       recommended: 'おすすめ',
+      recommendedDetail: 'おすすめ結果を確認',
       cooldown: '待機',
       active: '進行中',
       locked: '回数なし',

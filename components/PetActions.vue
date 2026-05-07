@@ -441,7 +441,9 @@ function getActionDetail(action: PetAction): string {
 }
 
 function getActionButtonDetail(action: PetAction): string {
-  if (getActionButtonState(action) === 'recommended') return recommendationDetail.value
+  if (getActionButtonState(action) === 'recommended') {
+    return messages.value.actionButtonState.recommendedDetail
+  }
 
   return getActionDetail(action)
 }
