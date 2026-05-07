@@ -312,6 +312,7 @@ const recommendationRewardText = computed(() => {
   return messages.value.careRecommendation.rewardHint
     .replace('{exp}', formatSigned(reward.gainedExp))
     .replace('{affinity}', formatSigned(reward.gainedAffinityExp))
+    .replace('{bonus}', formatMultiplier(reward.rewardMultiplier))
 })
 const recommendationRewardReducedText = computed(() => {
   if (!props.recommendedCareRewardPreview?.wasReduced) return ''
@@ -482,6 +483,10 @@ function formatSigned(value: number): string {
   if (value > 0) return `+${value}`
 
   return String(value)
+}
+
+function formatMultiplier(multiplier: number): string {
+  return multiplier.toFixed(1)
 }
 </script>
 

@@ -265,9 +265,13 @@ describe('pet recommendation reward preview', () => {
     )
 
     expect(setup.shouldShowRecommendationReward.value).toBe(true)
-    expect(setup.recommendationRewardText.value).toBe('예상 보상 경험치 +13 · 친밀도 +2')
+    expect(setup.recommendationRewardText.value).toBe(
+      '예상 보상 경험치 +13 · 친밀도 +2 · 경험치 보너스 x1.1',
+    )
     expect(setup.recommendationRewardReducedText.value).toBe('')
-    expect(reducedSetup.recommendationRewardText.value).toBe('예상 보상 경험치 +5 · 친밀도 +1')
+    expect(reducedSetup.recommendationRewardText.value).toBe(
+      '예상 보상 경험치 +5 · 친밀도 +1 · 경험치 보너스 x1.1',
+    )
     expect(reducedSetup.recommendationRewardReducedText.value).toBe(
       '이미 충분히 돌본 상태라 예상 보상이 낮습니다.',
     )
@@ -296,6 +300,7 @@ describe('pet recommendation reward preview', () => {
 
       expect(careRecommendation.rewardHint).toContain('{exp}')
       expect(careRecommendation.rewardHint).toContain('{affinity}')
+      expect(careRecommendation.rewardHint).toContain('{bonus}')
       expect(careRecommendation.rewardReduced.length).toBeGreaterThan(0)
     }
   })
