@@ -173,6 +173,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
             :active-reaction="pet.activeReaction.value"
           />
           <PetActions
+            :stats="currentPet.stats"
             :cooldowns="pet.actionCooldowns.value"
             :active-reaction="pet.activeReaction.value"
             :action-limit-info="pet.actionLimitInfo.value"

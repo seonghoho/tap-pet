@@ -6,11 +6,13 @@ import type {
   PetActionLimitRewardFeedback,
   PetCareFeedback,
   PetCareRecommendation,
+  PetStats,
 } from '~/types/pet'
 import type { CareActionRewardPreview } from '~/utils/petCare'
 import type { ProgressInfo } from '~/utils/petGrowth'
 
 const props = defineProps<{
+  stats: PetStats
   cooldowns: Record<PetAction, number>
   activeReaction: PetAction | null
   actionLimitInfo: PetActionLimitInfo
@@ -232,6 +234,17 @@ const shouldShowRecommendation = computed(
     !props.careFeedback,
   ),
 )
+const recommendationEvidenceText = computed(() => {
+  const recommendation = props.recommendedCareAction
+  if (!recommendation?.statKey) return ''
+
+  return messages.value.careRecommendation.statEvidence
+    .replace('{stat}', messages.value.stats[recommendation.statKey])
+    .replace('{value}', String(props.stats[recommendation.statKey]))
+})
+const shouldShowRecommendationEvidence = computed(() =>
+  Boolean(shouldShowRecommendation.value && recommendationEvidenceText.value),
+)
 const recommendationRewardText = computed(() => {
   const reward = props.recommendedCareRewardPreview
   if (!reward) return ''
@@ -413,6 +426,9 @@ function formatSigned(value: number): string {
       </div>
       <div class="action-recommendation__support">
         <small>{{ recommendationDetail }}</small>
+        <span v-if="shouldShowRecommendationEvidence" class="action-recommendation__evidence">
+          {{ recommendationEvidenceText }}
+        </span>
         <span v-if="shouldShowRecommendationReward" class="action-recommendation__reward">
           {{ recommendationRewardText }}
         </span>

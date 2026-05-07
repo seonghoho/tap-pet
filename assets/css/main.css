@@ -1482,6 +1482,22 @@ button:disabled {
   text-align: right;
 }
 
+.action-recommendation__evidence {
+  background: color-mix(in srgb, var(--app-accent) 9%, var(--app-surface));
+  border: 1px solid color-mix(in srgb, var(--app-accent) 26%, var(--app-border));
+  border-radius: 999px;
+  box-sizing: border-box;
+  color: var(--app-text);
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.25;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: 5px 8px;
+  text-align: right;
+}
+
 .action-recommendation__reward--muted {
   background: var(--app-surface);
   border-color: var(--app-border);
@@ -2235,6 +2251,10 @@ button:disabled {
   }
 
   .action-recommendation__reward {
+    text-align: left;
+  }
+
+  .action-recommendation__evidence {
     text-align: left;
   }
 
