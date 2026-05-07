@@ -275,35 +275,59 @@ const shouldShowRecommendationReward = computed(() =>
   Boolean(shouldShowRecommendation.value && props.recommendedCareRewardPreview),
 )
 const shouldShowFeedbackNextAction = computed(
-  () => Boolean(
-    props.careFeedback &&
-    props.recommendedCareAction &&
-    !isLimitReached.value &&
-    !props.activeReaction,
-  ),
+  () => {
+    const recommendation = props.recommendedCareAction
+
+    return Boolean(
+      props.careFeedback &&
+      recommendation &&
+      !isLimitReached.value &&
+      !props.activeReaction &&
+      props.cooldowns[recommendation.action] <= now.value,
+    )
+  },
 )
-const careFeedbackCheckbackText = computed(() => {
+const careFeedbackRetentionTitle = computed(() => {
   if (!props.careFeedback) return ''
 
-  if (hasActionLimitWindowExpired.value) return messages.value.careFeedback.checkbackReady
+  if (hasActionLimitWindowExpired.value) return messages.value.careFeedback.retentionReadyTitle
 
   if (isLimitReached.value) {
-    return messages.value.careFeedback.checkbackLimit.replace(
+    return messages.value.careFeedback.retentionInTitle.replace(
       '{time}',
       formatRemainingTime(props.actionLimitInfo.resetAt - now.value),
     )
   }
 
-  if (shouldShowFeedbackNextAction.value) return messages.value.careFeedback.checkbackNow
+  if (shouldShowFeedbackNextAction.value) return messages.value.careFeedback.retentionNowTitle
 
   const coolingAction = nextCoolingAction.value
   if (coolingAction) {
-    return messages.value.careFeedback.checkbackCooldown
+    return messages.value.careFeedback.retentionInTitle.replace(
+      '{time}',
+      formatRemainingTime(coolingAction.remaining),
+    )
+  }
+
+  return messages.value.careFeedback.retentionLaterTitle
+})
+const careFeedbackCheckbackText = computed(() => {
+  if (!props.careFeedback) return ''
+
+  if (hasActionLimitWindowExpired.value) return messages.value.careFeedback.retentionReadyDetail
+
+  if (isLimitReached.value) return messages.value.careFeedback.retentionLimitDetail
+
+  if (shouldShowFeedbackNextAction.value) return messages.value.careFeedback.retentionNowDetail
+
+  const coolingAction = nextCoolingAction.value
+  if (coolingAction) {
+    return messages.value.careFeedback.retentionCooldownDetail
       .replace('{action}', messages.value.actions[coolingAction.id].label)
       .replace('{time}', formatRemainingTime(coolingAction.remaining))
   }
 
-  return messages.value.careFeedback.checkbackLater
+  return messages.value.careFeedback.retentionLaterDetail
 })
 const shouldShowFeedbackCheckback = computed(() => Boolean(careFeedbackCheckbackText.value))
 const shouldShowFeedbackFollowup = computed(() =>
@@ -558,7 +582,10 @@ function formatSigned(value: number): string {
 
         <div v-if="shouldShowFeedbackCheckback" class="care-feedback__checkback">
           <span>{{ messages.careFeedback.checkbackLabel }}</span>
-          <small>{{ careFeedbackCheckbackText }}</small>
+          <div>
+            <strong>{{ careFeedbackRetentionTitle }}</strong>
+            <small>{{ careFeedbackCheckbackText }}</small>
+          </div>
         </div>
 
         <p v-if="careFeedback.wasReduced" class="care-feedback__note">

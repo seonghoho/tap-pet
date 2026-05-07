@@ -1915,6 +1915,18 @@ button:disabled {
   overflow-wrap: anywhere;
 }
 
+.care-feedback__checkback div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.care-feedback__checkback strong {
+  display: block;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
 .care-feedback__next small,
 .care-feedback__checkback small {
   color: var(--app-muted);

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 import { createRequire } from 'node:module'
+import { resolve } from 'node:path'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import ts from 'typescript'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -15,10 +15,9 @@ type SetupComponent<T> = {
 }
 
 type PetActionsSetup = {
+  careFeedbackRetentionTitle?: { value: string }
   careFeedbackCheckbackText?: { value: string }
   shouldShowFeedbackCheckback?: { value: boolean }
-  shouldShowFeedbackFollowup?: { value: boolean }
-  shouldShowFeedbackNextAction?: { value: boolean }
 }
 
 function loadScriptSetupComponent<T>(componentPath: string): SetupComponent<T> {
@@ -94,6 +93,11 @@ function extractElementBlock(template: string, className: string): string {
 
 function createBaseProps(overrides: Record<string, unknown> = {}) {
   return {
+    stats: {
+      fullness: 74,
+      energy: 21,
+      cleanliness: 64,
+    },
     cooldowns: {
       feed: 0,
       play: 0,
@@ -152,66 +156,24 @@ function setupPetActions(props: Record<string, unknown> = {}): PetActionsSetup {
   })
 }
 
-describe('care feedback checkback hint', () => {
+describe('care feedback retention hint', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
     vi.useRealTimers()
   })
 
-  it('renders the next check hint inside the feedback follow-up section', () => {
-    const template = readComponentTemplate('components/PetActions.vue')
-    const source = readSource('components/PetActions.vue')
-    const followupBlock = extractElementBlock(template, 'care-feedback__follow-up')
-
-    expect(followupBlock).toContain('class="care-feedback__checkback"')
-    expect(followupBlock).toContain('v-if="shouldShowFeedbackCheckback"')
-    expect(followupBlock).toContain('messages.careFeedback.checkbackLabel')
-    expect(followupBlock).toContain('careFeedbackRetentionTitle')
-    expect(followupBlock).toContain('careFeedbackCheckbackText')
-    expect(source).toContain('messages.value.careFeedback.retentionNowDetail')
-    expect(source).toContain('messages.value.careFeedback.retentionCooldownDetail')
-    expect(source).toContain('messages.value.careFeedback.retentionLimitDetail')
-  })
-
-  it('keeps follow-up visible when only a next check hint is available', () => {
-    const setup = setupPetActions({
-      recommendedCareAction: null,
-    })
-
-    expect(setup.shouldShowFeedbackNextAction?.value).toBe(false)
-    expect(setup.shouldShowFeedbackCheckback?.value).toBe(true)
-    expect(setup.shouldShowFeedbackFollowup?.value).toBe(true)
-    expect(setup.careFeedbackCheckbackText?.value).toBe(
-      '탭을 열어두면 상태 변화가 제목과 파비콘 신호로 먼저 나타납니다.',
-    )
-  })
-
-  it('guides users to continue now when a next recommendation is available', () => {
+  it('shows an immediate return hint when the next recommendation is available', () => {
     const setup = setupPetActions()
 
+    expect(setup.shouldShowFeedbackCheckback?.value).toBe(true)
+    expect(setup.careFeedbackRetentionTitle?.value).toBe('지금 다시 확인')
     expect(setup.careFeedbackCheckbackText?.value).toBe(
       '다음 추천을 돌보면 결과 카드와 성장 변화를 바로 확인할 수 있어요.',
     )
   })
 
-  it('guides users to the limit reset time when no care uses remain', () => {
-    const setup = setupPetActions({
-      actionLimitInfo: {
-        used: 5,
-        limit: 5,
-        remaining: 0,
-        resetAt: 31 * 60 * 1000 + 1000,
-        windowMs: 30 * 60 * 1000,
-      },
-    })
-
-    expect(setup.careFeedbackCheckbackText?.value).toBe(
-      '돌봄 횟수가 돌아오면 상태 변화와 다음 추천을 다시 확인할 수 있어요.',
-    )
-  })
-
-  it('guides users to the nearest cooldown when no immediate recommendation exists', () => {
+  it('shows the nearest cooldown as the next check time', () => {
     const setup = setupPetActions({
       cooldowns: {
         feed: 4500,
@@ -222,33 +184,77 @@ describe('care feedback checkback hint', () => {
       recommendedCareAction: null,
     })
 
+    expect(setup.careFeedbackRetentionTitle?.value).toBe('2s 후 다시 확인')
     expect(setup.careFeedbackCheckbackText?.value).toBe(
       '재우기: 2s 후 반복 돌봄 결과를 확인할 수 있어요.',
     )
   })
 
-  it('keeps checkback copy localized for every supported language', () => {
+  it('uses cooldown timing when the recommended follow-up is still cooling down', () => {
+    const setup = setupPetActions({
+      cooldowns: {
+        feed: 0,
+        play: 0,
+        sleep: 6100,
+        wash: 0,
+      },
+    })
+
+    expect(setup.careFeedbackRetentionTitle?.value).toBe('6s 후 다시 확인')
+    expect(setup.careFeedbackCheckbackText?.value).toBe(
+      '재우기: 6s 후 반복 돌봄 결과를 확인할 수 있어요.',
+    )
+  })
+
+  it('shows the action limit reset as the next check time', () => {
+    const setup = setupPetActions({
+      actionLimitInfo: {
+        used: 5,
+        limit: 5,
+        remaining: 0,
+        resetAt: 31 * 60 * 1000 + 1000,
+        windowMs: 30 * 60 * 1000,
+      },
+    })
+
+    expect(setup.careFeedbackRetentionTitle?.value).toBe('31m 00s 후 다시 확인')
+    expect(setup.careFeedbackCheckbackText?.value).toBe(
+      '돌봄 횟수가 돌아오면 상태 변화와 다음 추천을 다시 확인할 수 있어요.',
+    )
+  })
+
+  it('renders retention title and detail inside the feedback follow-up', () => {
+    const template = readComponentTemplate('components/PetActions.vue')
+    const checkbackBlock = extractElementBlock(template, 'care-feedback__checkback')
+
+    expect(checkbackBlock).toContain('careFeedbackRetentionTitle')
+    expect(checkbackBlock).toContain('careFeedbackCheckbackText')
+    expect(checkbackBlock).toMatch(/<strong>\s*\{\{\s*careFeedbackRetentionTitle\s*\}\}\s*<\/strong>/)
+    expect(checkbackBlock).toMatch(/<small>\s*\{\{\s*careFeedbackCheckbackText\s*\}\}\s*<\/small>/)
+  })
+
+  it('keeps retention copy localized for every supported language', () => {
     for (const locale of SUPPORTED_LOCALES) {
       const careFeedback = I18N_MESSAGES[locale].careFeedback
 
-      expect(careFeedback.checkbackLabel.length).toBeGreaterThan(0)
-      expect(careFeedback.checkbackNow.length).toBeGreaterThan(0)
-      expect(careFeedback.checkbackCooldown).toContain('{action}')
-      expect(careFeedback.checkbackCooldown).toContain('{time}')
-      expect(careFeedback.checkbackLimit).toContain('{time}')
-      expect(careFeedback.checkbackReady.length).toBeGreaterThan(0)
-      expect(careFeedback.checkbackLater.length).toBeGreaterThan(0)
+      expect(careFeedback.retentionNowTitle.length).toBeGreaterThan(0)
       expect(careFeedback.retentionInTitle).toContain('{time}')
+      expect(careFeedback.retentionReadyTitle.length).toBeGreaterThan(0)
+      expect(careFeedback.retentionLaterTitle.length).toBeGreaterThan(0)
+      expect(careFeedback.retentionNowDetail.length).toBeGreaterThan(0)
       expect(careFeedback.retentionCooldownDetail).toContain('{action}')
       expect(careFeedback.retentionCooldownDetail).toContain('{time}')
+      expect(careFeedback.retentionLimitDetail.length).toBeGreaterThan(0)
+      expect(careFeedback.retentionReadyDetail.length).toBeGreaterThan(0)
+      expect(careFeedback.retentionLaterDetail.length).toBeGreaterThan(0)
     }
   })
 
-  it('defines compact checkback styles', () => {
+  it('defines compact responsive retention hint styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.care-feedback__checkback')
-    expect(css).toMatch(/\.care-feedback__checkback\s*\{[^}]*grid-template-columns: minmax\(0, 0\.42fr\) minmax\(0, 1fr\);/)
+    expect(css).toMatch(/\.care-feedback__checkback div\s*\{[^}]*display: grid;/)
+    expect(css).toMatch(/\.care-feedback__checkback strong\s*\{[^}]*overflow-wrap: anywhere;/)
     expect(css).toMatch(/\.care-feedback__checkback small\s*\{[^}]*overflow-wrap: anywhere;/)
     expect(css).toMatch(
       /@media \(max-width: 720px\)[\s\S]*\.care-feedback__checkback\s*\{[^}]*grid-template-columns: 1fr;/,
