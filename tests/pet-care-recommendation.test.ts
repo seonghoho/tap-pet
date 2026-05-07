@@ -102,7 +102,7 @@ describe('pet care recommendation', () => {
 
     expect(template).toContain('action-recommendation')
     expect(template).toContain('recommendationTitle')
-    expect(template).toContain('isRecommendedAction(action.id)')
+    expect(template).toContain("getActionButtonState(action.id) === 'recommended'")
     expect(source).toContain('recommendedCareAction: PetCareRecommendation | null')
     expect(css).toContain('.action-recommendation')
     expect(css).toContain('.action-button--recommended')

@@ -47,6 +47,8 @@ const actions: Array<{
   },
 ]
 
+type ActionButtonState = 'ready' | 'recommended' | 'cooldown' | 'active' | 'locked'
+
 const hasActionLimitWindowExpired = computed(() => props.actionLimitInfo.resetAt <= now.value)
 const isLimitReached = computed(
   () => !hasActionLimitWindowExpired.value && props.actionLimitInfo.remaining <= 0,
@@ -277,6 +279,23 @@ function isRecommendedAction(action: PetAction): boolean {
   return !isLimitReached.value && !props.activeReaction && props.recommendedCareAction?.action === action
 }
 
+function getActionButtonState(action: PetAction): ActionButtonState {
+  if (isLimitReached.value) return 'locked'
+  if (props.activeReaction === action) return 'active'
+  if (props.cooldowns[action] > now.value) return 'cooldown'
+  if (isRecommendedAction(action)) return 'recommended'
+
+  return 'ready'
+}
+
+function getActionButtonStateLabel(action: PetAction): string {
+  return messages.value.actionButtonState[getActionButtonState(action)]
+}
+
+function getActionButtonStateClass(action: PetAction): string {
+  return `action-button__badge--${getActionButtonState(action)}`
+}
+
 function getActionDetail(action: PetAction): string {
   if (props.activeReaction === action) return messages.value.actionState.inProgress
   if (isLimitReached.value) return messages.value.actionState.limitReached
@@ -292,10 +311,16 @@ function getActionDetail(action: PetAction): string {
   return messages.value.actions[action].detail
 }
 
+function getActionButtonDetail(action: PetAction): string {
+  if (getActionButtonState(action) === 'recommended') return recommendationDetail.value
+
+  return getActionDetail(action)
+}
+
 function getActionAriaLabel(action: PetAction): string {
   return messages.value.actionState.ariaLabel
     .replace('{action}', messages.value.actions[action].label)
-    .replace('{state}', getActionDetail(action))
+    .replace('{state}', `${getActionButtonStateLabel(action)} · ${getActionButtonDetail(action)}`)
 }
 
 function formatRemainingTime(milliseconds: number): string {
@@ -377,7 +402,7 @@ function formatSigned(value: number): string {
         v-for="action in actions"
         :key="action.id"
         class="action-button"
-        :class="{ 'action-button--recommended': isRecommendedAction(action.id) }"
+        :class="{ 'action-button--recommended': getActionButtonState(action.id) === 'recommended' }"
         type="button"
         :disabled="isActionDisabled(action.id)"
         :aria-label="getActionAriaLabel(action.id)"
@@ -385,11 +410,11 @@ function formatSigned(value: number): string {
       >
         <span class="action-button__label">
           <span>{{ messages.actions[action.id].label }}</span>
-          <em v-if="isRecommendedAction(action.id)" class="action-button__badge">
-            {{ messages.careRecommendation.badge }}
+          <em class="action-button__badge" :class="getActionButtonStateClass(action.id)">
+            {{ getActionButtonStateLabel(action.id) }}
           </em>
         </span>
-        <small>{{ getActionDetail(action.id) }}</small>
+        <small>{{ getActionButtonDetail(action.id) }}</small>
       </button>
     </div>
 

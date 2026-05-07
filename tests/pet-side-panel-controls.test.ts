@@ -95,6 +95,13 @@ function createActionMessages() {
       limitReached: 'Care limit reached',
       ariaLabel: '{action}: {state}',
     },
+    actionButtonState: {
+      ready: 'Ready',
+      recommended: 'Recommended',
+      cooldown: 'Cooldown',
+      active: 'In progress',
+      locked: 'Locked',
+    },
   }
 }
 
@@ -424,7 +431,7 @@ describe('pet action controls', () => {
     )
 
     expect(setup.getActionDetail('sleep')).toBe('Ready in 3s')
-    expect(setup.getActionAriaLabel('sleep')).toBe('Sleep: Ready in 3s')
+    expect(setup.getActionAriaLabel('sleep')).toBe('Sleep: Cooldown · Ready in 3s')
   })
 
   it('describes active and limit-locked action states', () => {
