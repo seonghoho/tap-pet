@@ -16,6 +16,7 @@ body {
   margin: 0;
   background: var(--app-bg, #f6f7f9);
   color: var(--app-text, #20242c);
+  overflow-x: hidden;
 }
 
 button,
@@ -2403,5 +2404,29 @@ button:disabled {
   .pet-avatar {
     height: 190px;
     width: 190px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-shell {
+    padding: 12px;
+  }
+
+  .main-panel {
+    padding: 14px;
+  }
+
+  .action-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .emoji-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .pet-avatar {
+    height: 160px;
+    width: 160px;
   }
 }
