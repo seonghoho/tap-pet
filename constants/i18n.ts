@@ -161,6 +161,8 @@ export const I18N_MESSAGES = {
       heading: 'Recommended care',
       title: 'Try {action} next',
       badge: 'Recommended',
+      rewardHint: 'Expected reward {exp} EXP · {affinity} affinity',
+      rewardReduced: 'Expected reward is lower because this need is already high.',
       details: {
         feed: 'Fullness is the best stat to recover now.',
         play: 'It has been idle for a while. Play helps refresh the tab signal.',
@@ -436,6 +438,8 @@ export const I18N_MESSAGES = {
       heading: '추천 돌봄',
       title: '{action}부터 해보세요',
       badge: '추천',
+      rewardHint: '예상 보상 경험치 {exp} · 친밀도 {affinity}',
+      rewardReduced: '이미 충분히 돌본 상태라 예상 보상이 낮습니다.',
       details: {
         feed: '지금은 배부름을 먼저 회복하는 흐름이 좋습니다.',
         play: '오래 쉬고 있어 놀아주면 탭 신호가 다시 살아납니다.',
@@ -711,6 +715,8 @@ export const I18N_MESSAGES = {
       heading: 'おすすめのお世話',
       title: '次は{action}',
       badge: 'おすすめ',
+      rewardHint: '予想報酬 経験値 {exp} · 親密度 {affinity}',
+      rewardReduced: 'このニーズはすでに高いため、予想報酬は低めです。',
       details: {
         feed: 'いまは満腹度を先に回復するのがよさそうです。',
         play: 'しばらく動きがないため、遊ぶとタブの合図が戻ります。',

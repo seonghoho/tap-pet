@@ -37,6 +37,11 @@ export type CareActionResult = {
   wasReduced: boolean
 }
 
+export type CareActionRewardPreview = Pick<
+  CareActionResult,
+  'gainedExp' | 'gainedAffinityExp' | 'rewardMultiplier' | 'wasReduced'
+>
+
 const STATUS_RECOMMENDATIONS: Partial<Record<PetStatus, PetCareRecommendation>> = {
   hungry: {
     action: 'feed',
@@ -89,6 +94,18 @@ export function applyCareAction(input: CareActionInput): CareActionResult {
     cleanliness: clampStat(input.stats.cleanliness + effect.cleanliness),
   }
   const growth = normalizeGrowth(input.growth)
+  const rewardPreview = getCareActionRewardPreview(input)
+  const leveledGrowth = addLevelExp(growth, rewardPreview.gainedExp)
+
+  return {
+    stats,
+    growth: addAffinityExp(leveledGrowth, rewardPreview.gainedAffinityExp),
+    ...rewardPreview,
+  }
+}
+
+export function getCareActionRewardPreview(input: CareActionInput): CareActionRewardPreview {
+  const growth = normalizeGrowth(input.growth)
   const wasReduced = isOvercareAction(input.stats, input.action)
   const reductionMultiplier = wasReduced ? OVERCARE_REWARD_MULTIPLIER : 1
   const rewardMultiplier = getExperienceMultiplier(getAffinityLevel(growth.affinityExp))
@@ -100,11 +117,8 @@ export function applyCareAction(input: CareActionInput): CareActionResult {
     0,
     Math.round(BASE_AFFINITY_EXP[input.action] * reductionMultiplier),
   )
-  const leveledGrowth = addLevelExp(growth, gainedExp)
 
   return {
-    stats,
-    growth: addAffinityExp(leveledGrowth, gainedAffinityExp),
     gainedExp,
     gainedAffinityExp,
     rewardMultiplier,

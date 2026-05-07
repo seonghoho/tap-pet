@@ -179,6 +179,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
             :care-feedback="pet.lastCareFeedback.value"
             :action-limit-reward-feedback="pet.actionLimitRewardFeedback.value"
             :recommended-care-action="pet.recommendedCareAction.value"
+            :recommended-care-reward-preview="pet.recommendedCareRewardPreview.value"
             :level-progress="pet.levelProgress.value"
             @action="handleAction"
             @reward-ad="pet.grantRewardedAdActions"

@@ -1388,7 +1388,7 @@ button:disabled {
   padding: 12px;
 }
 
-.action-recommendation span {
+.action-recommendation > div:first-child span {
   color: var(--app-muted);
   display: block;
   font-size: 0.78rem;
@@ -1407,6 +1407,38 @@ button:disabled {
   line-height: 1.35;
   max-width: 300px;
   text-align: right;
+}
+
+.action-recommendation__support {
+  align-items: flex-end;
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+  max-width: min(100%, 320px);
+  min-width: 0;
+}
+
+.action-recommendation__reward {
+  background: color-mix(in srgb, var(--app-success) 10%, var(--app-surface));
+  border: 1px solid color-mix(in srgb, var(--app-success) 28%, var(--app-border));
+  border-radius: 999px;
+  box-sizing: border-box;
+  color: var(--app-text);
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.25;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: 5px 8px;
+  text-align: right;
+}
+
+.action-recommendation__reward--muted {
+  background: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--app-muted);
+  font-weight: 800;
 }
 
 .action-limit {
@@ -2091,6 +2123,17 @@ button:disabled {
 
   .action-recommendation small {
     max-width: none;
+    text-align: left;
+  }
+
+  .action-recommendation__support {
+    align-items: flex-start;
+    justify-items: start;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .action-recommendation__reward {
     text-align: left;
   }
 

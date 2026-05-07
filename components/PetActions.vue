@@ -7,6 +7,7 @@ import type {
   PetCareFeedback,
   PetCareRecommendation,
 } from '~/types/pet'
+import type { CareActionRewardPreview } from '~/utils/petCare'
 import type { ProgressInfo } from '~/utils/petGrowth'
 
 const props = defineProps<{
@@ -16,6 +17,7 @@ const props = defineProps<{
   careFeedback: PetCareFeedback | null
   actionLimitRewardFeedback: PetActionLimitRewardFeedback | null
   recommendedCareAction: PetCareRecommendation | null
+  recommendedCareRewardPreview?: CareActionRewardPreview | null
   levelProgress?: ProgressInfo | null
 }>()
 
@@ -228,6 +230,22 @@ const shouldShowRecommendation = computed(
     !props.careFeedback,
   ),
 )
+const recommendationRewardText = computed(() => {
+  const reward = props.recommendedCareRewardPreview
+  if (!reward) return ''
+
+  return messages.value.careRecommendation.rewardHint
+    .replace('{exp}', formatSigned(reward.gainedExp))
+    .replace('{affinity}', formatSigned(reward.gainedAffinityExp))
+})
+const recommendationRewardReducedText = computed(() => {
+  if (!props.recommendedCareRewardPreview?.wasReduced) return ''
+
+  return messages.value.careRecommendation.rewardReduced
+})
+const shouldShowRecommendationReward = computed(() =>
+  Boolean(shouldShowRecommendation.value && props.recommendedCareRewardPreview),
+)
 const shouldShowFeedbackNextAction = computed(
   () => Boolean(
     props.careFeedback &&
@@ -336,7 +354,18 @@ function formatSigned(value: number): string {
         <span>{{ messages.careRecommendation.heading }}</span>
         <strong>{{ recommendationTitle }}</strong>
       </div>
-      <small>{{ recommendationDetail }}</small>
+      <div class="action-recommendation__support">
+        <small>{{ recommendationDetail }}</small>
+        <span v-if="shouldShowRecommendationReward" class="action-recommendation__reward">
+          {{ recommendationRewardText }}
+        </span>
+        <span
+          v-if="recommendationRewardReducedText"
+          class="action-recommendation__reward action-recommendation__reward--muted"
+        >
+          {{ recommendationRewardReducedText }}
+        </span>
+      </div>
     </div>
 
     <div v-if="shouldShowActionAvailability" class="action-availability" aria-live="polite">

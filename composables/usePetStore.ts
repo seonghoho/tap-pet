@@ -19,7 +19,7 @@ import type {
   PetState,
   ThemeId,
 } from '~/types/pet'
-import { applyCareAction, getRecommendedCareAction } from '~/utils/petCare'
+import { applyCareAction, getCareActionRewardPreview, getRecommendedCareAction } from '~/utils/petCare'
 import {
   consumeActionLimitUse,
   getActionLimitInfo,
@@ -83,6 +83,16 @@ export function usePetStore(options: PetStoreOptions = {}) {
     return getRecommendedCareAction({
       stats: petState.value.stats,
       status: petStatus.value,
+    })
+  })
+  const recommendedCareRewardPreview = computed(() => {
+    const recommendation = recommendedCareAction.value
+    if (!petState.value || !recommendation) return null
+
+    return getCareActionRewardPreview({
+      stats: petState.value.stats,
+      growth: petState.value.growth,
+      action: recommendation.action,
     })
   })
   const levelProgress = computed(() =>
@@ -312,6 +322,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     isReady: readonly(isReady),
     petStatus,
     recommendedCareAction,
+    recommendedCareRewardPreview,
     levelProgress,
     affinityProgress,
     actionLimitInfo,
