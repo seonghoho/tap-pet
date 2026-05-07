@@ -122,8 +122,9 @@ describe('pet action button status labels', () => {
     const setup = setupPetActions()
 
     expect(setup.getActionButtonStateLabel('feed')).toBe('추천')
-    expect(setup.getActionButtonDetail('feed')).toBe('추천 결과 확인')
+    expect(setup.getActionButtonDetail('feed')).toBe('추천 돌봄 시작')
     expect(setup.getActionButtonStateClass('feed')).toBe('action-button__badge--recommended')
+    expect(setup.getActionAriaLabel('feed')).toBe('밥 주기: 추천 · 추천 돌봄 시작')
     expect(setup.getActionButtonStateLabel('play')).toBe('가능')
     expect(setup.getActionButtonDetail('play')).toBe(I18N_MESSAGES.ko.actions.play.detail)
     expect(setup.getActionButtonStateClass('play')).toBe('action-button__badge--ready')
@@ -185,12 +186,18 @@ describe('pet action button status labels', () => {
   })
 
   it('keeps action button state copy localized for every supported language', () => {
+    const recommendedDetailCopy = {
+      en: 'Start recommended care',
+      ko: '추천 돌봄 시작',
+      ja: 'おすすめのお世話を始める',
+    }
+
     for (const locale of SUPPORTED_LOCALES) {
       const actionButtonState = I18N_MESSAGES[locale].actionButtonState as ActionButtonStateMessages
 
       expect(actionButtonState.ready.length).toBeGreaterThan(0)
       expect(actionButtonState.recommended.length).toBeGreaterThan(0)
-      expect(actionButtonState.recommendedDetail.length).toBeGreaterThan(0)
+      expect(actionButtonState.recommendedDetail).toBe(recommendedDetailCopy[locale])
       expect(actionButtonState.cooldown.length).toBeGreaterThan(0)
       expect(actionButtonState.active.length).toBeGreaterThan(0)
       expect(actionButtonState.locked.length).toBeGreaterThan(0)

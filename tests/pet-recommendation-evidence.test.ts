@@ -6,6 +6,7 @@ import ts from 'typescript'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ACTION_LIMIT_AD_REWARD_USES } from '~/constants/pet'
 import { I18N_MESSAGES } from '~/constants/i18n'
+import type { PetAction } from '~/types/pet'
 
 const SUPPORTED_LOCALES = ['en', 'ko', 'ja'] as const
 const requireModule = createRequire(import.meta.url)
@@ -15,10 +16,12 @@ type SetupComponent<T> = {
 }
 
 type PetActionsSetup = {
+  recommendationDetail: { value: string }
   recommendationEvidenceText?: { value: string }
   shouldShowRecommendationEvidence?: { value: boolean }
   recommendationCtaStatusText?: { value: string }
   recommendationCtaStatusClass?: { value: string }
+  getActionButtonDetail: (action: PetAction) => string
 }
 
 function loadScriptSetupComponent<T>(componentPath: string): SetupComponent<T> {
@@ -186,6 +189,16 @@ describe('pet recommendation evidence', () => {
     expect(setup.recommendationCtaStatusClass?.value).toBe('action-recommendation__cta--ready')
   })
 
+  it('keeps the recommendation card reason separate from the compact button detail', () => {
+    const setup = setupPetActions()
+
+    expect(setup.recommendationDetail.value).toBe(I18N_MESSAGES.ko.careRecommendation.details.sleep)
+    expect(setup.getActionButtonDetail('sleep')).toBe(
+      I18N_MESSAGES.ko.actionButtonState.recommendedDetail,
+    )
+    expect(setup.recommendationDetail.value).not.toBe(setup.getActionButtonDetail('sleep'))
+  })
+
   it('shows cooldown CTA status for a recommended action that is not ready yet', () => {
     const setup = setupPetActions({
       cooldowns: {
@@ -232,6 +245,7 @@ describe('pet recommendation evidence', () => {
     const supportBlock = extractElementBlock(template, 'action-recommendation__support')
 
     expect(supportBlock).toContain('class="action-recommendation__evidence"')
+    expect(supportBlock).toContain('<small>{{ recommendationDetail }}</small>')
     expect(supportBlock).toContain('v-if="shouldShowRecommendationEvidence"')
     expect(supportBlock).toContain('recommendationEvidenceText')
     expect(supportBlock).toContain('class="action-recommendation__cta"')
