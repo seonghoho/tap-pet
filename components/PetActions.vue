@@ -256,6 +256,9 @@ const shouldShowFeedbackNextAction = computed(
     !props.activeReaction,
   ),
 )
+const shouldShowFeedbackFollowup = computed(() =>
+  Boolean(props.careFeedback && (shouldShowFeedbackNextAction.value || props.careFeedback.wasReduced)),
+)
 
 onMounted(() => {
   now.value = Date.now()
@@ -424,28 +427,30 @@ function formatSigned(value: number): string {
         <strong>+{{ careFeedback.gainedExp }} {{ messages.stats.exp }}</strong>
       </div>
 
-      <div class="care-feedback__summary">
-        <span>{{ messages.careFeedback.summaryLabel }}</span>
-        <strong>{{ careFeedbackSummary }}</strong>
-      </div>
+      <div class="care-feedback__overview">
+        <div class="care-feedback__summary">
+          <span>{{ messages.careFeedback.summaryLabel }}</span>
+          <strong>{{ careFeedbackSummary }}</strong>
+        </div>
 
-      <div v-if="shouldShowFeedbackGrowth" class="care-feedback__growth">
-        <span>{{ messages.careFeedback.growthLabel }}</span>
-        <div>
-          <strong>{{ feedbackGrowthTitle }}</strong>
-          <small>{{ feedbackGrowthDetail }}</small>
-          <div
-            class="care-feedback__growth-track"
-            role="progressbar"
-            :aria-label="messages.careFeedback.growthLabel"
-            :aria-valuemin="0"
-            :aria-valuenow="feedbackGrowthCurrent"
-            :aria-valuemax="feedbackGrowthRequired"
-          >
-            <span
-              class="care-feedback__growth-fill"
-              :style="{ width: `${feedbackGrowthPercent}%` }"
-            />
+        <div v-if="shouldShowFeedbackGrowth" class="care-feedback__growth">
+          <span>{{ messages.careFeedback.growthLabel }}</span>
+          <div>
+            <strong>{{ feedbackGrowthTitle }}</strong>
+            <small>{{ feedbackGrowthDetail }}</small>
+            <div
+              class="care-feedback__growth-track"
+              role="progressbar"
+              :aria-label="messages.careFeedback.growthLabel"
+              :aria-valuemin="0"
+              :aria-valuenow="feedbackGrowthCurrent"
+              :aria-valuemax="feedbackGrowthRequired"
+            >
+              <span
+                class="care-feedback__growth-fill"
+                :style="{ width: `${feedbackGrowthPercent}%` }"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -473,17 +478,19 @@ function formatSigned(value: number): string {
         </span>
       </div>
 
-      <div v-if="shouldShowFeedbackNextAction" class="care-feedback__next">
-        <span>{{ messages.careFeedback.nextLabel }}</span>
-        <div>
-          <strong>{{ feedbackNextActionTitle }}</strong>
-          <small>{{ feedbackNextActionDetail }}</small>
+      <div v-if="shouldShowFeedbackFollowup" class="care-feedback__follow-up">
+        <div v-if="shouldShowFeedbackNextAction" class="care-feedback__next">
+          <span>{{ messages.careFeedback.nextLabel }}</span>
+          <div>
+            <strong>{{ feedbackNextActionTitle }}</strong>
+            <small>{{ feedbackNextActionDetail }}</small>
+          </div>
         </div>
-      </div>
 
-      <p v-if="careFeedback.wasReduced" class="care-feedback__note">
-        {{ messages.careFeedback.reduced }}
-      </p>
+        <p v-if="careFeedback.wasReduced" class="care-feedback__note">
+          {{ messages.careFeedback.reduced }}
+        </p>
+      </div>
     </div>
   </div>
 </template>
