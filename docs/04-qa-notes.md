@@ -66,6 +66,20 @@ Checked areas:
 - Local run: `npm run test:e2e`. The config auto-starts `npm run dev` unless `PLAYWRIGHT_BASE_URL` is set.
 - One-time setup: `npx playwright install chromium`.
 
+## 4b. Accessibility Audit (static, 2026-05-08)
+
+Applied:
+
+- Global `:focus-visible` outline on `button`, `a`, `[role="button"]`, `[tabindex]`. Closes focus-indicator gaps on action, locale, theme, emoji, choice, segmented, and species buttons.
+- Light theme `muted` color darkened from `#697282` to `#505862` (~5.2:1 on `#ffffff`).
+- Dark theme `muted` color lightened from `#a8b2c1` to `#c5cfe0` (~6.5:1 on `#1f2329`).
+- `prefers-reduced-motion` block extended with a global `*` rule disabling animations and transitions, in addition to the existing habitat-scoped rules.
+
+Remaining for live-browser verification:
+
+- Run Lighthouse and axe in the deployed preview to confirm calculated contrast ratios and spot dynamic ARIA issues.
+- Verify focus order with keyboard navigation through species select → care actions → side panel.
+
 ## 2026-04-30 Growth MVP QA
 
 - `npm run test`: passed (43 tests)
