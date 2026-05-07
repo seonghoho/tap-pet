@@ -56,8 +56,15 @@ Checked areas:
 
 ## 4. Follow-up QA
 
-- Verify corrupted `localStorage` recovery manually in browser devtools or with an automated browser test when an evaluate-capable runner is introduced.
-- Verify mobile layout with a viewport-capable browser test runner.
+- Corrupted `localStorage` recovery is now exercised by `tests/use-local-pet-storage.test.ts` (unit) and `e2e/smoke.spec.ts` (browser).
+- Mobile layout is now exercised by the `mobile-chrome` Playwright project in `e2e/smoke.spec.ts`.
+
+## 4a. Playwright E2E Setup
+
+- Config: `playwright.config.ts`. Two projects: `chromium-desktop` and `mobile-chrome` (Pixel 7 device profile).
+- Specs: `e2e/`.
+- Local run: `npm run test:e2e`. The config auto-starts `npm run dev` unless `PLAYWRIGHT_BASE_URL` is set.
+- One-time setup: `npx playwright install chromium`.
 
 ## 2026-04-30 Growth MVP QA
 
