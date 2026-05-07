@@ -199,7 +199,7 @@ describe('pet storage validation', () => {
         version: PET_STORAGE_VERSION,
         species: 'cat',
         lastUpdatedAt: 'not-a-date',
-        lastPlayedAt: null,
+        lastPlayedAt: 'broken',
       },
       2000,
     )

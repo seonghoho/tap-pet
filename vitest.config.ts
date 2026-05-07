@@ -2,6 +2,10 @@ import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
+  define: {
+    'import.meta.client': 'true',
+    'import.meta.server': 'false',
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./', import.meta.url)),
@@ -10,5 +14,6 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
+    setupFiles: ['./tests/setup.ts'],
   },
 })

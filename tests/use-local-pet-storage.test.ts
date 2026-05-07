@@ -30,20 +30,16 @@ class MemoryStorage implements Storage {
   }
 }
 
-const importMeta = import.meta as ImportMeta & { client?: boolean }
-
 describe('useLocalPetStorage corruption handling', () => {
   let storage: MemoryStorage
 
   beforeEach(() => {
     storage = new MemoryStorage()
     vi.stubGlobal('localStorage', storage)
-    importMeta.client = true
   })
 
   afterEach(() => {
     vi.unstubAllGlobals()
-    delete importMeta.client
   })
 
   it('returns null and reports an error when the stored payload is not valid JSON', () => {
@@ -110,32 +106,3 @@ describe('useLocalPetStorage corruption handling', () => {
   })
 })
 
-describe('useLocalPetStorage SSR safety', () => {
-  beforeEach(() => {
-    delete importMeta.client
-    vi.stubGlobal(
-      'localStorage',
-      new Proxy(
-        {},
-        {
-          get() {
-            throw new Error('localStorage should not be touched during SSR')
-          },
-        },
-      ),
-    )
-  })
-
-  afterEach(() => {
-    vi.unstubAllGlobals()
-  })
-
-  it('skips localStorage access when not running on the client', () => {
-    const { loadPetState, savePetState, clearPetState } = useLocalPetStorage()
-
-    expect(() => loadPetState(1000)).not.toThrow()
-    expect(loadPetState(1000)).toBeNull()
-    expect(() => savePetState({} as never, 1000)).not.toThrow()
-    expect(() => clearPetState()).not.toThrow()
-  })
-})

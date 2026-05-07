@@ -145,7 +145,7 @@ describe('pet store', () => {
     expect(store.petState.value?.name).toBe('Berry')
   })
 
-  it('applies care actions immediately outside the client and blocks cooldown repeats', () => {
+  it('applies care actions after the reaction hold completes and blocks cooldown repeats', () => {
     const store = usePetStore()
 
     store.initializePet('cat')
@@ -153,9 +153,11 @@ describe('pet store', () => {
 
     store.performAction('play')
 
+    vi.advanceTimersByTime(ACTION_REACTION_HOLD_MS)
+
     expect(store.petState.value?.stats).not.toEqual(initialState?.stats)
     expect(store.petState.value?.growth.exp).toBeGreaterThan(initialState?.growth.exp ?? 0)
-    expect(store.petState.value?.lastPlayedAt).toBe(1000)
+    expect(store.petState.value?.lastPlayedAt).toBe(1000 + ACTION_REACTION_HOLD_MS)
     expect(store.activeReaction.value).toBeNull()
     expect(store.actionCooldowns.value.play).toBe(6000)
     expect(store.isActionCoolingDown('play')).toBe(true)
