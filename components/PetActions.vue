@@ -229,17 +229,6 @@ const nextCoolingAction = computed(() =>
     .filter((action) => action.remaining > 0)
     .sort((current, next) => current.remaining - next.remaining)[0] ?? null,
 )
-const actionAvailabilityText = computed(() => {
-  if (isLimitReached.value || props.activeReaction) return ''
-
-  const coolingAction = nextCoolingAction.value
-  if (!coolingAction) return ''
-
-  return messages.value.actionAvailability.cooldown
-    .replace('{action}', messages.value.actions[coolingAction.id].label)
-    .replace('{time}', formatRemainingTime(coolingAction.remaining))
-})
-const shouldShowActionAvailability = computed(() => Boolean(actionAvailabilityText.value))
 const shouldShowRecommendation = computed(
   () => Boolean(
     props.recommendedCareAction &&
@@ -272,6 +261,30 @@ const recommendationCtaStatusText = computed(() => {
 const recommendationCtaStatusClass = computed(() =>
   `action-recommendation__cta--${recommendationCtaStatus.value}`,
 )
+const nextAvailabilityCoolingAction = computed(() => {
+  const coolingAction = nextCoolingAction.value
+  if (!coolingAction) return null
+
+  const recommendedCooldownAction =
+    shouldShowRecommendation.value && recommendationCtaStatus.value === 'cooldown'
+      ? props.recommendedCareAction?.action
+      : null
+
+  if (coolingAction.id === recommendedCooldownAction) return null
+
+  return coolingAction
+})
+const actionAvailabilityText = computed(() => {
+  if (isLimitReached.value || props.activeReaction) return ''
+
+  const coolingAction = nextAvailabilityCoolingAction.value
+  if (!coolingAction) return ''
+
+  return messages.value.actionAvailability.cooldown
+    .replace('{action}', messages.value.actions[coolingAction.id].label)
+    .replace('{time}', formatRemainingTime(coolingAction.remaining))
+})
+const shouldShowActionAvailability = computed(() => Boolean(actionAvailabilityText.value))
 const recommendationEvidenceText = computed(() => {
   const recommendation = props.recommendedCareAction
   if (!recommendation) return ''

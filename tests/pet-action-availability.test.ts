@@ -128,6 +128,105 @@ describe('pet action availability forecast', () => {
     expect(setup.actionAvailabilityText.value).toBe('재우기 2s 후 다시 가능')
   })
 
+  it('hides the generic cooldown helper when the recommendation card already shows that action wait', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1000)
+    vi.stubGlobal('useLocale', () => ({ messages: { value: I18N_MESSAGES.ko } }))
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const component = loadScriptSetupComponent<PetActionsSetup>('components/PetActions.vue')
+
+    const setup = component.setup(
+      {
+        ...createBaseProps(),
+        recommendedCareAction: {
+          action: 'sleep',
+          reason: 'lowest-stat',
+          status: 'happy',
+          statKey: 'energy',
+        },
+        cooldowns: {
+          feed: 0,
+          play: 0,
+          sleep: 2100,
+          wash: 0,
+        },
+      },
+      {
+        emit: vi.fn(),
+        expose: vi.fn(),
+      },
+    )
+
+    expect(setup.shouldShowActionAvailability.value).toBe(false)
+    expect(setup.actionAvailabilityText.value).toBe('')
+  })
+
+  it('keeps the helper hidden when the recommended cooldown is the next action even if another action is cooling', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1000)
+    vi.stubGlobal('useLocale', () => ({ messages: { value: I18N_MESSAGES.ko } }))
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const component = loadScriptSetupComponent<PetActionsSetup>('components/PetActions.vue')
+
+    const setup = component.setup(
+      {
+        ...createBaseProps(),
+        recommendedCareAction: {
+          action: 'feed',
+          reason: 'lowest-stat',
+          status: 'happy',
+          statKey: 'fullness',
+        },
+        cooldowns: {
+          feed: 2100,
+          play: 0,
+          sleep: 4500,
+          wash: 0,
+        },
+      },
+      {
+        emit: vi.fn(),
+        expose: vi.fn(),
+      },
+    )
+
+    expect(setup.shouldShowActionAvailability.value).toBe(false)
+    expect(setup.actionAvailabilityText.value).toBe('')
+  })
+
+  it('keeps the generic cooldown helper for a different cooling action', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1000)
+    vi.stubGlobal('useLocale', () => ({ messages: { value: I18N_MESSAGES.ko } }))
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const component = loadScriptSetupComponent<PetActionsSetup>('components/PetActions.vue')
+
+    const setup = component.setup(
+      {
+        ...createBaseProps(),
+        recommendedCareAction: {
+          action: 'feed',
+          reason: 'lowest-stat',
+          status: 'happy',
+          statKey: 'fullness',
+        },
+        cooldowns: {
+          feed: 4500,
+          play: 0,
+          sleep: 2100,
+          wash: 0,
+        },
+      },
+      {
+        emit: vi.fn(),
+        expose: vi.fn(),
+      },
+    )
+
+    expect(setup.shouldShowActionAvailability.value).toBe(true)
+    expect(setup.actionAvailabilityText.value).toBe('재우기 2s 후 다시 가능')
+  })
+
   it('hides the cooldown helper during active reactions and action limit locks', () => {
     vi.useFakeTimers()
     vi.setSystemTime(1000)
