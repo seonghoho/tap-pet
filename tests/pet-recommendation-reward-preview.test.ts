@@ -5,6 +5,7 @@ import { compileScript, parse } from '@vue/compiler-sfc'
 import type { Ref } from 'vue'
 import ts from 'typescript'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { ACTION_LIMIT_AD_REWARD_USES } from '~/constants/pet'
 import { I18N_MESSAGES } from '~/constants/i18n'
 import { createInitialPetState } from '~/utils/petFactory'
 import * as petCare from '~/utils/petCare'
@@ -66,6 +67,7 @@ function loadScriptSetupComponent<T>(componentPath: string): SetupComponent<T> {
   const module = { exports: {} }
   const localRequire = (id: string): unknown => {
     if (id === 'vue') return requireModule('vue')
+    if (id === '~/constants/pet') return { ACTION_LIMIT_AD_REWARD_USES }
 
     return requireModule(id)
   }

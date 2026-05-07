@@ -4,6 +4,7 @@ import { createRequire } from 'node:module'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import ts from 'typescript'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { ACTION_LIMIT_AD_REWARD_USES } from '~/constants/pet'
 import { I18N_MESSAGES } from '~/constants/i18n'
 
 const SUPPORTED_LOCALES = ['en', 'ko', 'ja'] as const
@@ -33,6 +34,7 @@ function loadScriptSetupComponent<T>(componentPath: string): SetupComponent<T> {
   const module = { exports: {} }
   const localRequire = (id: string): unknown => {
     if (id === 'vue') return requireModule('vue')
+    if (id === '~/constants/pet') return { ACTION_LIMIT_AD_REWARD_USES }
 
     return requireModule(id)
   }

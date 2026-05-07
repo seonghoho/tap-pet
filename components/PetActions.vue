@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { ACTION_LIMIT_AD_REWARD_USES } from '~/constants/pet'
 import type {
   PetAction,
   PetActionLimitInfo,
@@ -206,6 +207,18 @@ const actionLimitRewardText = computed(() => {
 
   return messages.value.actionLimit.rewardGranted.replace('{count}', String(feedback.addedUses))
 })
+const actionLimitRecoveryWaitText = computed(() =>
+  messages.value.actionLimit.waitDetail.replace(
+    '{time}',
+    formatRemainingTime(props.actionLimitInfo.resetAt - now.value),
+  ),
+)
+const actionLimitRecoveryRewardText = computed(() =>
+  messages.value.actionLimit.rewardDetail.replace(
+    '{count}',
+    String(ACTION_LIMIT_AD_REWARD_USES),
+  ),
+)
 const nextCoolingAction = computed(() =>
   actions
     .map(({ id }) => ({
@@ -392,14 +405,25 @@ function formatSigned(value: number): string {
         <span>{{ actionLimitText }}</span>
         <small>{{ actionLimitMetaText }}</small>
       </div>
-      <button
+      <div
         v-if="isLimitReached"
-        class="small-button"
-        type="button"
-        @click="emit('rewardAd')"
+        class="action-limit__recovery"
+        role="group"
+        :aria-label="messages.actionLimit.recoveryLabel"
       >
-        {{ messages.actionLimit.rewardAd }}
-      </button>
+        <span class="action-limit__option action-limit__option--wait">
+          <strong>{{ messages.actionLimit.waitOption }}</strong>
+          <small>{{ actionLimitRecoveryWaitText }}</small>
+        </span>
+        <button
+          class="action-limit__option action-limit__option--reward"
+          type="button"
+          @click="emit('rewardAd')"
+        >
+          <strong>{{ messages.actionLimit.rewardOption }}</strong>
+          <small>{{ actionLimitRecoveryRewardText }}</small>
+        </button>
+      </div>
     </div>
 
     <div v-if="actionLimitRewardFeedback" class="action-limit-reward" role="status">

@@ -4,6 +4,7 @@ import { createRequire } from 'node:module'
 import { compileScript, parse } from '@vue/compiler-sfc'
 import ts from 'typescript'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { ACTION_LIMIT_AD_REWARD_USES } from '~/constants/pet'
 import type { PetAction, PetSettings } from '~/types/pet'
 
 type SetupComponent<T> = {
@@ -48,6 +49,7 @@ function loadScriptSetupComponent<T>(componentPath: string): SetupComponent<T> {
     if (id === 'vue') return requireModule('vue')
     if (id === '~/constants/themes') return { PET_THEMES: [] }
     if (id === '~/constants/titles') return { DISGUISE_TITLES: [], getDisguiseTitleLabel: () => '' }
+    if (id === '~/constants/pet') return { ACTION_LIMIT_AD_REWARD_USES }
 
     return requireModule(id)
   }
