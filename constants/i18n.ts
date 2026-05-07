@@ -191,6 +191,8 @@ export const I18N_MESSAGES = {
       rewardReduced: 'Expected reward is lower because this need is already high.',
       statEvidence: 'Evidence {stat} {value}/100',
       playEvidence: 'Evidence last play {time}',
+      ctaReady: 'Ready now · tap the recommended button to see the result',
+      ctaCooldown: 'Recommended wait · ready in {time}',
       details: {
         feed: 'Fullness is the best stat to recover now.',
         play: 'It has been idle for a while. Play helps refresh the tab signal.',
@@ -511,6 +513,8 @@ export const I18N_MESSAGES = {
       rewardReduced: '이미 충분히 돌본 상태라 예상 보상이 낮습니다.',
       statEvidence: '근거 {stat} {value}/100',
       playEvidence: '근거 마지막 놀이 {time}',
+      ctaReady: '지금 가능 · 추천 버튼을 눌러 결과를 확인하세요',
+      ctaCooldown: '추천 대기 · {time} 후 가능',
       details: {
         feed: '지금은 배부름을 먼저 회복하는 흐름이 좋습니다.',
         play: '오래 쉬고 있어 놀아주면 탭 신호가 다시 살아납니다.',
@@ -831,6 +835,8 @@ export const I18N_MESSAGES = {
       rewardReduced: 'このニーズはすでに高いため、予想報酬は低めです。',
       statEvidence: '根拠 {stat} {value}/100',
       playEvidence: '根拠 最後の遊び {time}',
+      ctaReady: '今すぐ可能 · おすすめボタンで結果を確認',
+      ctaCooldown: 'おすすめ待機 · {time} 後に可能',
       details: {
         feed: 'いまは満腹度を先に回復するのがよさそうです。',
         play: 'しばらく動きがないため、遊ぶとタブの合図が戻ります。',

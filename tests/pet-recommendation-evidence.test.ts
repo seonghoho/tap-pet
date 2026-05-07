@@ -17,6 +17,8 @@ type SetupComponent<T> = {
 type PetActionsSetup = {
   recommendationEvidenceText?: { value: string }
   shouldShowRecommendationEvidence?: { value: boolean }
+  recommendationCtaStatusText?: { value: string }
+  recommendationCtaStatusClass?: { value: string }
 }
 
 function loadScriptSetupComponent<T>(componentPath: string): SetupComponent<T> {
@@ -177,6 +179,29 @@ describe('pet recommendation evidence', () => {
     expect(setup.recommendationEvidenceText?.value).toBe('근거 에너지 21/100')
   })
 
+  it('separates ready recommendation CTA status from the detail copy', () => {
+    const setup = setupPetActions()
+
+    expect(setup.recommendationCtaStatusText?.value).toBe(
+      '지금 가능 · 추천 버튼을 눌러 결과를 확인하세요',
+    )
+    expect(setup.recommendationCtaStatusClass?.value).toBe('action-recommendation__cta--ready')
+  })
+
+  it('shows cooldown CTA status for a recommended action that is not ready yet', () => {
+    const setup = setupPetActions({
+      cooldowns: {
+        feed: 0,
+        play: 0,
+        sleep: 4500,
+        wash: 0,
+      },
+    })
+
+    expect(setup.recommendationCtaStatusText?.value).toBe('추천 대기 · 4s 후 가능')
+    expect(setup.recommendationCtaStatusClass?.value).toBe('action-recommendation__cta--cooldown')
+  })
+
   it('summarizes idle time when play is recommended', () => {
     const setup = setupPetActions({
       lastPlayedAt: 1000 - 1000 * 60 * 135,
@@ -211,6 +236,9 @@ describe('pet recommendation evidence', () => {
     expect(supportBlock).toContain('class="action-recommendation__evidence"')
     expect(supportBlock).toContain('v-if="shouldShowRecommendationEvidence"')
     expect(supportBlock).toContain('recommendationEvidenceText')
+    expect(supportBlock).toContain('class="action-recommendation__cta"')
+    expect(supportBlock).toContain(':class="recommendationCtaStatusClass"')
+    expect(supportBlock).toContain('recommendationCtaStatusText')
   })
 
   it('keeps recommendation evidence copy localized for every supported language', () => {
@@ -220,6 +248,8 @@ describe('pet recommendation evidence', () => {
       expect(careRecommendation.statEvidence).toContain('{stat}')
       expect(careRecommendation.statEvidence).toContain('{value}')
       expect(careRecommendation.playEvidence).toContain('{time}')
+      expect(careRecommendation.ctaReady.length).toBeGreaterThan(0)
+      expect(careRecommendation.ctaCooldown).toContain('{time}')
       expect(I18N_MESSAGES[locale].time.minutesAgo).toContain('{minutes}')
       expect(I18N_MESSAGES[locale].time.hoursAgo).toContain('{hours}')
       expect(I18N_MESSAGES[locale].time.hoursMinutesAgo).toContain('{hours}')
@@ -231,10 +261,18 @@ describe('pet recommendation evidence', () => {
     const css = readSource('assets/css/main.css')
 
     expect(css).toContain('.action-recommendation__evidence')
+    expect(css).toContain('.action-recommendation__cta')
+    expect(css).toContain('.action-recommendation__cta--ready')
+    expect(css).toContain('.action-recommendation__cta--cooldown')
     expect(css).toMatch(/\.action-recommendation__evidence\s*\{[^}]*display: inline-block;/)
     expect(css).toMatch(/\.action-recommendation__evidence\s*\{[^}]*overflow-wrap: anywhere;/)
+    expect(css).toMatch(/\.action-recommendation__cta\s*\{[^}]*display: inline-block;/)
+    expect(css).toMatch(/\.action-recommendation__cta\s*\{[^}]*overflow-wrap: anywhere;/)
     expect(css).toMatch(
       /@media \(max-width: 720px\)[\s\S]*\.action-recommendation__evidence\s*\{[^}]*text-align: left;/,
+    )
+    expect(css).toMatch(
+      /@media \(max-width: 720px\)[\s\S]*\.action-recommendation__cta\s*\{[^}]*text-align: left;/,
     )
   })
 })

@@ -248,6 +248,30 @@ const shouldShowRecommendation = computed(
     !props.careFeedback,
   ),
 )
+const recommendedActionCooldownRemaining = computed(() => {
+  const recommendation = props.recommendedCareAction
+  if (!recommendation) return 0
+
+  return Math.max(0, props.cooldowns[recommendation.action] - now.value)
+})
+const recommendationCtaStatus = computed(() =>
+  recommendedActionCooldownRemaining.value > 0 ? 'cooldown' : 'ready',
+)
+const recommendationCtaStatusText = computed(() => {
+  if (!shouldShowRecommendation.value) return ''
+
+  if (recommendationCtaStatus.value === 'cooldown') {
+    return messages.value.careRecommendation.ctaCooldown.replace(
+      '{time}',
+      formatRemainingTime(recommendedActionCooldownRemaining.value),
+    )
+  }
+
+  return messages.value.careRecommendation.ctaReady
+})
+const recommendationCtaStatusClass = computed(() =>
+  `action-recommendation__cta--${recommendationCtaStatus.value}`,
+)
 const recommendationEvidenceText = computed(() => {
   const recommendation = props.recommendedCareAction
   if (!recommendation) return ''
@@ -498,6 +522,13 @@ function formatSigned(value: number): string {
       </div>
       <div class="action-recommendation__support">
         <small>{{ recommendationDetail }}</small>
+        <span
+          v-if="recommendationCtaStatusText"
+          class="action-recommendation__cta"
+          :class="recommendationCtaStatusClass"
+        >
+          {{ recommendationCtaStatusText }}
+        </span>
         <span v-if="shouldShowRecommendationEvidence" class="action-recommendation__evidence">
           {{ recommendationEvidenceText }}
         </span>
