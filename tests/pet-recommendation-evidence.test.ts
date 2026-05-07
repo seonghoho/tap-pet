@@ -182,9 +182,7 @@ describe('pet recommendation evidence', () => {
   it('separates ready recommendation CTA status from the detail copy', () => {
     const setup = setupPetActions()
 
-    expect(setup.recommendationCtaStatusText?.value).toBe(
-      '지금 가능 · 추천 버튼을 눌러 결과를 확인하세요',
-    )
+    expect(setup.recommendationCtaStatusText?.value).toBe('지금 가능 · 결과 확인')
     expect(setup.recommendationCtaStatusClass?.value).toBe('action-recommendation__cta--ready')
   })
 
@@ -255,6 +253,9 @@ describe('pet recommendation evidence', () => {
       expect(I18N_MESSAGES[locale].time.hoursMinutesAgo).toContain('{hours}')
       expect(I18N_MESSAGES[locale].time.hoursMinutesAgo).toContain('{minutes}')
     }
+    expect(I18N_MESSAGES.en.careRecommendation.ctaReady).toBe('Ready now · see result')
+    expect(I18N_MESSAGES.ko.careRecommendation.ctaReady).toBe('지금 가능 · 결과 확인')
+    expect(I18N_MESSAGES.ja.careRecommendation.ctaReady).toBe('今すぐ可能 · 結果を確認')
   })
 
   it('defines compact responsive evidence styles', () => {
@@ -268,6 +269,12 @@ describe('pet recommendation evidence', () => {
     expect(css).toMatch(/\.action-recommendation__evidence\s*\{[^}]*overflow-wrap: anywhere;/)
     expect(css).toMatch(/\.action-recommendation__cta\s*\{[^}]*display: inline-block;/)
     expect(css).toMatch(/\.action-recommendation__cta\s*\{[^}]*overflow-wrap: anywhere;/)
+    expect(css).toMatch(/\.action-recommendation__reward\s*\{[^}]*min-width: 0;/)
+    expect(css).toMatch(/\.action-recommendation__reward\s*\{[^}]*width: fit-content;/)
+    expect(css).toMatch(/\.action-recommendation__cta\s*\{[^}]*min-width: 0;/)
+    expect(css).toMatch(/\.action-recommendation__cta\s*\{[^}]*width: fit-content;/)
+    expect(css).toMatch(/\.action-recommendation__evidence\s*\{[^}]*min-width: 0;/)
+    expect(css).toMatch(/\.action-recommendation__evidence\s*\{[^}]*width: fit-content;/)
     expect(css).toMatch(
       /@media \(max-width: 720px\)[\s\S]*\.action-recommendation__evidence\s*\{[^}]*text-align: left;/,
     )

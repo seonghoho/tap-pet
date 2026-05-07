@@ -1477,9 +1477,11 @@ button:disabled {
   font-weight: 900;
   line-height: 1.25;
   max-width: 100%;
+  min-width: 0;
   overflow-wrap: anywhere;
   padding: 5px 8px;
   text-align: right;
+  width: fit-content;
 }
 
 .action-recommendation__cta {
@@ -1493,9 +1495,11 @@ button:disabled {
   font-weight: 900;
   line-height: 1.25;
   max-width: 100%;
+  min-width: 0;
   overflow-wrap: anywhere;
   padding: 5px 8px;
   text-align: right;
+  width: fit-content;
 }
 
 .action-recommendation__cta--ready {
@@ -1519,9 +1523,11 @@ button:disabled {
   font-weight: 900;
   line-height: 1.25;
   max-width: 100%;
+  min-width: 0;
   overflow-wrap: anywhere;
   padding: 5px 8px;
   text-align: right;
+  width: fit-content;
 }
 
 .action-recommendation__reward--muted {
