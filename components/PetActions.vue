@@ -256,8 +256,37 @@ const shouldShowFeedbackNextAction = computed(
     !props.activeReaction,
   ),
 )
+const careFeedbackCheckbackText = computed(() => {
+  if (!props.careFeedback) return ''
+
+  if (hasActionLimitWindowExpired.value) return messages.value.careFeedback.checkbackReady
+
+  if (isLimitReached.value) {
+    return messages.value.careFeedback.checkbackLimit.replace(
+      '{time}',
+      formatRemainingTime(props.actionLimitInfo.resetAt - now.value),
+    )
+  }
+
+  if (shouldShowFeedbackNextAction.value) return messages.value.careFeedback.checkbackNow
+
+  const coolingAction = nextCoolingAction.value
+  if (coolingAction) {
+    return messages.value.careFeedback.checkbackCooldown
+      .replace('{action}', messages.value.actions[coolingAction.id].label)
+      .replace('{time}', formatRemainingTime(coolingAction.remaining))
+  }
+
+  return messages.value.careFeedback.checkbackLater
+})
+const shouldShowFeedbackCheckback = computed(() => Boolean(careFeedbackCheckbackText.value))
 const shouldShowFeedbackFollowup = computed(() =>
-  Boolean(props.careFeedback && (shouldShowFeedbackNextAction.value || props.careFeedback.wasReduced)),
+  Boolean(
+    props.careFeedback &&
+    (shouldShowFeedbackNextAction.value ||
+      props.careFeedback.wasReduced ||
+      shouldShowFeedbackCheckback.value),
+  ),
 )
 
 onMounted(() => {
@@ -485,6 +514,11 @@ function formatSigned(value: number): string {
             <strong>{{ feedbackNextActionTitle }}</strong>
             <small>{{ feedbackNextActionDetail }}</small>
           </div>
+        </div>
+
+        <div v-if="shouldShowFeedbackCheckback" class="care-feedback__checkback">
+          <span>{{ messages.careFeedback.checkbackLabel }}</span>
+          <small>{{ careFeedbackCheckbackText }}</small>
         </div>
 
         <p v-if="careFeedback.wasReduced" class="care-feedback__note">

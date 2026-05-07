@@ -1780,7 +1780,18 @@ button:disabled {
   grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr);
 }
 
-.care-feedback__next span {
+.care-feedback__checkback {
+  background: color-mix(in srgb, var(--app-accent) 7%, var(--app-surface));
+  border: 1px solid color-mix(in srgb, var(--app-accent) 20%, var(--app-border));
+  border-radius: 8px;
+  display: grid;
+  gap: 6px 10px;
+  grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr);
+  padding: 8px 10px;
+}
+
+.care-feedback__next span,
+.care-feedback__checkback span {
   color: var(--app-muted);
   font-size: 0.78rem;
   font-weight: 800;
@@ -1793,11 +1804,13 @@ button:disabled {
   overflow-wrap: anywhere;
 }
 
-.care-feedback__next small {
+.care-feedback__next small,
+.care-feedback__checkback small {
   color: var(--app-muted);
   display: block;
   line-height: 1.35;
   margin-top: 3px;
+  overflow-wrap: anywhere;
 }
 
 .care-feedback__note {
@@ -2195,6 +2208,10 @@ button:disabled {
   }
 
   .care-feedback__next {
+    grid-template-columns: 1fr;
+  }
+
+  .care-feedback__checkback {
     grid-template-columns: 1fr;
   }
 

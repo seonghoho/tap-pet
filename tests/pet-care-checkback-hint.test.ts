@@ -6,6 +6,7 @@ import ts from 'typescript'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { I18N_MESSAGES } from '~/constants/i18n'
 
+const SUPPORTED_LOCALES = ['en', 'ko', 'ja'] as const
 const requireModule = createRequire(import.meta.url)
 
 type SetupComponent<T> = {
@@ -13,9 +14,10 @@ type SetupComponent<T> = {
 }
 
 type PetActionsSetup = {
-  shouldShowFeedbackCheckback: { value: boolean }
-  shouldShowFeedbackFollowup: { value: boolean }
-  shouldShowFeedbackNextAction: { value: boolean }
+  careFeedbackCheckbackText?: { value: string }
+  shouldShowFeedbackCheckback?: { value: boolean }
+  shouldShowFeedbackFollowup?: { value: boolean }
+  shouldShowFeedbackNextAction?: { value: boolean }
 }
 
 function loadScriptSetupComponent<T>(componentPath: string): SetupComponent<T> {
@@ -101,7 +103,7 @@ function createBaseProps(overrides: Record<string, unknown> = {}) {
       used: 4,
       limit: 5,
       remaining: 1,
-      resetAt: 31 * 60 * 1000,
+      resetAt: 31 * 60 * 1000 + 1000,
       windowMs: 30 * 60 * 1000,
     },
     careFeedback: {
@@ -148,117 +150,102 @@ function setupPetActions(props: Record<string, unknown> = {}): PetActionsSetup {
   })
 }
 
-describe('care feedback priority layout', () => {
+describe('care feedback checkback hint', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
     vi.useRealTimers()
   })
 
-  it('orders primary result, overview, chips, and follow-up sections', () => {
+  it('renders the next check hint inside the feedback follow-up section', () => {
     const template = readComponentTemplate('components/PetActions.vue')
-    const feedbackIndex = template.indexOf('class="care-feedback"')
-    const headerIndex = template.indexOf('class="care-feedback__header"')
-    const overviewIndex = template.indexOf('class="care-feedback__overview"')
-    const summaryIndex = template.indexOf('class="care-feedback__summary"')
-    const growthIndex = template.indexOf('class="care-feedback__growth"')
-    const chipsIndex = template.indexOf('class="care-feedback__chips"')
-    const followupIndex = template.indexOf('class="care-feedback__follow-up"')
-    const nextIndex = template.indexOf('class="care-feedback__next"')
-    const noteIndex = template.indexOf('class="care-feedback__note"')
-
-    expect(feedbackIndex).toBeGreaterThan(-1)
-    expect(headerIndex).toBeGreaterThan(feedbackIndex)
-    expect(overviewIndex).toBeGreaterThan(headerIndex)
-    expect(summaryIndex).toBeGreaterThan(overviewIndex)
-    expect(growthIndex).toBeGreaterThan(summaryIndex)
-    expect(chipsIndex).toBeGreaterThan(growthIndex)
-    expect(followupIndex).toBeGreaterThan(chipsIndex)
-    expect(nextIndex).toBeGreaterThan(followupIndex)
-    expect(noteIndex).toBeGreaterThan(followupIndex)
-    expect(template).toContain('v-if="shouldShowFeedbackFollowup"')
-
-    const overviewBlock = extractElementBlock(template, 'care-feedback__overview')
+    const source = readSource('components/PetActions.vue')
     const followupBlock = extractElementBlock(template, 'care-feedback__follow-up')
 
-    expect(overviewBlock).toContain('class="care-feedback__summary"')
-    expect(overviewBlock).toContain('class="care-feedback__growth"')
-    expect(overviewBlock).not.toContain('class="care-feedback__chips"')
-    expect(followupBlock).toContain('class="care-feedback__next"')
     expect(followupBlock).toContain('class="care-feedback__checkback"')
-    expect(followupBlock).toContain('class="care-feedback__note"')
+    expect(followupBlock).toContain('v-if="shouldShowFeedbackCheckback"')
+    expect(followupBlock).toContain('messages.careFeedback.checkbackLabel')
+    expect(followupBlock).toContain('careFeedbackCheckbackText')
+    expect(source).toContain('messages.value.careFeedback.checkbackNow')
+    expect(source).toContain('messages.value.careFeedback.checkbackCooldown')
+    expect(source).toContain('messages.value.careFeedback.checkbackLimit')
   })
 
-  it('shows follow-up when next action, reduced reward note, or checkback hint is available', () => {
+  it('keeps follow-up visible when only a next check hint is available', () => {
+    const setup = setupPetActions({
+      recommendedCareAction: null,
+    })
+
+    expect(setup.shouldShowFeedbackNextAction?.value).toBe(false)
+    expect(setup.shouldShowFeedbackCheckback?.value).toBe(true)
+    expect(setup.shouldShowFeedbackFollowup?.value).toBe(true)
+    expect(setup.careFeedbackCheckbackText?.value).toBe(
+      '탭을 열어두고 펫 신호가 바뀌면 다시 확인하세요.',
+    )
+  })
+
+  it('guides users to continue now when a next recommendation is available', () => {
     const setup = setupPetActions()
-    const reducedSetup = setupPetActions({
+
+    expect(setup.careFeedbackCheckbackText?.value).toBe(
+      '지금 이어서 다음 추천을 돌볼 수 있어요.',
+    )
+  })
+
+  it('guides users to the limit reset time when no care uses remain', () => {
+    const setup = setupPetActions({
       actionLimitInfo: {
         used: 5,
         limit: 5,
         remaining: 0,
-        resetAt: 31 * 60 * 1000,
+        resetAt: 31 * 60 * 1000 + 1000,
         windowMs: 30 * 60 * 1000,
-      },
-      careFeedback: {
-        action: 'feed',
-        statChanges: {
-          fullness: 5,
-          energy: -3,
-          cleanliness: -2,
-        },
-        gainedExp: 5,
-        gainedAffinityExp: 1,
-        didLevelUp: false,
-        didAffinityLevelUp: false,
-        wasReduced: true,
-        createdAt: 1000,
       },
     })
-    const quietSetup = setupPetActions({
-      actionLimitInfo: {
-        used: 5,
-        limit: 5,
-        remaining: 0,
-        resetAt: 31 * 60 * 1000,
-        windowMs: 30 * 60 * 1000,
+
+    expect(setup.careFeedbackCheckbackText?.value).toBe(
+      '31m 00s 후 돌봄 횟수가 돌아와요. 그때 다시 확인하거나 지금 추가할 수 있어요.',
+    )
+  })
+
+  it('guides users to the nearest cooldown when no immediate recommendation exists', () => {
+    const setup = setupPetActions({
+      cooldowns: {
+        feed: 4500,
+        play: 0,
+        sleep: 2100,
+        wash: 0,
       },
       recommendedCareAction: null,
-      careFeedback: {
-        action: 'feed',
-        statChanges: {
-          fullness: 28,
-          energy: -3,
-          cleanliness: -2,
-        },
-        gainedExp: 12,
-        gainedAffinityExp: 2,
-        didLevelUp: false,
-        didAffinityLevelUp: false,
-        wasReduced: false,
-        createdAt: 1000,
-      },
     })
 
-    expect(setup.shouldShowFeedbackNextAction.value).toBe(true)
-    expect(setup.shouldShowFeedbackCheckback.value).toBe(true)
-    expect(setup.shouldShowFeedbackFollowup.value).toBe(true)
-    expect(reducedSetup.shouldShowFeedbackNextAction.value).toBe(false)
-    expect(reducedSetup.shouldShowFeedbackCheckback.value).toBe(true)
-    expect(reducedSetup.shouldShowFeedbackFollowup.value).toBe(true)
-    expect(quietSetup.shouldShowFeedbackNextAction.value).toBe(false)
-    expect(quietSetup.shouldShowFeedbackCheckback.value).toBe(true)
-    expect(quietSetup.shouldShowFeedbackFollowup.value).toBe(true)
+    expect(setup.careFeedbackCheckbackText?.value).toBe(
+      '재우기: 2s 후 다시 가능해요. 그때 확인하세요.',
+    )
   })
 
-  it('defines responsive overview and follow-up styles', () => {
+  it('keeps checkback copy localized for every supported language', () => {
+    for (const locale of SUPPORTED_LOCALES) {
+      const careFeedback = I18N_MESSAGES[locale].careFeedback
+
+      expect(careFeedback.checkbackLabel.length).toBeGreaterThan(0)
+      expect(careFeedback.checkbackNow.length).toBeGreaterThan(0)
+      expect(careFeedback.checkbackCooldown).toContain('{action}')
+      expect(careFeedback.checkbackCooldown).toContain('{time}')
+      expect(careFeedback.checkbackLimit).toContain('{time}')
+      expect(careFeedback.checkbackReady.length).toBeGreaterThan(0)
+      expect(careFeedback.checkbackLater.length).toBeGreaterThan(0)
+    }
+  })
+
+  it('defines compact checkback styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.care-feedback__overview')
-    expect(css).toContain('.care-feedback__follow-up')
-    expect(css).toMatch(/\.care-feedback__overview\s*\{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/)
-    expect(css).toMatch(/\.care-feedback__follow-up\s*\{[^}]*border-top: 1px solid var\(--app-border\);/)
+    expect(css).toContain('.care-feedback__checkback')
+    expect(css).toMatch(/\.care-feedback__checkback\s*\{[^}]*grid-template-columns: minmax\(0, 0\.42fr\) minmax\(0, 1fr\);/)
+    expect(css).toMatch(/\.care-feedback__checkback small\s*\{[^}]*overflow-wrap: anywhere;/)
     expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.care-feedback__overview\s*\{[^}]*grid-template-columns: 1fr;/,
+      /@media \(max-width: 720px\)[\s\S]*\.care-feedback__checkback\s*\{[^}]*grid-template-columns: 1fr;/,
     )
   })
 })
