@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { PetSettings } from '~/types/pet'
+import { getExperienceMultiplier } from '~/utils/petGrowth'
 import type { ProgressInfo, AffinityProgressInfo } from '~/utils/petGrowth'
 
 const props = defineProps<{
@@ -53,6 +54,19 @@ const affinityGoalText = computed(() => {
     .replace('{level}', String(props.affinityProgress.level + 1))
     .replace('{remaining}', String(affinityGoalRemaining.value))
 })
+const currentAffinityBonus = computed(() => getExperienceMultiplier(props.affinityProgress.level))
+const nextAffinityBonus = computed(() => getExperienceMultiplier(props.affinityProgress.level + 1))
+const affinityGoalDetail = computed(() => {
+  const template = currentAffinityBonus.value === nextAffinityBonus.value
+    ? messages.value.sidePanelProgress.affinityGoalMaxDetail
+    : messages.value.sidePanelProgress.affinityGoalDetail
+
+  return template
+    .replace('{current}', String(props.affinityProgress.current))
+    .replace('{required}', String(props.affinityProgress.required))
+    .replace('{currentBonus}', formatMultiplier(currentAffinityBonus.value))
+    .replace('{nextBonus}', formatMultiplier(nextAffinityBonus.value))
+})
 const progressGoalRows = computed(() => [
   {
     id: 'level' as const,
@@ -64,7 +78,7 @@ const progressGoalRows = computed(() => [
     id: 'affinity' as const,
     label: messages.value.sidePanelProgress.affinityGoalLabel,
     text: affinityGoalText.value,
-    detail: formatGoalProgress(props.affinityProgress.current, props.affinityProgress.required),
+    detail: affinityGoalDetail.value,
   },
 ])
 
@@ -72,6 +86,10 @@ function formatGoalProgress(current: number, required: number): string {
   return messages.value.sidePanelProgress.goalProgressDetail
     .replace('{current}', String(current))
     .replace('{required}', String(required))
+}
+
+function formatMultiplier(multiplier: number): string {
+  return multiplier.toFixed(1)
 }
 </script>
 

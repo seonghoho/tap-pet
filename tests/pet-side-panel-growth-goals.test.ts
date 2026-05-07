@@ -6,6 +6,7 @@ import ts from 'typescript'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { I18N_MESSAGES } from '~/constants/i18n'
 import type { PetSettings } from '~/types/pet'
+import * as petGrowth from '~/utils/petGrowth'
 
 const SUPPORTED_LOCALES = ['en', 'ko', 'ja'] as const
 const requireModule = createRequire(import.meta.url)
@@ -15,6 +16,7 @@ type SetupComponent<T> = {
 }
 
 type PetSidePanelSetup = {
+  affinityGoalDetail?: { value: string }
   affinityGoalText?: { value: string }
   levelGoalText?: { value: string }
   progressGoalRows?: {
@@ -42,6 +44,7 @@ function loadScriptSetupComponent<T>(componentPath: string): SetupComponent<T> {
   const module = { exports: {} }
   const localRequire = (id: string): unknown => {
     if (id === 'vue') return requireModule('vue')
+    if (id === '~/utils/petGrowth') return petGrowth
 
     return requireModule(id)
   }
@@ -129,6 +132,7 @@ describe('pet side panel growth goals', () => {
 
     expect(setup.levelGoalText?.value).toBe('레벨 3까지 55 경험치')
     expect(setup.affinityGoalText?.value).toBe('보상 보너스 4까지 110')
+    expect(setup.affinityGoalDetail?.value).toBe('현재 30/140 · 돌봄 경험치 x1.3 → x1.4')
     expect(setup.progressGoalRows?.value).toEqual([
       {
         id: 'level',
@@ -140,7 +144,7 @@ describe('pet side panel growth goals', () => {
         id: 'affinity',
         label: '보상 보너스',
         text: '보상 보너스 4까지 110',
-        detail: '현재 30/140',
+        detail: '현재 30/140 · 돌봄 경험치 x1.3 → x1.4',
       },
     ])
   })
@@ -164,6 +168,20 @@ describe('pet side panel growth goals', () => {
     expect(setup.affinityGoalText?.value).toBe('다음 목표 준비 완료')
   })
 
+  it('uses max bonus copy when the next affinity multiplier is capped', () => {
+    const setup = setupSidePanel({
+      affinityProgress: {
+        level: 5,
+        current: 10,
+        required: 220,
+        percent: 5,
+      },
+    })
+
+    expect(setup.affinityGoalText?.value).toBe('보상 보너스 6까지 210')
+    expect(setup.affinityGoalDetail?.value).toBe('현재 10/220 · 돌봄 경험치 최대 x1.5')
+  })
+
   it('keeps growth goal copy localized for every supported language', () => {
     for (const locale of SUPPORTED_LOCALES) {
       const sidePanelProgress = I18N_MESSAGES[locale].sidePanelProgress
@@ -176,6 +194,13 @@ describe('pet side panel growth goals', () => {
       expect(sidePanelProgress.levelGoalRemaining).toContain('{exp}')
       expect(sidePanelProgress.affinityGoalRemaining).toContain('{level}')
       expect(sidePanelProgress.affinityGoalRemaining).toContain('{remaining}')
+      expect(sidePanelProgress.affinityGoalDetail).toContain('{current}')
+      expect(sidePanelProgress.affinityGoalDetail).toContain('{required}')
+      expect(sidePanelProgress.affinityGoalDetail).toContain('{currentBonus}')
+      expect(sidePanelProgress.affinityGoalDetail).toContain('{nextBonus}')
+      expect(sidePanelProgress.affinityGoalMaxDetail).toContain('{current}')
+      expect(sidePanelProgress.affinityGoalMaxDetail).toContain('{required}')
+      expect(sidePanelProgress.affinityGoalMaxDetail).toContain('{currentBonus}')
       expect(sidePanelProgress.goalComplete.length).toBeGreaterThan(0)
       expect(sidePanelProgress.goalProgressDetail).toContain('{current}')
       expect(sidePanelProgress.goalProgressDetail).toContain('{required}')

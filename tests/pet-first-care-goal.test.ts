@@ -6,6 +6,7 @@ import ts from 'typescript'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { I18N_MESSAGES } from '~/constants/i18n'
 import type { PetSettings } from '~/types/pet'
+import * as petGrowth from '~/utils/petGrowth'
 
 const SUPPORTED_LOCALES = ['en', 'ko', 'ja'] as const
 const FIRST_CARE_STEP_IDS = ['recommend', 'result', 'growth'] as const
@@ -59,6 +60,7 @@ function loadScriptSetupComponent<T>(componentPath: string): SetupComponent<T> {
   const module = { exports: {} }
   const localRequire = (id: string): unknown => {
     if (id === 'vue') return requireModule('vue')
+    if (id === '~/utils/petGrowth') return petGrowth
 
     return requireModule(id)
   }
