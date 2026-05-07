@@ -21,6 +21,17 @@ const emit = defineEmits<{
 
 const { messages } = useLocale()
 
+const hasStartedFirstCareLoop = computed(() =>
+  props.level > 1 ||
+  props.levelProgress.current > 0 ||
+  props.affinityProgress.level > 1 ||
+  props.affinityProgress.current > 0,
+)
+const firstCareGoalCopy = computed(() =>
+  hasStartedFirstCareLoop.value
+    ? messages.value.firstCareGoal.repeat
+    : messages.value.firstCareGoal,
+)
 const levelGoalRemaining = computed(() =>
   Math.max(0, props.levelProgress.required - props.levelProgress.current),
 )
@@ -97,16 +108,20 @@ function formatGoalProgress(current: number, required: number): string {
         </p>
       </div>
 
-      <section class="first-care-goal" aria-labelledby="first-care-goal-title">
+      <section
+        class="first-care-goal"
+        :class="{ 'first-care-goal--repeat': hasStartedFirstCareLoop }"
+        aria-labelledby="first-care-goal-title"
+      >
         <div class="first-care-goal__copy">
-          <span>{{ messages.firstCareGoal.eyebrow }}</span>
-          <strong id="first-care-goal-title">{{ messages.firstCareGoal.title }}</strong>
-          <small>{{ messages.firstCareGoal.description }}</small>
+          <span>{{ firstCareGoalCopy.eyebrow }}</span>
+          <strong id="first-care-goal-title">{{ firstCareGoalCopy.title }}</strong>
+          <small>{{ firstCareGoalCopy.description }}</small>
         </div>
 
         <ol class="first-care-goal__list" role="list">
           <li
-            v-for="step in messages.firstCareGoal.steps"
+            v-for="step in firstCareGoalCopy.steps"
             :key="step.id"
             class="first-care-goal__step"
           >

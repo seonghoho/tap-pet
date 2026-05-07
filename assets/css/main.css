@@ -375,6 +375,10 @@ button:disabled {
   padding: 12px 0;
 }
 
+.first-care-goal--repeat {
+  border-color: color-mix(in srgb, var(--app-success) 28%, var(--app-border));
+}
+
 .first-care-goal__copy {
   display: grid;
   gap: 4px;
@@ -386,6 +390,10 @@ button:disabled {
   font-weight: 900;
   line-height: 1.2;
   text-transform: uppercase;
+}
+
+.first-care-goal--repeat .first-care-goal__copy span {
+  color: var(--app-success);
 }
 
 .first-care-goal__copy strong {
@@ -432,6 +440,12 @@ button:disabled {
   height: 24px;
   justify-content: center;
   width: 24px;
+}
+
+.first-care-goal--repeat .first-care-goal__step::before {
+  background: color-mix(in srgb, var(--app-success) 13%, var(--app-surface-strong));
+  border-color: color-mix(in srgb, var(--app-success) 36%, var(--app-border));
+  color: var(--app-success);
 }
 
 .first-care-goal__step span {

@@ -252,6 +252,25 @@ export const I18N_MESSAGES = {
           label: 'Watch growth and affinity',
         },
       ],
+      repeat: {
+        eyebrow: 'Care loop active',
+        title: 'Keep the loop going',
+        description: 'Use the next recommendation when it is ready, then check the result and growth again.',
+        steps: [
+          {
+            id: 'recommend',
+            label: 'Start the next recommended care',
+          },
+          {
+            id: 'result',
+            label: 'Check the next result',
+          },
+          {
+            id: 'growth',
+            label: 'Track the next growth goal',
+          },
+        ],
+      },
     },
     titles: {
       heading: 'Disguise title',
@@ -575,6 +594,25 @@ export const I18N_MESSAGES = {
           label: '성장/친밀도 변화 보기',
         },
       ],
+      repeat: {
+        eyebrow: '돌봄 루프 진행 중',
+        title: '다음 루프를 이어가세요',
+        description: '다음 추천이 준비되면 돌보고, 결과와 성장 변화를 다시 확인하세요.',
+        steps: [
+          {
+            id: 'recommend',
+            label: '다음 추천 돌봄 시작',
+          },
+          {
+            id: 'result',
+            label: '다음 결과 확인',
+          },
+          {
+            id: 'growth',
+            label: '다음 성장 목표 확인',
+          },
+        ],
+      },
     },
     titles: {
       heading: '위장 타이틀',
@@ -898,6 +936,25 @@ export const I18N_MESSAGES = {
           label: '成長と親密度を見る',
         },
       ],
+      repeat: {
+        eyebrow: 'ケアループ進行中',
+        title: '次のループを続ける',
+        description: '次のおすすめが準備できたらお世話し、結果と成長の変化をもう一度確認します。',
+        steps: [
+          {
+            id: 'recommend',
+            label: '次のおすすめのお世話を始める',
+          },
+          {
+            id: 'result',
+            label: '次の結果を確認',
+          },
+          {
+            id: 'growth',
+            label: '次の成長目標を確認',
+          },
+        ],
+      },
     },
     titles: {
       heading: '偽装タイトル',
