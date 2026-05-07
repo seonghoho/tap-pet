@@ -113,4 +113,98 @@ describe('pet storage validation', () => {
   it('rejects invalid species', () => {
     expect(parseStoredPetState({ version: PET_STORAGE_VERSION, species: 'bird' }, 1000)).toBeNull()
   })
+
+  it('rejects non-record inputs', () => {
+    expect(parseStoredPetState(null, 1000)).toBeNull()
+    expect(parseStoredPetState(undefined, 1000)).toBeNull()
+    expect(parseStoredPetState('serialized', 1000)).toBeNull()
+    expect(parseStoredPetState(42, 1000)).toBeNull()
+    expect(parseStoredPetState([], 1000)).toBeNull()
+  })
+
+  it('rejects unknown version values', () => {
+    expect(parseStoredPetState({ version: 99, species: 'cat' }, 1000)).toBeNull()
+    expect(parseStoredPetState({ version: '2', species: 'cat' }, 1000)).toBeNull()
+    expect(parseStoredPetState({ species: 'cat' }, 1000)).toBeNull()
+  })
+
+  it('clamps non-finite stat values to the valid range', () => {
+    const parsed = parseStoredPetState(
+      {
+        version: PET_STORAGE_VERSION,
+        species: 'cat',
+        stats: { fullness: Number.NaN, energy: Number.POSITIVE_INFINITY, cleanliness: -1000 },
+        lastUpdatedAt: 1000,
+      },
+      2000,
+    )
+
+    expect(parsed?.stats).toEqual({ fullness: 0, energy: 0, cleanliness: 0 })
+  })
+
+  it('clamps stats above the maximum', () => {
+    const parsed = parseStoredPetState(
+      {
+        version: PET_STORAGE_VERSION,
+        species: 'cat',
+        stats: { fullness: 9999, energy: 9999, cleanliness: 9999 },
+        lastUpdatedAt: 1000,
+      },
+      2000,
+    )
+
+    expect(parsed?.stats).toEqual({ fullness: 100, energy: 100, cleanliness: 100 })
+  })
+
+  it('coerces numeric strings in stats', () => {
+    const parsed = parseStoredPetState(
+      {
+        version: PET_STORAGE_VERSION,
+        species: 'cat',
+        stats: { fullness: '50', energy: '60', cleanliness: '70' },
+        lastUpdatedAt: 1000,
+      },
+      2000,
+    )
+
+    expect(parsed?.stats).toEqual({ fullness: 50, energy: 60, cleanliness: 70 })
+  })
+
+  it('falls back to defaults when stats payload is missing or wrong shape', () => {
+    const missing = parseStoredPetState(
+      {
+        version: PET_STORAGE_VERSION,
+        species: 'cat',
+        lastUpdatedAt: 1000,
+      },
+      2000,
+    )
+    const wrongShape = parseStoredPetState(
+      {
+        version: PET_STORAGE_VERSION,
+        species: 'cat',
+        stats: 'broken',
+        lastUpdatedAt: 1000,
+      },
+      2000,
+    )
+
+    expect(missing?.stats).toEqual({ fullness: 0, energy: 0, cleanliness: 70 })
+    expect(wrongShape?.stats).toEqual({ fullness: 0, energy: 0, cleanliness: 70 })
+  })
+
+  it('falls back when timestamps are non-numeric', () => {
+    const parsed = parseStoredPetState(
+      {
+        version: PET_STORAGE_VERSION,
+        species: 'cat',
+        lastUpdatedAt: 'not-a-date',
+        lastPlayedAt: null,
+      },
+      2000,
+    )
+
+    expect(parsed?.lastUpdatedAt).toBe(2000)
+    expect(parsed?.lastPlayedAt).toBe(2000)
+  })
 })
