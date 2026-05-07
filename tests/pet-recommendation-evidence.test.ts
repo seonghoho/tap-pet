@@ -103,6 +103,7 @@ function createBaseProps(overrides: Record<string, unknown> = {}) {
       energy: 21,
       cleanliness: 64,
     },
+    lastPlayedAt: 1000,
     cooldowns: {
       feed: 0,
       play: 0,
@@ -159,6 +160,16 @@ describe('pet recommendation evidence', () => {
     expect(source).toContain('stats: PetStats')
   })
 
+  it('passes last played time into the action controls', () => {
+    const appTemplate = readComponentTemplate('app.vue')
+    const source = readSource('components/PetActions.vue')
+
+    expect(getComponentPropExpression(appTemplate, 'PetActions', 'last-played-at')).toBe(
+      'currentPet.lastPlayedAt',
+    )
+    expect(source).toContain('lastPlayedAt: number')
+  })
+
   it('summarizes the recommended stat and current value', () => {
     const setup = setupPetActions()
 
@@ -166,12 +177,26 @@ describe('pet recommendation evidence', () => {
     expect(setup.recommendationEvidenceText?.value).toBe('근거 에너지 21/100')
   })
 
-  it('hides evidence when the recommendation has no stat key', () => {
+  it('summarizes idle time when play is recommended', () => {
     const setup = setupPetActions({
+      lastPlayedAt: 1000 - 1000 * 60 * 135,
       recommendedCareAction: {
         action: 'play',
         reason: 'need',
         status: 'bored',
+      },
+    })
+
+    expect(setup.shouldShowRecommendationEvidence?.value).toBe(true)
+    expect(setup.recommendationEvidenceText?.value).toBe('근거 마지막 놀이 2시간 15분 전')
+  })
+
+  it('hides evidence when the recommendation has no stat key', () => {
+    const setup = setupPetActions({
+      recommendedCareAction: {
+        action: 'feed',
+        reason: 'need',
+        status: 'hungry',
       },
     })
 
@@ -194,6 +219,11 @@ describe('pet recommendation evidence', () => {
 
       expect(careRecommendation.statEvidence).toContain('{stat}')
       expect(careRecommendation.statEvidence).toContain('{value}')
+      expect(careRecommendation.playEvidence).toContain('{time}')
+      expect(I18N_MESSAGES[locale].time.minutesAgo).toContain('{minutes}')
+      expect(I18N_MESSAGES[locale].time.hoursAgo).toContain('{hours}')
+      expect(I18N_MESSAGES[locale].time.hoursMinutesAgo).toContain('{hours}')
+      expect(I18N_MESSAGES[locale].time.hoursMinutesAgo).toContain('{minutes}')
     }
   })
 

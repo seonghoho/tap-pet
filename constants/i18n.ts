@@ -142,6 +142,11 @@ export const I18N_MESSAGES = {
         detail: 'Restores cleanliness',
       },
     },
+    time: {
+      minutesAgo: '{minutes}m ago',
+      hoursAgo: '{hours}h ago',
+      hoursMinutesAgo: '{hours}h {minutes}m ago',
+    },
     actionLimit: {
       remaining: '{remaining}/{limit} care actions left in this 30-minute window.',
       locked: 'Care limit reached. Choose how to continue.',
@@ -185,6 +190,7 @@ export const I18N_MESSAGES = {
       rewardHint: 'Expected reward {exp} EXP · {affinity} affinity',
       rewardReduced: 'Expected reward is lower because this need is already high.',
       statEvidence: 'Evidence {stat} {value}/100',
+      playEvidence: 'Evidence last play {time}',
       details: {
         feed: 'Fullness is the best stat to recover now.',
         play: 'It has been idle for a while. Play helps refresh the tab signal.',
@@ -456,6 +462,11 @@ export const I18N_MESSAGES = {
         detail: '청결 회복',
       },
     },
+    time: {
+      minutesAgo: '{minutes}분 전',
+      hoursAgo: '{hours}시간 전',
+      hoursMinutesAgo: '{hours}시간 {minutes}분 전',
+    },
     actionLimit: {
       remaining: '30분 돌봄 가능 횟수 {remaining}/{limit}회 남음',
       locked: '돌봄 횟수를 모두 사용했습니다. 이어갈 방법을 선택하세요.',
@@ -499,6 +510,7 @@ export const I18N_MESSAGES = {
       rewardHint: '예상 보상 경험치 {exp} · 친밀도 {affinity}',
       rewardReduced: '이미 충분히 돌본 상태라 예상 보상이 낮습니다.',
       statEvidence: '근거 {stat} {value}/100',
+      playEvidence: '근거 마지막 놀이 {time}',
       details: {
         feed: '지금은 배부름을 먼저 회복하는 흐름이 좋습니다.',
         play: '오래 쉬고 있어 놀아주면 탭 신호가 다시 살아납니다.',
@@ -770,6 +782,11 @@ export const I18N_MESSAGES = {
         detail: '清潔度を回復',
       },
     },
+    time: {
+      minutesAgo: '{minutes}分前',
+      hoursAgo: '{hours}時間前',
+      hoursMinutesAgo: '{hours}時間{minutes}分前',
+    },
     actionLimit: {
       remaining: '30分のお世話回数が {remaining}/{limit} 回残っています。',
       locked: 'お世話回数を使い切りました。続け方を選んでください。',
@@ -813,6 +830,7 @@ export const I18N_MESSAGES = {
       rewardHint: '予想報酬 経験値 {exp} · 親密度 {affinity}',
       rewardReduced: 'このニーズはすでに高いため、予想報酬は低めです。',
       statEvidence: '根拠 {stat} {value}/100',
+      playEvidence: '根拠 最後の遊び {time}',
       details: {
         feed: 'いまは満腹度を先に回復するのがよさそうです。',
         play: 'しばらく動きがないため、遊ぶとタブの合図が戻ります。',

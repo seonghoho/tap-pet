@@ -14,6 +14,7 @@ import type { ProgressInfo } from '~/utils/petGrowth'
 
 const props = defineProps<{
   stats: PetStats
+  lastPlayedAt: number
   cooldowns: Record<PetAction, number>
   activeReaction: PetAction | null
   actionLimitInfo: PetActionLimitInfo
@@ -249,7 +250,16 @@ const shouldShowRecommendation = computed(
 )
 const recommendationEvidenceText = computed(() => {
   const recommendation = props.recommendedCareAction
-  if (!recommendation?.statKey) return ''
+  if (!recommendation) return ''
+
+  if (recommendation.action === 'play') {
+    return messages.value.careRecommendation.playEvidence.replace(
+      '{time}',
+      formatElapsedTime(now.value - props.lastPlayedAt),
+    )
+  }
+
+  if (!recommendation.statKey) return ''
 
   return messages.value.careRecommendation.statEvidence
     .replace('{stat}', messages.value.stats[recommendation.statKey])
@@ -413,6 +423,20 @@ function formatRemainingTime(milliseconds: number): string {
   if (minutes <= 0) return `${seconds}s`
 
   return `${minutes}m ${seconds.toString().padStart(2, '0')}s`
+}
+
+function formatElapsedTime(milliseconds: number): string {
+  const elapsedMilliseconds = Number.isFinite(milliseconds) ? Math.max(0, milliseconds) : 0
+  const totalMinutes = Math.max(1, Math.floor(elapsedMilliseconds / 60000))
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+
+  if (hours <= 0) return messages.value.time.minutesAgo.replace('{minutes}', String(minutes))
+  if (minutes <= 0) return messages.value.time.hoursAgo.replace('{hours}', String(hours))
+
+  return messages.value.time.hoursMinutesAgo
+    .replace('{hours}', String(hours))
+    .replace('{minutes}', String(minutes))
 }
 
 function formatSigned(value: number): string {
