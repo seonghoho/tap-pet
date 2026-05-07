@@ -320,6 +320,54 @@ button:disabled {
   gap: 14px;
 }
 
+.progress-goals {
+  border-bottom: 1px solid var(--app-border);
+  display: grid;
+  gap: 10px;
+  padding-bottom: 14px;
+}
+
+.progress-goals__copy strong {
+  display: block;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.progress-goals__list {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.progress-goal {
+  background: color-mix(in srgb, var(--app-accent) 7%, var(--app-surface-strong));
+  border: 1px solid color-mix(in srgb, var(--app-accent) 20%, var(--app-border));
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px;
+}
+
+.progress-goal span {
+  color: var(--app-muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.progress-goal strong {
+  display: block;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.progress-goal small {
+  color: var(--app-muted);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
 .first-care-goal {
   border-block: 1px solid var(--app-border);
   display: grid;
@@ -2159,6 +2207,10 @@ button:disabled {
   .first-care-goal__step::before {
     height: 22px;
     width: 22px;
+  }
+
+  .progress-goals__list {
+    grid-template-columns: 1fr;
   }
 
   .action-panel {

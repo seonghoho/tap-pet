@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { PetSettings } from '~/types/pet'
 import type { ProgressInfo, AffinityProgressInfo } from '~/utils/petGrowth'
 
-defineProps<{
+const props = defineProps<{
   mode: 'status' | 'settings'
   name: string
   level: number
@@ -19,6 +20,48 @@ const emit = defineEmits<{
 }>()
 
 const { messages } = useLocale()
+
+const levelGoalRemaining = computed(() =>
+  Math.max(0, props.levelProgress.required - props.levelProgress.current),
+)
+const affinityGoalRemaining = computed(() =>
+  Math.max(0, props.affinityProgress.required - props.affinityProgress.current),
+)
+const levelGoalText = computed(() => {
+  if (levelGoalRemaining.value <= 0) return messages.value.sidePanelProgress.goalComplete
+
+  return messages.value.sidePanelProgress.levelGoalRemaining
+    .replace('{level}', String(props.level + 1))
+    .replace('{remaining}', String(levelGoalRemaining.value))
+    .replace('{exp}', messages.value.stats.exp)
+})
+const affinityGoalText = computed(() => {
+  if (affinityGoalRemaining.value <= 0) return messages.value.sidePanelProgress.goalComplete
+
+  return messages.value.sidePanelProgress.affinityGoalRemaining
+    .replace('{level}', String(props.affinityProgress.level + 1))
+    .replace('{remaining}', String(affinityGoalRemaining.value))
+})
+const progressGoalRows = computed(() => [
+  {
+    id: 'level' as const,
+    label: messages.value.sidePanelProgress.levelGoalLabel,
+    text: levelGoalText.value,
+    detail: formatGoalProgress(props.levelProgress.current, props.levelProgress.required),
+  },
+  {
+    id: 'affinity' as const,
+    label: messages.value.sidePanelProgress.affinityGoalLabel,
+    text: affinityGoalText.value,
+    detail: formatGoalProgress(props.affinityProgress.current, props.affinityProgress.required),
+  },
+])
+
+function formatGoalProgress(current: number, required: number): string {
+  return messages.value.sidePanelProgress.goalProgressDetail
+    .replace('{current}', String(current))
+    .replace('{required}', String(required))
+}
 </script>
 
 <template>
@@ -70,6 +113,24 @@ const { messages } = useLocale()
             <span>{{ step.label }}</span>
           </li>
         </ol>
+      </section>
+
+      <section class="progress-goals" aria-labelledby="progress-goals-title">
+        <div class="progress-goals__copy">
+          <strong id="progress-goals-title">{{ messages.sidePanelProgress.progressGoalHeading }}</strong>
+        </div>
+
+        <div class="progress-goals__list">
+          <div
+            v-for="goal in progressGoalRows"
+            :key="goal.id"
+            class="progress-goal"
+          >
+            <span>{{ goal.label }}</span>
+            <strong>{{ goal.text }}</strong>
+            <small>{{ goal.detail }}</small>
+          </div>
+        </div>
       </section>
 
       <div class="progress-list">

@@ -115,6 +115,15 @@ export const I18N_MESSAGES = {
       exp: 'EXP',
       affinity: 'Affinity',
     },
+    sidePanelProgress: {
+      progressGoalHeading: 'Next growth goals',
+      levelGoalLabel: 'Level goal',
+      affinityGoalLabel: 'Reward bonus',
+      levelGoalRemaining: '{remaining} {exp} to Level {level}',
+      affinityGoalRemaining: '{remaining} to reward bonus {level}',
+      goalComplete: 'Next goal is ready',
+      goalProgressDetail: 'Current {current}/{required}',
+    },
     actions: {
       feed: {
         label: 'Feed',
@@ -405,6 +414,15 @@ export const I18N_MESSAGES = {
       exp: '경험치',
       affinity: '친밀도',
     },
+    sidePanelProgress: {
+      progressGoalHeading: '다음 성장 목표',
+      levelGoalLabel: '레벨 목표',
+      affinityGoalLabel: '보상 보너스',
+      levelGoalRemaining: '레벨 {level}까지 {remaining} {exp}',
+      affinityGoalRemaining: '보상 보너스 {level}까지 {remaining}',
+      goalComplete: '다음 목표 준비 완료',
+      goalProgressDetail: '현재 {current}/{required}',
+    },
     actions: {
       feed: {
         label: '밥 주기',
@@ -694,6 +712,15 @@ export const I18N_MESSAGES = {
       level: 'レベル',
       exp: '経験値',
       affinity: '親密度',
+    },
+    sidePanelProgress: {
+      progressGoalHeading: '次の成長目標',
+      levelGoalLabel: 'レベル目標',
+      affinityGoalLabel: '報酬ボーナス',
+      levelGoalRemaining: 'レベル {level} まで {remaining} {exp}',
+      affinityGoalRemaining: '報酬ボーナス {level} まで {remaining}',
+      goalComplete: '次の目標の準備完了',
+      goalProgressDetail: '現在 {current}/{required}',
     },
     actions: {
       feed: {
