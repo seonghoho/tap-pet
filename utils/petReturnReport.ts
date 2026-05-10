@@ -34,10 +34,10 @@ export function getPrimaryReturnReportStat(stats: PetStats): PetStatKey {
 export function createPetReturnReport(input: {
   state: PetState
   previousLastUpdatedAt: number
-  now?: number
+  now: number
   recommendedCareAction?: PetCareRecommendation | null
 }): PetReturnReport | null {
-  const now = input.now ?? Date.now()
+  const now = input.now
   const elapsedMs = Math.max(0, now - input.previousLastUpdatedAt)
   const bucket = getPetReturnReportBucket(elapsedMs)
 

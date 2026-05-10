@@ -13,12 +13,23 @@ import {
   getPrimaryReturnReportStat,
 } from '~/utils/petReturnReport'
 
+type CreatePetReturnReportInput = Parameters<typeof createPetReturnReport>[0]
+
 function createState(overrides: Partial<PetState> = {}): PetState {
   return {
     ...createInitialPetState('cat', 1000, { name: '몽이' }),
     ...overrides,
   }
 }
+
+// @ts-expect-error createPetReturnReport requires callers to inject current time.
+const missingReturnReportNowInput: CreatePetReturnReportInput = {
+  state: createState(),
+  previousLastUpdatedAt: 1000,
+  recommendedCareAction: null,
+}
+
+void missingReturnReportNowInput
 
 describe('pet return report', () => {
   it('does not create a report for short absence', () => {
