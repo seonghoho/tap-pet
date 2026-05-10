@@ -157,6 +157,42 @@ describe('pet daily goal store behavior', () => {
     })
     expect(savedStates.at(-1)?.growth.exp).toBeGreaterThan(0)
   })
+
+  it('clears the return report when care starts', () => {
+    const restoredAt = 1000 * 60 * 60
+    const previousLastUpdatedAt = 1000
+    const restoredState = createInitialPetState('cat', previousLastUpdatedAt)
+    vi.setSystemTime(restoredAt)
+    vi.stubGlobal('useLocalPetStorage', () => ({
+      storageError: { value: null },
+      loadPetState: () => restoredState,
+      loadPetStateWithMeta: () => ({
+        state: {
+          ...restoredState,
+          lastUpdatedAt: restoredAt,
+        },
+        previousLastUpdatedAt,
+      }),
+      savePetState: (state: PetState) => {
+        savedStates.push(state)
+      },
+      clearPetState: vi.fn(),
+    }))
+
+    const callbacks: Array<() => void> = []
+    const store = usePetStore({
+      scheduleAction: (callback) => {
+        callbacks.push(callback)
+      },
+    })
+
+    store.restorePet()
+    expect(store.returnReport.value).not.toBeNull()
+
+    store.performAction(store.recommendedCareAction.value!.action)
+
+    expect(store.returnReport.value).toBeNull()
+  })
 })
 
 describe('pet daily goal storage migration', () => {

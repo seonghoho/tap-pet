@@ -191,6 +191,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     if (!consumedLimit) return
 
     lastCareFeedback.value = null
+    returnReport.value = null
     actionLimitRewardFeedbackState.value = null
     dailyGoalRewardFeedbackState.value = null
     const wasRecommendedCareAction = recommendedCareAction.value?.action === action
