@@ -1,7 +1,10 @@
 import type { PetAction, PetGrowth, PetSettings, PetStats } from '~/types/pet'
 
 export const PET_STORAGE_KEY = 'tab-pet:state'
-export const PET_STORAGE_VERSION = 2
+export const PET_STORAGE_VERSION = 3
+
+export const DAILY_GOAL_REWARD_EXP = 20
+export const DAILY_GOAL_REWARD_AFFINITY_EXP = 4
 
 export const STAT_MIN = 0
 export const STAT_MAX = 100

@@ -93,6 +93,22 @@ export type PetReturnReport = {
   createdAt: number
 }
 
+export type PetDailyGoalId = 'recommended-care'
+
+export type PetDailyGoalState = {
+  dateKey: string
+  goalId: PetDailyGoalId
+  progress: number
+  completedAt: number | null
+  claimedAt: number | null
+}
+
+export type PetDailyGoalRewardFeedback = {
+  gainedExp: number
+  gainedAffinityExp: number
+  createdAt: number
+}
+
 export type PetState = {
   species: PetSpecies
   name: string
@@ -100,6 +116,7 @@ export type PetState = {
   growth: PetGrowth
   settings: PetSettings
   actionLimit: PetActionLimit
+  dailyGoal: PetDailyGoalState
   lastUpdatedAt: number
   lastPlayedAt: number
 }

@@ -11,6 +11,7 @@ import { PET_THEMES } from '~/constants/themes'
 import type {
   DisguiseTitleId,
   PetActionLimit,
+  PetDailyGoalState,
   PetGrowth,
   PetSettings,
   PetSpecies,
@@ -20,6 +21,7 @@ import type {
   ThemeId,
 } from '~/types/pet'
 import { normalizeActionLimit } from '~/utils/petActionLimit'
+import { createDailyGoal, normalizeDailyGoalState } from '~/utils/petDailyGoal'
 import { normalizeGrowth } from '~/utils/petGrowth'
 
 const PET_SPECIES = ['cat', 'dog', 'hedgehog'] as const
@@ -74,6 +76,10 @@ export function parseStoredPetState(value: unknown, now = Date.now()): PetState 
   if (!isPetSpecies(value.species)) return null
 
   if (value.version === PET_STORAGE_VERSION) {
+    return parseStoredPetStateV3(value, now)
+  }
+
+  if (value.version === 2) {
     return parseStoredPetStateV2(value, now)
   }
 
@@ -92,7 +98,17 @@ export function toStoredPetState(state: PetState, version: number): StoredPetSta
     growth: normalizeGrowth(state.growth),
     settings: normalizeSettings(state.settings),
     actionLimit: normalizeStoredActionLimit(state.actionLimit, state.lastUpdatedAt),
+    dailyGoal: normalizeStoredDailyGoal(state.dailyGoal, state.lastUpdatedAt),
     version,
+  }
+}
+
+function parseStoredPetStateV3(value: Record<string, unknown>, now: number): PetState {
+  const state = parseStoredPetStateV2(value, now)
+
+  return {
+    ...state,
+    dailyGoal: normalizeStoredDailyGoal(value.dailyGoal, now),
   }
 }
 
@@ -107,6 +123,7 @@ function parseStoredPetStateV2(value: Record<string, unknown>, now: number): Pet
     growth: normalizeStoredGrowth(value.growth),
     settings: normalizeSettings(getStoredSettingsValue(value)),
     actionLimit: normalizeStoredActionLimit(value.actionLimit, now),
+    dailyGoal: createDailyGoal(now),
     lastUpdatedAt,
     lastPlayedAt: normalizeTimestamp(value.lastPlayedAt, now),
   }
@@ -126,6 +143,7 @@ function parseStoredPetStateV1(value: Record<string, unknown>, now: number): Pet
       themeId: normalizeLegacyThemeId(value.themeId),
     }),
     actionLimit: normalizeStoredActionLimit(value.actionLimit, now),
+    dailyGoal: createDailyGoal(now),
     lastUpdatedAt,
     lastPlayedAt: normalizeTimestamp(value.lastPlayedAt, lastUpdatedAt),
   }
@@ -149,6 +167,10 @@ function normalizeStoredGrowth(value: unknown): PetGrowth {
 
 function normalizeStoredActionLimit(value: unknown, now: number): PetActionLimit {
   return normalizeActionLimit(value, now)
+}
+
+function normalizeStoredDailyGoal(value: unknown, now: number): PetDailyGoalState {
+  return normalizeDailyGoalState(value, now)
 }
 
 function normalizeTimestamp(value: unknown, fallback: number): number {
