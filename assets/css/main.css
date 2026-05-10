@@ -329,6 +329,69 @@ a:focus-visible,
   gap: 14px;
 }
 
+.return-report,
+.daily-goal {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: var(--app-surface);
+}
+
+.return-report span,
+.daily-goal span {
+  color: var(--app-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.return-report__title {
+  display: block;
+  margin-top: 4px;
+  color: var(--app-text);
+  overflow-wrap: anywhere;
+}
+
+.daily-goal__title {
+  display: block;
+  margin-top: 4px;
+  color: var(--app-text);
+  overflow-wrap: anywhere;
+}
+
+.return-report p,
+.return-report small,
+.daily-goal small,
+.daily-goal__meta {
+  color: var(--app-muted);
+}
+
+.daily-goal__meta {
+  display: grid;
+  gap: 4px;
+}
+
+.daily-goal__meta strong,
+.daily-goal__feedback {
+  color: var(--app-success);
+}
+
+.daily-goal__claim {
+  min-height: 38px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--app-accent);
+  color: var(--app-accent-text);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.daily-goal__claimed {
+  color: var(--app-success);
+}
+
 .progress-goals {
   border-bottom: 1px solid var(--app-border);
   display: grid;
@@ -2350,6 +2413,11 @@ a:focus-visible,
 
   .progress-goals__list {
     grid-template-columns: 1fr;
+  }
+
+  .return-report,
+  .daily-goal {
+    padding: 12px;
   }
 
   .action-panel {

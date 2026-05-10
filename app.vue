@@ -172,6 +172,10 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
             :theme-id="resolvedThemeId"
             :active-reaction="pet.activeReaction.value"
           />
+          <PetReturnReport
+            :report="pet.returnReport.value"
+            :pet-name="currentPet.name"
+          />
           <PetActions
             :stats="currentPet.stats"
             :last-played-at="currentPet.lastPlayedAt"
@@ -202,10 +206,13 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
           :level="currentPet.growth.level"
           :level-progress="pet.levelProgress.value"
           :affinity-progress="pet.affinityProgress.value"
+          :daily-goal="currentPet.dailyGoal"
+          :daily-goal-reward-feedback="pet.dailyGoalRewardFeedback.value"
           :settings="currentPet.settings"
           @set-mode="pet.setSidePanelMode"
           @update-name="pet.updatePetName"
           @update-settings="pet.updatePetSettings"
+          @claim-daily-goal="pet.claimDailyGoalReward"
           @reset="pet.resetPet"
         />
         <GuidePanel v-if="currentPet" />

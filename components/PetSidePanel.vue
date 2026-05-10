@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { PetSettings } from '~/types/pet'
+import type { PetDailyGoalRewardFeedback, PetDailyGoalState, PetSettings } from '~/types/pet'
 import { getExperienceMultiplier } from '~/utils/petGrowth'
 import type { ProgressInfo, AffinityProgressInfo } from '~/utils/petGrowth'
 
@@ -10,6 +10,8 @@ const props = defineProps<{
   level: number
   levelProgress: ProgressInfo
   affinityProgress: AffinityProgressInfo
+  dailyGoal: PetDailyGoalState
+  dailyGoalRewardFeedback: PetDailyGoalRewardFeedback | null
   settings: PetSettings
 }>()
 
@@ -17,6 +19,7 @@ const emit = defineEmits<{
   setMode: [mode: 'status' | 'settings']
   updateName: [name: string]
   updateSettings: [settings: Partial<PetSettings>]
+  claimDailyGoal: []
   reset: []
 }>()
 
@@ -147,6 +150,12 @@ function formatMultiplier(multiplier: number): string {
           </li>
         </ol>
       </section>
+
+      <PetDailyGoal
+        :daily-goal="dailyGoal"
+        :reward-feedback="dailyGoalRewardFeedback"
+        @claim="emit('claimDailyGoal')"
+      />
 
       <section class="progress-goals" aria-labelledby="progress-goals-title">
         <div class="progress-goals__copy">
