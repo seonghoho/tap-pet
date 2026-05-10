@@ -1,9 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import type { Ref } from 'vue'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   DAILY_GOAL_REWARD_AFFINITY_EXP,
   DAILY_GOAL_REWARD_EXP,
   PET_STORAGE_VERSION,
 } from '~/constants/pet'
+import { usePetStore } from '~/composables/usePetStore'
+import type { PetState } from '~/types/pet'
 import { createInitialPetState } from '~/utils/petFactory'
 import {
   claimDailyGoalReward,
@@ -13,6 +16,22 @@ import {
   resolveDailyGoalForToday,
 } from '~/utils/petDailyGoal'
 import { parseStoredPetState, toStoredPetState } from '~/utils/petValidation'
+
+const nuxtState = vi.hoisted(() => new Map<string, Ref<unknown>>())
+
+vi.mock('#app', async () => {
+  const { ref } = await vi.importActual<typeof import('vue')>('vue')
+
+  return {
+    useState: <T>(key: string, init: () => T): Ref<T> => {
+      if (!nuxtState.has(key)) {
+        nuxtState.set(key, ref(init()) as Ref<unknown>)
+      }
+
+      return nuxtState.get(key) as Ref<T>
+    },
+  }
+})
 
 describe('pet daily goal model', () => {
   it('creates a recommended-care daily goal for the local day', () => {
@@ -88,6 +107,55 @@ describe('pet daily goal model', () => {
         now: 4000,
       }),
     ).toBeNull()
+  })
+})
+
+describe('pet daily goal store behavior', () => {
+  const savedStates: PetState[] = []
+
+  beforeEach(() => {
+    nuxtState.clear()
+    savedStates.length = 0
+    vi.useFakeTimers()
+    vi.setSystemTime(1000)
+    vi.stubGlobal('useLocalPetStorage', () => ({
+      storageError: { value: null },
+      loadPetState: () => null,
+      loadPetStateWithMeta: () => ({
+        state: null,
+        previousLastUpdatedAt: null,
+      }),
+      savePetState: (state: PetState) => {
+        savedStates.push(state)
+      },
+      clearPetState: vi.fn(),
+    }))
+  })
+
+  it('completes and claims the daily goal after recommended care resolves', () => {
+    const callbacks: Array<() => void> = []
+    const store = usePetStore({
+      scheduleAction: (callback) => {
+        callbacks.push(callback)
+      },
+    })
+
+    store.initializePet('cat')
+    expect(store.petState.value?.dailyGoal.completedAt).toBeNull()
+
+    store.performAction(store.recommendedCareAction.value!.action)
+    callbacks[0]?.()
+
+    expect(store.petState.value?.dailyGoal.completedAt).toBe(1000)
+
+    store.claimDailyGoalReward()
+
+    expect(store.petState.value?.dailyGoal.claimedAt).toBe(1000)
+    expect(store.dailyGoalRewardFeedback.value).toMatchObject({
+      gainedExp: DAILY_GOAL_REWARD_EXP,
+      gainedAffinityExp: DAILY_GOAL_REWARD_AFFINITY_EXP,
+    })
+    expect(savedStates.at(-1)?.growth.exp).toBeGreaterThan(0)
   })
 })
 

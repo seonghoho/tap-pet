@@ -104,5 +104,23 @@ describe('useLocalPetStorage corruption handling', () => {
     expect(parsed.stats.fullness).toBeLessThanOrEqual(100)
     expect(parsed.stats.cleanliness).toBeGreaterThanOrEqual(0)
   })
-})
 
+  it('exposes the previous update timestamp when loading with metadata', () => {
+    storage.setItem(
+      PET_STORAGE_KEY,
+      JSON.stringify({
+        version: PET_STORAGE_VERSION,
+        species: 'cat',
+        stats: { fullness: 80, energy: 80, cleanliness: 80 },
+        lastUpdatedAt: 1000,
+        lastPlayedAt: 1000,
+      }),
+    )
+
+    const { loadPetStateWithMeta } = useLocalPetStorage()
+    const loaded = loadPetStateWithMeta(1000 + 1000 * 60 * 60)
+
+    expect(loaded.state?.lastUpdatedAt).toBe(1000 + 1000 * 60 * 60)
+    expect(loaded.previousLastUpdatedAt).toBe(1000)
+  })
+})

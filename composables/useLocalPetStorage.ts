@@ -4,20 +4,45 @@ import type { PetState } from '~/types/pet'
 import { applyOfflineDecay } from '~/utils/petDecay'
 import { parseStoredPetState, toStoredPetState } from '~/utils/petValidation'
 
+type LoadedPetState = {
+  state: PetState | null
+  previousLastUpdatedAt: number | null
+}
+
 export function useLocalPetStorage() {
   const storageError = ref<string | null>(null)
 
   function loadPetState(now = Date.now()): PetState | null {
-    if (!import.meta.client) return null
+    return loadPetStateWithMeta(now).state
+  }
+
+  function loadPetStateWithMeta(now = Date.now()): LoadedPetState {
+    if (!import.meta.client) {
+      return {
+        state: null,
+        previousLastUpdatedAt: null,
+      }
+    }
 
     try {
       storageError.value = null
       const raw = localStorage.getItem(PET_STORAGE_KEY)
-      if (!raw) return null
+      if (!raw) {
+        return {
+          state: null,
+          previousLastUpdatedAt: null,
+        }
+      }
 
       const parsed = parseStoredPetState(JSON.parse(raw), now)
-      if (!parsed) return null
+      if (!parsed) {
+        return {
+          state: null,
+          previousLastUpdatedAt: null,
+        }
+      }
 
+      const previousLastUpdatedAt = parsed.lastUpdatedAt
       const restored: PetState = {
         ...parsed,
         stats: applyOfflineDecay(parsed.stats, parsed.lastUpdatedAt, now),
@@ -26,10 +51,17 @@ export function useLocalPetStorage() {
 
       savePetState(restored, now)
 
-      return restored
+      return {
+        state: restored,
+        previousLastUpdatedAt,
+      }
     } catch (error) {
       storageError.value = getErrorMessage(error)
-      return null
+
+      return {
+        state: null,
+        previousLastUpdatedAt: null,
+      }
     }
   }
 
@@ -69,6 +101,7 @@ export function useLocalPetStorage() {
   return {
     storageError,
     loadPetState,
+    loadPetStateWithMeta,
     savePetState,
     clearPetState,
   }
