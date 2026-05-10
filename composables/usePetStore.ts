@@ -90,6 +90,11 @@ export function usePetStore(options: PetStoreOptions = {}) {
 
     return getPetStatus(petState.value.stats, petState.value.lastPlayedAt, now.value)
   })
+  const dailyGoal = computed(() => {
+    if (!petState.value) return null
+
+    return resolveDailyGoalForToday(petState.value.dailyGoal, now.value)
+  })
   const recommendedCareAction = computed(() => {
     if (!petState.value || !petStatus.value) return null
 
@@ -321,12 +326,21 @@ export function usePetStore(options: PetStoreOptions = {}) {
     if (!petState.value) return
 
     const claimedAt = Date.now()
+    const currentDailyGoal = resolveDailyGoalForToday(petState.value.dailyGoal, claimedAt)
     const result = claimDailyGoalRewardResult({
-      goal: petState.value.dailyGoal,
+      goal: currentDailyGoal,
       growth: petState.value.growth,
       now: claimedAt,
     })
-    if (!result) return
+    if (!result) {
+      if (currentDailyGoal !== petState.value.dailyGoal) {
+        commitState({
+          ...petState.value,
+          dailyGoal: currentDailyGoal,
+        })
+      }
+      return
+    }
 
     commitState({
       ...petState.value,
@@ -388,6 +402,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     draftThemeId: readonly(draftThemeId),
     isReady: readonly(isReady),
     petStatus,
+    dailyGoal,
     recommendedCareAction,
     recommendedCareRewardPreview,
     levelProgress,

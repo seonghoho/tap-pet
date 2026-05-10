@@ -34,7 +34,7 @@ describe('return report and daily goal UI', () => {
   it('passes daily goal state into the side panel', () => {
     const template = readComponentTemplate('app.vue')
 
-    expect(template).toContain(':daily-goal="currentPet.dailyGoal"')
+    expect(template).toContain(':daily-goal="pet.dailyGoal.value"')
     expect(template).toContain(':daily-goal-reward-feedback="pet.dailyGoalRewardFeedback.value"')
     expect(template).toContain('@claim-daily-goal="pet.claimDailyGoalReward"')
   })

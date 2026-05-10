@@ -200,13 +200,13 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
         :aria-label="messages.app.settingsLabel"
       >
         <PetSidePanel
-          v-if="currentPet && pet.levelProgress.value && pet.affinityProgress.value"
+          v-if="currentPet && pet.levelProgress.value && pet.affinityProgress.value && pet.dailyGoal.value"
           :mode="pet.sidePanelMode.value"
           :name="currentPet.name"
           :level="currentPet.growth.level"
           :level-progress="pet.levelProgress.value"
           :affinity-progress="pet.affinityProgress.value"
-          :daily-goal="currentPet.dailyGoal"
+          :daily-goal="pet.dailyGoal.value"
           :daily-goal-reward-feedback="pet.dailyGoalRewardFeedback.value"
           :settings="currentPet.settings"
           @set-mode="pet.setSidePanelMode"

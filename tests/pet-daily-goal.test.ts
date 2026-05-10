@@ -158,6 +158,68 @@ describe('pet daily goal store behavior', () => {
     expect(savedStates.at(-1)?.growth.exp).toBeGreaterThan(0)
   })
 
+  it('exposes a fresh incomplete daily goal after the local day rolls over', () => {
+    const dayOne = new Date('2026-05-10T09:00:00+09:00').getTime()
+    const dayTwo = new Date('2026-05-11T09:00:00+09:00').getTime()
+    vi.setSystemTime(dayOne)
+
+    const callbacks: Array<() => void> = []
+    const store = usePetStore({
+      scheduleAction: (callback) => {
+        callbacks.push(callback)
+      },
+    })
+
+    store.initializePet('cat')
+    store.performAction(store.recommendedCareAction.value!.action)
+    callbacks[0]?.()
+    store.claimDailyGoalReward()
+
+    expect(store.petState.value?.dailyGoal).toEqual({
+      ...createDailyGoal(dayOne),
+      progress: 1,
+      completedAt: dayOne,
+      claimedAt: dayOne,
+    })
+
+    vi.setSystemTime(dayTwo)
+    ;(nuxtState.get('tab-pet:now') as Ref<number>).value = dayTwo
+
+    expect(store.dailyGoal.value).toEqual(createDailyGoal(dayTwo))
+  })
+
+  it('commits a fresh incomplete daily goal when claiming a stale completed goal after day rollover', () => {
+    const dayOne = new Date('2026-05-10T09:00:00+09:00').getTime()
+    const dayTwo = new Date('2026-05-11T09:00:00+09:00').getTime()
+    vi.setSystemTime(dayOne)
+
+    const callbacks: Array<() => void> = []
+    const store = usePetStore({
+      scheduleAction: (callback) => {
+        callbacks.push(callback)
+      },
+    })
+
+    store.initializePet('cat')
+    store.performAction(store.recommendedCareAction.value!.action)
+    callbacks[0]?.()
+
+    expect(store.petState.value?.dailyGoal).toEqual({
+      ...createDailyGoal(dayOne),
+      progress: 1,
+      completedAt: dayOne,
+      claimedAt: null,
+    })
+
+    vi.setSystemTime(dayTwo)
+    ;(nuxtState.get('tab-pet:now') as Ref<number>).value = dayTwo
+
+    store.claimDailyGoalReward()
+
+    expect(store.petState.value?.dailyGoal).toEqual(createDailyGoal(dayTwo))
+    expect(savedStates.at(-1)?.dailyGoal).toEqual(createDailyGoal(dayTwo))
+  })
+
   it('clears the return report when care starts', () => {
     const restoredAt = 1000 * 60 * 60
     const previousLastUpdatedAt = 1000
