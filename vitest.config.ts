@@ -15,6 +15,6 @@ export default defineConfig({
   test: {
     environment: 'node',
     setupFiles: ['./tests/setup.ts'],
-    exclude: ['e2e/**', 'node_modules/**', 'dist/**', '.nuxt/**', '.output/**'],
+    exclude: ['e2e/**', 'node_modules/**', 'dist/**', '.nuxt/**', '.output/**', '.claude/**'],
   },
 })

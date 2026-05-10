@@ -4,13 +4,15 @@ const STORAGE_KEY = 'tab-pet:state'
 const LOCALE_KEY = 'tab-pet:locale'
 
 test.beforeEach(async ({ page }) => {
-  await page.addInitScript(
+  await page.goto('/')
+  await page.evaluate(
     ({ storageKey, localeKey }) => {
       window.localStorage.removeItem(storageKey)
       window.localStorage.setItem(localeKey, 'ko')
     },
     { storageKey: STORAGE_KEY, localeKey: LOCALE_KEY },
   )
+  await page.reload()
 })
 
 test('first load shows the species selection screen', async ({ page }) => {
@@ -27,7 +29,7 @@ test('selecting a species reveals the care panel', async ({ page }) => {
   await page.getByRole('button', { name: /고양이/ }).first().click()
 
   await expect(page.getByRole('button', { name: /먹이|밥/ })).toBeVisible()
-  await expect(page.getByText(/포만감|기분|에너지/)).toBeVisible()
+  await expect(page.locator('.pet-status').getByText('배부름', { exact: true })).toBeVisible()
 })
 
 test('reload restores the selected species', async ({ page }) => {
