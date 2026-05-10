@@ -89,6 +89,10 @@ describe('pet store', () => {
     vi.stubGlobal('useLocalPetStorage', () => ({
       storageError: { value: null },
       loadPetState: () => null,
+      loadPetStateWithMeta: () => ({
+        state: null,
+        previousLastUpdatedAt: null,
+      }),
       savePetState: (state: PetState) => {
         savedStates.push(state)
       },

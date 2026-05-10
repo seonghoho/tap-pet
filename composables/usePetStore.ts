@@ -13,6 +13,8 @@ import type {
   PetAction,
   PetActionLimitRewardFeedback,
   PetCareFeedback,
+  PetDailyGoalRewardFeedback,
+  PetReturnReport,
   PetSettings,
   PetSpecies,
   PetStats,
@@ -26,7 +28,13 @@ import {
   grantRewardedActionUses,
 } from '~/utils/petActionLimit'
 import { createInitialPetState } from '~/utils/petFactory'
+import {
+  claimDailyGoalReward as claimDailyGoalRewardResult,
+  progressDailyGoal,
+  resolveDailyGoalForToday,
+} from '~/utils/petDailyGoal'
 import { getAffinityLevel, getAffinityProgress, getLevelProgress } from '~/utils/petGrowth'
+import { createPetReturnReport } from '~/utils/petReturnReport'
 import { getPetStatus } from '~/utils/petStatus'
 import { isDisguiseTitleId, isPetSpecies, isThemeId } from '~/utils/petValidation'
 
@@ -61,6 +69,11 @@ export function usePetStore(options: PetStoreOptions = {}) {
   const actionGeneration = useState<number>('tab-pet:action-generation', () => 0)
   const latestActionRunId = useState<number>('tab-pet:latest-action-run-id', () => 0)
   const lastCareFeedback = useState<PetCareFeedback | null>('tab-pet:last-care-feedback', () => null)
+  const returnReport = useState<PetReturnReport | null>('tab-pet:return-report', () => null)
+  const dailyGoalRewardFeedbackState = useState<PetDailyGoalRewardFeedback | null>(
+    'tab-pet:daily-goal-reward-feedback',
+    () => null,
+  )
   const actionLimitRewardFeedbackState = useState<PetActionLimitRewardFeedback | null>(
     'tab-pet:action-limit-reward-feedback',
     () => null,
@@ -76,6 +89,11 @@ export function usePetStore(options: PetStoreOptions = {}) {
     if (!petState.value) return null
 
     return getPetStatus(petState.value.stats, petState.value.lastPlayedAt, now.value)
+  })
+  const dailyGoal = computed(() => {
+    if (!petState.value) return null
+
+    return resolveDailyGoalForToday(petState.value.dailyGoal, now.value)
   })
   const recommendedCareAction = computed(() => {
     if (!petState.value || !petStatus.value) return null
@@ -125,7 +143,28 @@ export function usePetStore(options: PetStoreOptions = {}) {
   function restorePet(): void {
     if (!import.meta.client || hasRestored.value) return
 
-    petState.value = storage.loadPetState()
+    const restoredAt = Date.now()
+    now.value = restoredAt
+    const restored = storage.loadPetStateWithMeta(restoredAt)
+    petState.value = restored.state
+    if (restored.state && restored.previousLastUpdatedAt !== null) {
+      const restoredStatus = getPetStatus(
+        restored.state.stats,
+        restored.state.lastPlayedAt,
+        restoredAt,
+      )
+      returnReport.value = createPetReturnReport({
+        state: restored.state,
+        previousLastUpdatedAt: restored.previousLastUpdatedAt,
+        now: restoredAt,
+        recommendedCareAction: getRecommendedCareAction({
+          stats: restored.state.stats,
+          status: restoredStatus,
+        }),
+      })
+    } else {
+      returnReport.value = null
+    }
     hasRestored.value = true
     isReady.value = true
   }
@@ -137,6 +176,8 @@ export function usePetStore(options: PetStoreOptions = {}) {
     latestActionRunId.value += 1
     activeReaction.value = null
     lastCareFeedback.value = null
+    returnReport.value = null
+    dailyGoalRewardFeedbackState.value = null
     actionLimitRewardFeedbackState.value = null
     commitState(
       createInitialPetState(species, Date.now(), {
@@ -155,7 +196,10 @@ export function usePetStore(options: PetStoreOptions = {}) {
     if (!consumedLimit) return
 
     lastCareFeedback.value = null
+    returnReport.value = null
     actionLimitRewardFeedbackState.value = null
+    dailyGoalRewardFeedbackState.value = null
+    const wasRecommendedCareAction = recommendedCareAction.value?.action === action
     actionCooldowns.value = {
       ...actionCooldowns.value,
       [action]: startedAt + ACTION_COOLDOWN_MS[action],
@@ -181,11 +225,18 @@ export function usePetStore(options: PetStoreOptions = {}) {
       })
       const resolvedAt = Date.now()
       const nextAffinityLevel = getAffinityLevel(result.growth.affinityExp)
+      const resolvedDailyGoal = wasRecommendedCareAction
+        ? progressDailyGoal(previousState.dailyGoal, {
+            goalId: 'recommended-care',
+            now: resolvedAt,
+          })
+        : resolveDailyGoalForToday(previousState.dailyGoal, resolvedAt)
 
       commitState({
         ...previousState,
         stats: result.stats,
         growth: result.growth,
+        dailyGoal: resolvedDailyGoal,
         lastPlayedAt: action === 'play' ? resolvedAt : previousState.lastPlayedAt,
       })
       if (latestActionRunId.value === actionRunId) {
@@ -271,6 +322,34 @@ export function usePetStore(options: PetStoreOptions = {}) {
     }
   }
 
+  function claimDailyGoalReward(): void {
+    if (!petState.value) return
+
+    const claimedAt = Date.now()
+    const currentDailyGoal = resolveDailyGoalForToday(petState.value.dailyGoal, claimedAt)
+    const result = claimDailyGoalRewardResult({
+      goal: currentDailyGoal,
+      growth: petState.value.growth,
+      now: claimedAt,
+    })
+    if (!result) {
+      if (currentDailyGoal !== petState.value.dailyGoal) {
+        commitState({
+          ...petState.value,
+          dailyGoal: currentDailyGoal,
+        })
+      }
+      return
+    }
+
+    commitState({
+      ...petState.value,
+      growth: result.growth,
+      dailyGoal: result.goal,
+    })
+    dailyGoalRewardFeedbackState.value = result.feedback
+  }
+
   function resetPet(): void {
     actionGeneration.value += 1
     latestActionRunId.value += 1
@@ -284,6 +363,8 @@ export function usePetStore(options: PetStoreOptions = {}) {
     }
     activeReaction.value = null
     lastCareFeedback.value = null
+    returnReport.value = null
+    dailyGoalRewardFeedbackState.value = null
     actionLimitRewardFeedbackState.value = null
     sidePanelMode.value = 'status'
     storage.clearPetState()
@@ -321,6 +402,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     draftThemeId: readonly(draftThemeId),
     isReady: readonly(isReady),
     petStatus,
+    dailyGoal,
     recommendedCareAction,
     recommendedCareRewardPreview,
     levelProgress,
@@ -329,6 +411,8 @@ export function usePetStore(options: PetStoreOptions = {}) {
     actionCooldowns: readonly(actionCooldowns),
     activeReaction: readonly(activeReaction),
     lastCareFeedback: readonly(lastCareFeedback),
+    returnReport: readonly(returnReport),
+    dailyGoalRewardFeedback: readonly(dailyGoalRewardFeedbackState),
     actionLimitRewardFeedback,
     sidePanelMode: readonly(sidePanelMode),
     storageError: storage.storageError,
@@ -342,6 +426,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     setDisguiseTitle,
     setTheme,
     grantRewardedAdActions,
+    claimDailyGoalReward,
     resetPet,
   }
 }

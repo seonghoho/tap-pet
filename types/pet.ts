@@ -81,6 +81,34 @@ export type PetCareFeedback = {
   createdAt: number
 }
 
+export type PetReturnReportBucket = 'short' | 'medium' | 'long' | 'capped'
+
+export type PetReturnReport = {
+  id: string
+  elapsedMs: number
+  bucket: PetReturnReportBucket
+  status: PetStatus
+  primaryStat: PetStatKey
+  recommendedAction?: PetAction
+  createdAt: number
+}
+
+export type PetDailyGoalId = 'recommended-care'
+
+export type PetDailyGoalState = {
+  dateKey: string
+  goalId: PetDailyGoalId
+  progress: number
+  completedAt: number | null
+  claimedAt: number | null
+}
+
+export type PetDailyGoalRewardFeedback = {
+  gainedExp: number
+  gainedAffinityExp: number
+  createdAt: number
+}
+
 export type PetState = {
   species: PetSpecies
   name: string
@@ -88,6 +116,7 @@ export type PetState = {
   growth: PetGrowth
   settings: PetSettings
   actionLimit: PetActionLimit
+  dailyGoal: PetDailyGoalState
   lastUpdatedAt: number
   lastPlayedAt: number
 }
