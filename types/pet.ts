@@ -81,6 +81,18 @@ export type PetCareFeedback = {
   createdAt: number
 }
 
+export type PetReturnReportBucket = 'short' | 'medium' | 'long' | 'capped'
+
+export type PetReturnReport = {
+  id: string
+  elapsedMs: number
+  bucket: PetReturnReportBucket
+  status: PetStatus
+  primaryStat: PetStatKey
+  recommendedAction?: PetAction
+  createdAt: number
+}
+
 export type PetState = {
   species: PetSpecies
   name: string
