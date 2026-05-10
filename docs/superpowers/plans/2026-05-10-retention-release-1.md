@@ -1,12 +1,18 @@
 # Retention Release 1 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps are marked complete with checkbox (`- [x]`) syntax.
 
 **Goal:** Add the first retention layer: a one-time return report after meaningful absence and one daily goal that rewards completing the recommended care action.
 
 **Architecture:** Keep game rules in pure `utils/` modules, store durable state in `PetState`, and keep browser lifecycle behavior inside `usePetStore` and `useLocalPetStorage`. The return report is computed at restore time and kept as transient UI state; the daily goal is durable and migrates existing stored pets to storage version 3.
 
 **Tech Stack:** Nuxt 3, Vue 3 Composition API, TypeScript, Vitest, Playwright, localStorage.
+
+**Implementation Status:** Complete on branch `codex/retention-release-1`.
+
+**Verified:** `npm run -s test`, `npm run -s lint`, `npm run -s build`, and `npm run -s test:e2e` passed on 2026-05-10.
+
+**Handoff Notes:** The final review found one rollover issue where an already-open tab could keep yesterday's completed daily goal visible after the local day changed. The store now exposes a normalized current-day `dailyGoal`, `app.vue` passes that computed value into the side panel, and a stale reward claim no-op commits a fresh incomplete goal instead of leaving stale UI state.
 
 ---
 
@@ -59,7 +65,7 @@ Modify:
 - Create: `utils/petReturnReport.ts`
 - Create: `tests/pet-return-report.test.ts`
 
-- [ ] **Step 1: Write the failing return report tests**
+- [x] **Step 1: Write the failing return report tests**
 
 Add `tests/pet-return-report.test.ts`:
 
@@ -158,7 +164,7 @@ describe('pet return report', () => {
 })
 ```
 
-- [ ] **Step 2: Run the new test to verify it fails**
+- [x] **Step 2: Run the new test to verify it fails**
 
 Run:
 
@@ -168,7 +174,7 @@ npm run -s test -- tests/pet-return-report.test.ts
 
 Expected: FAIL because `utils/petReturnReport.ts`, return report types, and constants do not exist.
 
-- [ ] **Step 3: Add return report types and constants**
+- [x] **Step 3: Add return report types and constants**
 
 In `types/pet.ts`, add after `PetCareFeedback`:
 
@@ -195,7 +201,7 @@ export const PET_RETURN_REPORT_MEDIUM_MAX_MS = 1000 * 60 * 60 * 8
 export const PET_RETURN_REPORT_LONG_MAX_MS = 1000 * 60 * 60 * 24
 ```
 
-- [ ] **Step 4: Implement `utils/petReturnReport.ts`**
+- [x] **Step 4: Implement `utils/petReturnReport.ts`**
 
 Create `utils/petReturnReport.ts`:
 
@@ -260,7 +266,7 @@ export function createPetReturnReport(input: {
 }
 ```
 
-- [ ] **Step 5: Run the return report tests**
+- [x] **Step 5: Run the return report tests**
 
 Run:
 
@@ -270,7 +276,7 @@ npm run -s test -- tests/pet-return-report.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit Task 1**
+- [x] **Step 6: Commit Task 1**
 
 Run:
 
@@ -293,7 +299,7 @@ git commit -m "feat: add return report model"
 - Create: `tests/pet-daily-goal.test.ts`
 - Modify: `tests/pet-model.test.ts`
 
-- [ ] **Step 1: Write the failing daily goal utility tests**
+- [x] **Step 1: Write the failing daily goal utility tests**
 
 Create `tests/pet-daily-goal.test.ts`:
 
@@ -409,7 +415,7 @@ describe('pet daily goal storage migration', () => {
 })
 ```
 
-- [ ] **Step 2: Run the daily goal test to verify it fails**
+- [x] **Step 2: Run the daily goal test to verify it fails**
 
 Run:
 
@@ -419,7 +425,7 @@ npm run -s test -- tests/pet-daily-goal.test.ts
 
 Expected: FAIL because daily goal types, constants, utility functions, and storage migration do not exist.
 
-- [ ] **Step 3: Add daily goal types and constants**
+- [x] **Step 3: Add daily goal types and constants**
 
 In `types/pet.ts`, add after `PetReturnReport`:
 
@@ -466,7 +472,7 @@ export const DAILY_GOAL_REWARD_EXP = 20
 export const DAILY_GOAL_REWARD_AFFINITY_EXP = 4
 ```
 
-- [ ] **Step 4: Implement `utils/petDailyGoal.ts`**
+- [x] **Step 4: Implement `utils/petDailyGoal.ts`**
 
 Create `utils/petDailyGoal.ts`:
 
@@ -602,7 +608,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 ```
 
-- [ ] **Step 5: Initialize daily goal in pet factory**
+- [x] **Step 5: Initialize daily goal in pet factory**
 
 Modify `utils/petFactory.ts` imports:
 
@@ -619,7 +625,7 @@ Add `dailyGoal` to the returned state:
     lastUpdatedAt: now,
 ```
 
-- [ ] **Step 6: Migrate storage parsing to version 3**
+- [x] **Step 6: Migrate storage parsing to version 3**
 
 Modify `utils/petValidation.ts` imports:
 
@@ -688,7 +694,7 @@ function normalizeStoredDailyGoal(value: unknown, now: number): PetDailyGoalStat
 }
 ```
 
-- [ ] **Step 7: Run daily goal model tests**
+- [x] **Step 7: Run daily goal model tests**
 
 Run:
 
@@ -698,7 +704,7 @@ npm run -s test -- tests/pet-daily-goal.test.ts tests/pet-model.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit daily goal model and migration**
+- [x] **Step 8: Commit daily goal model and migration**
 
 Run:
 
@@ -718,7 +724,7 @@ git commit -m "feat: add daily goal model"
 - Modify: `tests/use-local-pet-storage.test.ts`
 - Modify: `tests/pet-daily-goal.test.ts`
 
-- [ ] **Step 1: Add failing storage metadata test**
+- [x] **Step 1: Add failing storage metadata test**
 
 Append to `tests/use-local-pet-storage.test.ts`:
 
@@ -743,7 +749,7 @@ Append to `tests/use-local-pet-storage.test.ts`:
   })
 ```
 
-- [ ] **Step 2: Run storage test to verify it fails**
+- [x] **Step 2: Run storage test to verify it fails**
 
 Run:
 
@@ -753,7 +759,7 @@ npm run -s test -- tests/use-local-pet-storage.test.ts
 
 Expected: FAIL because `loadPetStateWithMeta` does not exist.
 
-- [ ] **Step 3: Add storage metadata loading**
+- [x] **Step 3: Add storage metadata loading**
 
 Modify `composables/useLocalPetStorage.ts`:
 
@@ -832,7 +838,7 @@ Return `loadPetStateWithMeta`:
   }
 ```
 
-- [ ] **Step 4: Add failing store behavior test**
+- [x] **Step 4: Add failing store behavior test**
 
 Append to `tests/pet-daily-goal.test.ts`:
 
@@ -908,7 +914,7 @@ describe('pet daily goal store behavior', () => {
 })
 ```
 
-- [ ] **Step 5: Run store behavior test to verify it fails**
+- [x] **Step 5: Run store behavior test to verify it fails**
 
 Run:
 
@@ -918,7 +924,7 @@ npm run -s test -- tests/pet-daily-goal.test.ts
 
 Expected: FAIL because `claimDailyGoalReward` and `dailyGoalRewardFeedback` are not exposed by `usePetStore`.
 
-- [ ] **Step 6: Wire return report and daily goal into `usePetStore`**
+- [x] **Step 6: Wire return report and daily goal into `usePetStore`**
 
 Modify `composables/usePetStore.ts` imports:
 
@@ -1051,7 +1057,7 @@ Return the new values and method:
     claimDailyGoalReward,
 ```
 
-- [ ] **Step 7: Run store and storage tests**
+- [x] **Step 7: Run store and storage tests**
 
 Run:
 
@@ -1061,7 +1067,7 @@ npm run -s test -- tests/use-local-pet-storage.test.ts tests/pet-daily-goal.test
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit store integration**
+- [x] **Step 8: Commit store integration**
 
 Run:
 
@@ -1084,7 +1090,7 @@ git commit -m "feat: wire return report and daily goal store"
 - Modify: `assets/css/main.css`
 - Create: `tests/pet-return-and-daily-ui.test.ts`
 
-- [ ] **Step 1: Write failing UI and i18n tests**
+- [x] **Step 1: Write failing UI and i18n tests**
 
 Create `tests/pet-return-and-daily-ui.test.ts`:
 
@@ -1162,7 +1168,7 @@ describe('return report and daily goal UI', () => {
 })
 ```
 
-- [ ] **Step 2: Run the UI test to verify it fails**
+- [x] **Step 2: Run the UI test to verify it fails**
 
 Run:
 
@@ -1172,7 +1178,7 @@ npm run -s test -- tests/pet-return-and-daily-ui.test.ts
 
 Expected: FAIL because the components, i18n messages, and app wiring do not exist.
 
-- [ ] **Step 3: Add localized copy**
+- [x] **Step 3: Add localized copy**
 
 In `constants/i18n.ts`, add these keys to each locale object. For Korean:
 
@@ -1297,7 +1303,7 @@ For Japanese:
     },
 ```
 
-- [ ] **Step 4: Create `PetReturnReport.vue`**
+- [x] **Step 4: Create `PetReturnReport.vue`**
 
 Create `components/PetReturnReport.vue`:
 
@@ -1349,7 +1355,7 @@ const reportAction = computed(() => {
 </template>
 ```
 
-- [ ] **Step 5: Create `PetDailyGoal.vue`**
+- [x] **Step 5: Create `PetDailyGoal.vue`**
 
 Create `components/PetDailyGoal.vue`:
 
@@ -1429,7 +1435,7 @@ const rewardFeedbackText = computed(() => {
 </template>
 ```
 
-- [ ] **Step 6: Wire UI in `PetSidePanel.vue` and `app.vue`**
+- [x] **Step 6: Wire UI in `PetSidePanel.vue` and `app.vue`**
 
 In `components/PetSidePanel.vue`, import types:
 
@@ -1477,7 +1483,7 @@ Update the side panel props:
           @claim-daily-goal="pet.claimDailyGoalReward"
 ```
 
-- [ ] **Step 7: Add CSS**
+- [x] **Step 7: Add CSS**
 
 Append compact styles to `assets/css/main.css` near existing care/side-panel styles:
 
@@ -1547,7 +1553,7 @@ Append compact styles to `assets/css/main.css` near existing care/side-panel sty
 }
 ```
 
-- [ ] **Step 8: Run UI tests**
+- [x] **Step 8: Run UI tests**
 
 Run:
 
@@ -1557,7 +1563,7 @@ npm run -s test -- tests/pet-return-and-daily-ui.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 9: Commit UI components**
+- [x] **Step 9: Commit UI components**
 
 Run:
 
@@ -1574,7 +1580,7 @@ git commit -m "feat: show return report and daily goal"
 
 - Modify: `e2e/smoke.spec.ts`
 
-- [ ] **Step 1: Add failing E2E coverage**
+- [x] **Step 1: Add failing E2E coverage**
 
 Append to `e2e/smoke.spec.ts`:
 
@@ -1661,7 +1667,7 @@ test('completing recommended care completes the daily goal and claims reward', a
 })
 ```
 
-- [ ] **Step 2: Run E2E to verify initial failure or pass after UI wiring**
+- [x] **Step 2: Run E2E to verify initial failure or pass after UI wiring**
 
 Run:
 
@@ -1671,7 +1677,7 @@ npm run -s test:e2e
 
 Expected after Task 4 is complete: PASS for desktop and mobile projects.
 
-- [ ] **Step 3: Run focused unit test suite**
+- [x] **Step 3: Run focused unit test suite**
 
 Run:
 
@@ -1681,7 +1687,7 @@ npm run -s test -- tests/pet-return-report.test.ts tests/pet-daily-goal.test.ts 
 
 Expected: PASS.
 
-- [ ] **Step 4: Run full verification**
+- [x] **Step 4: Run full verification**
 
 Run:
 
@@ -1693,7 +1699,7 @@ npm run -s build
 
 Expected: all commands PASS.
 
-- [ ] **Step 5: Commit E2E and verification changes**
+- [x] **Step 5: Commit E2E and verification changes**
 
 Run:
 
@@ -1713,3 +1719,13 @@ git commit -m "test: cover retention release one flow"
 - [x] Browser consistency: return report uses metadata from `loadPetStateWithMeta`, so offline decay does not erase the previous timestamp needed for the report.
 - [x] UX consistency: return report is transient; daily goal is durable; reward claim is manual and one-time per day.
 - [x] Test consistency: each feature has a failing test before implementation and exact verification commands.
+
+## Next Work Queue
+
+Use this queue when resuming from another machine.
+
+1. Pull `master` after the PR merge and run `npm install` if dependencies are missing.
+2. Re-run `npm run -s test`, `npm run -s lint`, `npm run -s build`, and `npm run -s test:e2e` locally.
+3. Start the next product slice from `docs/superpowers/specs/2026-05-10-retention-growth-design.md`: visible level rewards before personality, decoration, or events.
+4. For visible level rewards, define a small unlock table first: level 2 title copy, level 3 favicon accent, level 4 habitat reaction variant.
+5. Keep Release 2 scoped to local-only data. Do not add login, server sync, real ad SDK, payments, or live events yet.

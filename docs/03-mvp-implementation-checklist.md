@@ -8,6 +8,8 @@ MVP는 한 번에 전체 앱을 만드는 방식이 아니라, 탭 반응까지 
 
 추가 구현 상태: 한국어/일본어 i18n과 언어 선택 UI 완료. 현재 지원 언어는 English, 한국어, 日本語다.
 
+Retention Release 1 구현 상태: 완료. 부재 후 복귀 리포트, 일일 추천 케어 목표, 일일 목표 보상, 저장소 v3 마이그레이션, compact UI, unit/component/E2E 회귀 테스트가 추가됐다.
+
 우선순위:
 
 1. 상태 모델
@@ -232,6 +234,8 @@ MVP는 한 번에 전체 앱을 만드는 방식이 아니라, 탭 반응까지 
 11. 수익화 목업 추가
 12. 이모지 복사 패널 추가
 13. QA와 배포 점검
+14. Retention Release 1 복귀 리포트와 일일 목표
+15. Retention Release 2 visible level rewards
 
 ## 13. 구현 중 지켜야 할 결정
 
@@ -242,6 +246,8 @@ MVP는 한 번에 전체 앱을 만드는 방식이 아니라, 탭 반응까지 
 - UI 컴포넌트가 favicon SVG를 직접 만들지 않는다.
 - 광고와 결제는 MVP에서 실제 연동하지 않는다.
 - 크롬 확장 구조를 미리 만들지 않는다.
+- Retention 기능은 서버 동기화 없이 localStorage 모델을 유지한다.
+- 일일 리셋은 브라우저 로컬 날짜 기준으로 처리한다.
 
 ## 14. MVP 완료 정의
 
@@ -260,4 +266,14 @@ MVP는 한 번에 전체 앱을 만드는 방식이 아니라, 탭 반응까지 
 - [x] 광고 보상형 UI 목업이 있다.
 - [x] 프리미엄 UI 목업이 있다.
 - [x] 이모지 복사 패널이 있다.
+- [x] 복귀 리포트가 의미 있는 부재 후 1회 표시된다.
+- [x] 추천 케어 기반 일일 목표와 수동 보상 수령이 동작한다.
 - [x] 실제 광고 SDK, 결제, 로그인, 서버 DB가 없다.
+
+## 15. 다음 작업 목록
+
+- [ ] 다른 PC에서 `master` 최신 상태를 pull한다.
+- [ ] `npm run -s test`, `npm run -s lint`, `npm run -s build`, `npm run -s test:e2e`를 다시 실행한다.
+- [ ] Retention Release 2 visible level rewards 기획을 `docs/superpowers/specs/2026-05-10-retention-growth-design.md` 기준으로 세분화한다.
+- [ ] Release 2 첫 구현 범위는 level unlock table, unlock copy, favicon/habitat 보상 표시로 제한한다.
+- [ ] 서버, 로그인, 실제 광고 SDK, 결제, 시즌 이벤트는 Release 2 범위에서 제외한다.
