@@ -171,6 +171,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
             :stats="currentPet.stats"
             :status="effectiveStatus"
             :theme-id="resolvedThemeId"
+            :level="currentPet.growth.level"
             :active-reaction="pet.activeReaction.value"
           />
           <PetReturnReport

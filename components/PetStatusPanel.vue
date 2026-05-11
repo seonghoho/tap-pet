@@ -7,6 +7,7 @@ const props = defineProps<{
   stats: PetStats
   status: PetStatus
   themeId: ThemeId
+  level: number
   activeReaction?: PetAction | null
 }>()
 const { messages } = useLocale()
@@ -37,6 +38,7 @@ const statRows = computed(() => [
         :species="species"
         :status="status"
         :theme-id="themeId"
+        :level="level"
         :active-reaction="activeReaction"
         :avatar-label="`${messages.species[species].label} ${messages.status.aria[status]}`"
       />

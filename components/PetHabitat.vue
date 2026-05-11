@@ -6,6 +6,7 @@ import {
   STATUS_HABITAT_MOTION,
 } from '~/constants/habitat'
 import type { PetAction, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
+import { getAvailableLevelUnlocks } from '~/utils/petLevelUnlocks'
 import { getThemeById } from '~/utils/theme'
 
 type Direction = 'left' | 'right'
@@ -20,6 +21,7 @@ const props = defineProps<{
   status: PetStatus
   themeId: ThemeId
   avatarLabel: string
+  level: number
   activeReaction?: PetAction | null
 }>()
 
@@ -45,6 +47,14 @@ const habitatStyle = computed<Record<string, string>>(() => ({
 }))
 
 const shouldBounce = computed(() => props.status === 'excited' && !isReducedMotion.value)
+const shouldShowReactionSpark = computed(() =>
+  Boolean(
+    props.activeReaction &&
+      getAvailableLevelUnlocks(props.level).some(
+        (unlock) => unlock.id === 'habitat-reaction-spark',
+      ),
+  ),
+)
 
 onMounted(() => {
   motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -110,7 +120,10 @@ function randomWithin(min: number, max: number): number {
     :class="[
       `pet-habitat--${status}`,
       activeReaction ? `pet-habitat--reaction-${activeReaction}` : null,
-      { 'pet-habitat--bounce': shouldBounce },
+      {
+        'pet-habitat--bounce': shouldBounce,
+        'pet-habitat--reaction-spark': shouldShowReactionSpark,
+      },
     ]"
     :data-reaction="activeReaction ?? undefined"
     :style="habitatStyle"
@@ -178,6 +191,16 @@ function randomWithin(min: number, max: number): number {
       <span class="pet-habitat__wash-bubble pet-habitat__wash-bubble--three" />
       <span class="pet-habitat__wash-sparkle pet-habitat__wash-sparkle--one" />
       <span class="pet-habitat__wash-sparkle pet-habitat__wash-sparkle--two" />
+    </span>
+
+    <span
+      v-if="shouldShowReactionSpark"
+      class="pet-habitat__reaction pet-habitat__reaction--spark"
+      aria-hidden="true"
+    >
+      <span class="pet-habitat__spark pet-habitat__spark--one" />
+      <span class="pet-habitat__spark pet-habitat__spark--two" />
+      <span class="pet-habitat__spark pet-habitat__spark--three" />
     </span>
 
     <div

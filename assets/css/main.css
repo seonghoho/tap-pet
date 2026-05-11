@@ -1252,6 +1252,59 @@ a:focus-visible,
   top: 34px;
 }
 
+.pet-habitat__reaction--spark {
+  height: 120px;
+  left: 50%;
+  top: 28%;
+  transform: translateX(-50%);
+  width: 156px;
+}
+
+.pet-habitat--reaction-spark .pet-habitat__spark {
+  animation: habitat-reaction-spark 920ms ease-in-out infinite;
+  background: color-mix(in srgb, #ffd166 82%, var(--app-surface));
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--habitat-accent) 36%, transparent),
+    0 0 16px color-mix(in srgb, #ffd166 54%, transparent);
+  height: 8px;
+  position: absolute;
+  width: 8px;
+}
+
+.pet-habitat__spark::before,
+.pet-habitat__spark::after {
+  background: inherit;
+  border-radius: 999px;
+  content: "";
+  height: 2px;
+  left: -3px;
+  position: absolute;
+  top: 3px;
+  width: 14px;
+}
+
+.pet-habitat__spark::after {
+  rotate: 90deg;
+}
+
+.pet-habitat__spark--one {
+  left: 24px;
+  top: 48px;
+}
+
+.pet-habitat__spark--two {
+  animation-delay: 180ms;
+  right: 28px;
+  top: 16px;
+}
+
+.pet-habitat__spark--three {
+  animation-delay: 320ms;
+  bottom: 22px;
+  left: 72px;
+}
+
 .pet-habitat--reaction-feed .pet-habitat__pet {
   left: 28%;
   top: 61%;
@@ -1493,6 +1546,27 @@ a:focus-visible,
   50% {
     opacity: 1;
     scale: 1.08;
+  }
+}
+
+@keyframes habitat-reaction-spark {
+  0%,
+  100% {
+    opacity: 0.3;
+    scale: 0.72;
+    translate: 0 8px;
+  }
+
+  45% {
+    opacity: 1;
+    scale: 1.08;
+    translate: 0 0;
+  }
+
+  72% {
+    opacity: 0.72;
+    scale: 0.92;
+    translate: 0 -6px;
   }
 }
 
