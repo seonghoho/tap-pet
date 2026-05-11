@@ -7,6 +7,7 @@ import type {
   PetActionLimitRewardFeedback,
   PetCareFeedback,
   PetCareRecommendation,
+  PetLevelUnlock,
   PetStats,
 } from '~/types/pet'
 import type { CareActionRewardPreview } from '~/utils/petCare'
@@ -92,6 +93,8 @@ const careFeedbackSummary = computed(() => {
   return messages.value.careFeedback.expSummary.replace('{value}', formatSigned(feedback.gainedExp))
 })
 const shouldShowFeedbackGrowth = computed(() => Boolean(props.careFeedback && props.levelProgress))
+const feedbackLevelUnlocks = computed(() => props.careFeedback?.levelUnlocks ?? [])
+const shouldShowFeedbackLevelUnlocks = computed(() => feedbackLevelUnlocks.value.length > 0)
 const feedbackGrowthCurrent = computed(() => props.levelProgress?.current ?? 0)
 const feedbackGrowthRequired = computed(() => props.levelProgress?.required ?? 0)
 const feedbackGrowthRemaining = computed(() =>
@@ -488,6 +491,14 @@ function formatSigned(value: number): string {
 function formatMultiplier(multiplier: number): string {
   return multiplier.toFixed(1)
 }
+
+function getLevelUnlockName(unlock: PetLevelUnlock): string {
+  return messages.value.levelUnlocks.rewards[unlock.id].name
+}
+
+function getLevelUnlockDetail(unlock: PetLevelUnlock): string {
+  return messages.value.levelUnlocks.rewards[unlock.id].detail
+}
 </script>
 
 <template>
@@ -620,6 +631,20 @@ function formatMultiplier(multiplier: number): string {
               />
             </div>
           </div>
+        </div>
+
+        <div v-if="shouldShowFeedbackLevelUnlocks" class="care-feedback__unlock">
+          <span>{{ messages.levelUnlocks.unlockedLabel }}</span>
+          <ul class="care-feedback__unlock-list" role="list">
+            <li
+              v-for="unlock in feedbackLevelUnlocks"
+              :key="unlock.id"
+              class="care-feedback__unlock-item"
+            >
+              <strong>{{ getLevelUnlockName(unlock) }}</strong>
+              <small>{{ getLevelUnlockDetail(unlock) }}</small>
+            </li>
+          </ul>
         </div>
       </div>
 

@@ -126,6 +126,29 @@ export const I18N_MESSAGES = {
       goalComplete: 'Next goal is ready',
       goalProgressDetail: 'Current {current}/{required}',
     },
+    levelUnlocks: {
+      heading: 'Visible rewards',
+      description: 'Growth unlocks small tab and habitat changes.',
+      availableLabel: 'Available',
+      nextLabel: 'Next reward',
+      unlockedLabel: 'New reward',
+      levelRequirement: 'Level {level}',
+      allUnlocked: 'All early rewards are available.',
+      rewards: {
+        'title-focus-signal': {
+          name: 'Focus title signal',
+          detail: 'Status title copy now reads as a calmer work signal.',
+        },
+        'favicon-bright-accent': {
+          name: 'Bright favicon accent',
+          detail: 'The tab icon can use a clearer accent as the pet grows.',
+        },
+        'habitat-reaction-spark': {
+          name: 'Habitat reaction spark',
+          detail: 'The room reaction after care becomes a little more visible.',
+        },
+      },
+    },
     returnReport: {
       heading: 'Welcome back',
       elapsed: {
@@ -506,6 +529,29 @@ export const I18N_MESSAGES = {
       goalComplete: '다음 목표 준비 완료',
       goalProgressDetail: '현재 {current}/{required}',
     },
+    levelUnlocks: {
+      heading: '보이는 성장 보상',
+      description: '성장하면 탭과 방 안의 작은 표현이 열립니다.',
+      availableLabel: '사용 가능',
+      nextLabel: '다음 보상',
+      unlockedLabel: '새 보상',
+      levelRequirement: '레벨 {level}',
+      allUnlocked: '초기 성장 보상을 모두 사용할 수 있어요.',
+      rewards: {
+        'title-focus-signal': {
+          name: '집중 제목 신호',
+          detail: '탭 제목 상태 문구가 더 차분한 업무 신호로 보입니다.',
+        },
+        'favicon-bright-accent': {
+          name: '밝은 파비콘 포인트',
+          detail: '펫이 성장하면 탭 아이콘 신호가 조금 더 또렷해져요.',
+        },
+        'habitat-reaction-spark': {
+          name: '방 안 반응 포인트',
+          detail: '돌봄 직후 방 안 반응이 조금 더 선명해져요.',
+        },
+      },
+    },
     returnReport: {
       heading: '다시 만난 탭 펫',
       elapsed: {
@@ -885,6 +931,29 @@ export const I18N_MESSAGES = {
       affinityGoalMaxDetail: '現在 {current}/{required} · お世話経験値 最大 x{currentBonus}',
       goalComplete: '次の目標の準備完了',
       goalProgressDetail: '現在 {current}/{required}',
+    },
+    levelUnlocks: {
+      heading: '見える成長報酬',
+      description: '成長するとタブと部屋の小さな表現が開放されます。',
+      availableLabel: '利用可能',
+      nextLabel: '次の報酬',
+      unlockedLabel: '新しい報酬',
+      levelRequirement: 'レベル {level}',
+      allUnlocked: '初期の成長報酬はすべて利用できます。',
+      rewards: {
+        'title-focus-signal': {
+          name: '集中タイトル信号',
+          detail: 'タブタイトルの状態文が、より落ち着いた作業向けの合図になります。',
+        },
+        'favicon-bright-accent': {
+          name: '明るいファビコンアクセント',
+          detail: 'ペットが成長すると、タブアイコンの合図が少し見やすくなります。',
+        },
+        'habitat-reaction-spark': {
+          name: '部屋のリアクションアクセント',
+          detail: 'お世話の直後、部屋の反応が少しはっきり見えるようになります。',
+        },
+      },
     },
     returnReport: {
       heading: 'おかえりなさい',

@@ -79,6 +79,7 @@ export type PetCareFeedback = {
   didAffinityLevelUp: boolean
   wasReduced: boolean
   createdAt: number
+  levelUnlocks?: readonly PetLevelUnlock[]
 }
 
 export type PetReturnReportBucket = 'short' | 'medium' | 'long' | 'capped'
@@ -107,6 +108,19 @@ export type PetDailyGoalRewardFeedback = {
   gainedExp: number
   gainedAffinityExp: number
   createdAt: number
+}
+
+export type PetLevelUnlockId =
+  | 'title-focus-signal'
+  | 'favicon-bright-accent'
+  | 'habitat-reaction-spark'
+
+export type PetLevelUnlockCategory = 'title' | 'favicon' | 'habitat'
+
+export type PetLevelUnlock = {
+  id: PetLevelUnlockId
+  requiredLevel: number
+  category: PetLevelUnlockCategory
 }
 
 export type PetState = {

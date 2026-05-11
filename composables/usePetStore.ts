@@ -34,6 +34,7 @@ import {
   resolveDailyGoalForToday,
 } from '~/utils/petDailyGoal'
 import { getAffinityLevel, getAffinityProgress, getLevelProgress } from '~/utils/petGrowth'
+import { getLevelUnlocksForTransition } from '~/utils/petLevelUnlocks'
 import { createPetReturnReport } from '~/utils/petReturnReport'
 import { getPetStatus } from '~/utils/petStatus'
 import { isDisguiseTitleId, isPetSpecies, isThemeId } from '~/utils/petValidation'
@@ -249,6 +250,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
           didAffinityLevelUp: nextAffinityLevel > previousAffinityLevel,
           wasReduced: result.wasReduced,
           createdAt: resolvedAt,
+          levelUnlocks: getLevelUnlocksForTransition(previousState.growth.level, result.growth.level),
         }
       }
       if (latestActionRunId.value === actionRunId && activeReaction.value === action) {

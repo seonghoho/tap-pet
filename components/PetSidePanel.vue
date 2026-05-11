@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { PetDailyGoalRewardFeedback, PetDailyGoalState, PetSettings } from '~/types/pet'
+import type {
+  PetDailyGoalRewardFeedback,
+  PetDailyGoalState,
+  PetLevelUnlock,
+  PetSettings,
+} from '~/types/pet'
 import { getExperienceMultiplier } from '~/utils/petGrowth'
 import type { ProgressInfo, AffinityProgressInfo } from '~/utils/petGrowth'
+import { getAvailableLevelUnlocks, getNextLevelUnlock } from '~/utils/petLevelUnlocks'
 
 const props = defineProps<{
   mode: 'status' | 'settings'
@@ -84,6 +90,8 @@ const progressGoalRows = computed(() => [
     detail: affinityGoalDetail.value,
   },
 ])
+const availableLevelUnlocks = computed(() => getAvailableLevelUnlocks(props.level))
+const nextLevelUnlock = computed(() => getNextLevelUnlock(props.level))
 
 function formatGoalProgress(current: number, required: number): string {
   return messages.value.sidePanelProgress.goalProgressDetail
@@ -93,6 +101,21 @@ function formatGoalProgress(current: number, required: number): string {
 
 function formatMultiplier(multiplier: number): string {
   return multiplier.toFixed(1)
+}
+
+function getLevelUnlockName(unlock: PetLevelUnlock): string {
+  return messages.value.levelUnlocks.rewards[unlock.id].name
+}
+
+function getLevelUnlockDetail(unlock: PetLevelUnlock): string {
+  return messages.value.levelUnlocks.rewards[unlock.id].detail
+}
+
+function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
+  return messages.value.levelUnlocks.levelRequirement.replace(
+    '{level}',
+    String(unlock.requiredLevel),
+  )
 }
 </script>
 
@@ -173,6 +196,38 @@ function formatMultiplier(multiplier: number): string {
             <small>{{ goal.detail }}</small>
           </div>
         </div>
+      </section>
+
+      <section class="level-unlocks" aria-labelledby="level-unlocks-title">
+        <div class="level-unlocks__copy">
+          <strong id="level-unlocks-title">{{ messages.levelUnlocks.heading }}</strong>
+          <small>{{ messages.levelUnlocks.description }}</small>
+        </div>
+
+        <div class="level-unlocks__list">
+          <div
+            v-for="unlock in availableLevelUnlocks"
+            :key="unlock.id"
+            class="level-unlock"
+          >
+            <span>{{ messages.levelUnlocks.availableLabel }} · {{ getLevelUnlockRequirement(unlock) }}</span>
+            <strong>{{ getLevelUnlockName(unlock) }}</strong>
+            <small>{{ getLevelUnlockDetail(unlock) }}</small>
+          </div>
+
+          <div
+            v-if="nextLevelUnlock"
+            class="level-unlock level-unlock--next"
+          >
+            <span>{{ messages.levelUnlocks.nextLabel }} · {{ getLevelUnlockRequirement(nextLevelUnlock) }}</span>
+            <strong>{{ getLevelUnlockName(nextLevelUnlock) }}</strong>
+            <small>{{ getLevelUnlockDetail(nextLevelUnlock) }}</small>
+          </div>
+        </div>
+
+        <p v-if="!nextLevelUnlock" class="level-unlocks__complete">
+          {{ messages.levelUnlocks.allUnlocked }}
+        </p>
       </section>
 
       <div class="progress-list">
