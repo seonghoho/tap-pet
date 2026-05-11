@@ -202,12 +202,14 @@ describe('pet level unlock UI', () => {
   it('shows newly unlocked rewards in the care feedback card', () => {
     const template = readComponentTemplate('components/PetActions.vue')
     const source = readSource('composables/usePetStore.ts')
+    const appSource = readSource('app.vue')
 
     expect(template).toContain('class="care-feedback__unlock"')
     expect(template).toContain('shouldShowFeedbackLevelUnlocks')
     expect(template).toContain('feedbackLevelUnlocks')
     expect(template).toContain('messages.levelUnlocks.unlockedLabel')
     expect(source).toContain('getLevelUnlocksForTransition(previousState.growth.level, result.growth.level)')
+    expect(appSource).toContain('level: currentPet.value?.growth.level')
   })
 
   it('formats feedback unlock copy from localized reward messages', () => {

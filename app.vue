@@ -57,6 +57,7 @@ const tabPresentation = computed(() =>
     themeId: resolvedThemeId.value,
     locale: locale.value,
     isDocumentVisible: isDocumentVisible.value,
+    level: currentPet.value?.growth.level,
   }),
 )
 const themeStyle = computed<Record<string, string>>(() => {

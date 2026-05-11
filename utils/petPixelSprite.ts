@@ -82,21 +82,26 @@ export function renderPetPixelSpriteSvg(input: {
   status: PetStatus
   palette: PetPixelPalette
   backgroundColor?: string
+  accentBoost?: boolean
 }): string {
   const background = input.backgroundColor
     ? `<rect width="24" height="24" fill="${input.backgroundColor}"/>`
     : ''
-  const cells = getPetPixelSpriteCells({
-    species: input.species,
-    status: input.status,
-  })
+  const cells = [
+    ...getPetPixelSpriteCells({
+      species: input.species,
+      status: input.status,
+    }),
+    ...(input.accentBoost ? getFaviconAccentBoostCells() : []),
+  ]
     .map(
       (cell) =>
         `<rect x="${cell.x}" y="${cell.y}" width="${cell.width}" height="${cell.height}" fill="${input.palette[cell.color]}"/>`,
     )
     .join('')
+  const unlockAttr = input.accentBoost ? ' data-unlock="favicon-bright-accent"' : ''
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">${background}${cells}</svg>`
+  return `<svg xmlns="http://www.w3.org/2000/svg"${unlockAttr} viewBox="0 0 24 24" shape-rendering="crispEdges">${background}${cells}</svg>`
 }
 
 function getCatSpriteBase(): PetPixelCell[] {
@@ -415,6 +420,14 @@ function getStatusAccentCells(status: PetStatus): PetPixelCell[] {
   }
 
   return []
+}
+
+function getFaviconAccentBoostCells(): PetPixelCell[] {
+  return [
+    cell(20, 3, 1, 1, 'accent', 'accent'),
+    cell(19, 4, 3, 1, 'accent', 'accent'),
+    cell(20, 5, 1, 1, 'accent', 'accent'),
+  ]
 }
 
 function cell(

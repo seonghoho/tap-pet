@@ -9,6 +9,7 @@ import { DEFAULT_THEME_ID } from '~/constants/themes'
 import { DEFAULT_LOCALE } from '~/constants/i18n'
 import type { AppLocale } from '~/types/i18n'
 import type { DisguiseTitleId, PetSettings, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
+import { getAvailableLevelUnlocks } from '~/utils/petLevelUnlocks'
 import {
   getPetPixelPalette,
   renderPetPixelSpriteSvg,
@@ -60,6 +61,7 @@ export function getTabPresentation(input: {
   isDocumentVisible?: boolean
   themeId?: ThemeId
   disguiseTitleId?: DisguiseTitleId
+  level?: number
 }): TabPresentation {
   const species = input.species ?? 'cat'
   const status = input.status ?? 'happy'
@@ -74,7 +76,7 @@ export function getTabPresentation(input: {
       locale,
       isDocumentVisible: input.isDocumentVisible ?? false,
     }),
-    faviconSvg: getFaviconSvg(species, status, themeId),
+    faviconSvg: getFaviconSvg(species, status, themeId, { level: input.level }),
   }
 }
 
@@ -82,16 +84,23 @@ export function getFaviconSvg(
   species: PetSpecies,
   status: PetStatus,
   themeId: ThemeId,
+  options: {
+    level?: number
+  } = {},
 ): string {
   const theme = getThemeById(themeId)
   const baseColor = theme.statusColors[status]
   const contrast = theme.colors.petContrast
   const bgColor = theme.colors.surface
+  const hasBrightAccent = getAvailableLevelUnlocks(options.level ?? 1).some(
+    (unlock) => unlock.id === 'favicon-bright-accent',
+  )
 
   return renderPetPixelSpriteSvg({
     species,
     status,
     backgroundColor: bgColor,
+    accentBoost: hasBrightAccent,
     palette: getPetPixelPalette({
       body: baseColor,
       contrast,

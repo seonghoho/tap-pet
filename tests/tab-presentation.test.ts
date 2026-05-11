@@ -115,6 +115,16 @@ describe('getFaviconSvg', () => {
 
     expect(happy).not.toBe(sad)
   })
+
+  it('adds the visible favicon accent reward at level 3', () => {
+    const lockedSvg = getFaviconSvg('cat', 'happy', 'light', { level: 2 })
+    const unlockedSvg = getFaviconSvg('cat', 'happy', 'light', { level: 3 })
+
+    expect(unlockedSvg).not.toBe(lockedSvg)
+    expect(lockedSvg).not.toContain('data-unlock="favicon-bright-accent"')
+    expect(unlockedSvg).toContain('data-unlock="favicon-bright-accent"')
+    expect(unlockedSvg).toContain('fill="#facc15"')
+  })
 })
 
 describe('svgToDataUrl', () => {
