@@ -13,6 +13,7 @@ import type {
   PetActionLimit,
   PetDailyGoalState,
   PetGrowth,
+  PetPersonalityState,
   PetSettings,
   PetSpecies,
   PetState,
@@ -23,6 +24,7 @@ import type {
 import { normalizeActionLimit } from '~/utils/petActionLimit'
 import { createDailyGoal, normalizeDailyGoalState } from '~/utils/petDailyGoal'
 import { normalizeGrowth } from '~/utils/petGrowth'
+import { createPetPersonalityState, normalizePetPersonalityState } from '~/utils/petPersonality'
 
 const PET_SPECIES = ['cat', 'dog', 'hedgehog'] as const
 
@@ -76,6 +78,10 @@ export function parseStoredPetState(value: unknown, now = Date.now()): PetState 
   if (!isPetSpecies(value.species)) return null
 
   if (value.version === PET_STORAGE_VERSION) {
+    return parseStoredPetStateV4(value, now)
+  }
+
+  if (value.version === 3) {
     return parseStoredPetStateV3(value, now)
   }
 
@@ -99,7 +105,17 @@ export function toStoredPetState(state: PetState, version: number): StoredPetSta
     settings: normalizeSettings(state.settings),
     actionLimit: normalizeStoredActionLimit(state.actionLimit, state.lastUpdatedAt),
     dailyGoal: normalizeStoredDailyGoal(state.dailyGoal, state.lastUpdatedAt),
+    personality: normalizeStoredPersonality(state.personality, state.lastUpdatedAt),
     version,
+  }
+}
+
+function parseStoredPetStateV4(value: Record<string, unknown>, now: number): PetState {
+  const state = parseStoredPetStateV3(value, now)
+
+  return {
+    ...state,
+    personality: normalizeStoredPersonality(value.personality, now),
   }
 }
 
@@ -109,6 +125,7 @@ function parseStoredPetStateV3(value: Record<string, unknown>, now: number): Pet
   return {
     ...state,
     dailyGoal: normalizeStoredDailyGoal(value.dailyGoal, now),
+    personality: createPetPersonalityState(),
   }
 }
 
@@ -124,6 +141,7 @@ function parseStoredPetStateV2(value: Record<string, unknown>, now: number): Pet
     settings: normalizeSettings(getStoredSettingsValue(value)),
     actionLimit: normalizeStoredActionLimit(value.actionLimit, now),
     dailyGoal: createDailyGoal(now),
+    personality: createPetPersonalityState(),
     lastUpdatedAt,
     lastPlayedAt: normalizeTimestamp(value.lastPlayedAt, now),
   }
@@ -144,6 +162,7 @@ function parseStoredPetStateV1(value: Record<string, unknown>, now: number): Pet
     }),
     actionLimit: normalizeStoredActionLimit(value.actionLimit, now),
     dailyGoal: createDailyGoal(now),
+    personality: createPetPersonalityState(),
     lastUpdatedAt,
     lastPlayedAt: normalizeTimestamp(value.lastPlayedAt, lastUpdatedAt),
   }
@@ -171,6 +190,10 @@ function normalizeStoredActionLimit(value: unknown, now: number): PetActionLimit
 
 function normalizeStoredDailyGoal(value: unknown, now: number): PetDailyGoalState {
   return normalizeDailyGoalState(value, now)
+}
+
+function normalizeStoredPersonality(value: unknown, now: number): PetPersonalityState {
+  return normalizePetPersonalityState(value, now)
 }
 
 function normalizeTimestamp(value: unknown, fallback: number): number {

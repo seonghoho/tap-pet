@@ -7,6 +7,7 @@ import {
 import type { PetSettings, PetSpecies, PetState } from '~/types/pet'
 import { createPetActionLimit } from '~/utils/petActionLimit'
 import { createDailyGoal } from '~/utils/petDailyGoal'
+import { createPetPersonalityState } from '~/utils/petPersonality'
 
 export function createInitialPetState(
   species: PetSpecies,
@@ -27,6 +28,7 @@ export function createInitialPetState(
     },
     actionLimit: createPetActionLimit(now),
     dailyGoal: createDailyGoal(now),
+    personality: createPetPersonalityState(),
     lastUpdatedAt: now,
     lastPlayedAt: now,
   }

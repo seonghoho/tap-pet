@@ -4,11 +4,124 @@ import { createInitialPetState } from '~/utils/petFactory'
 import { parseStoredPetState, toStoredPetState } from '~/utils/petValidation'
 
 describe('pet storage validation', () => {
-  it('round-trips a valid v2 pet state', () => {
+  it('round-trips a valid current pet state', () => {
     const state = createInitialPetState('cat', 1000)
     const stored = toStoredPetState(state, PET_STORAGE_VERSION)
 
     expect(parseStoredPetState(stored, 2000)).toEqual(state)
+  })
+
+  it('creates new pets with unassigned personality state', () => {
+    expect(createInitialPetState('cat', 1000).personality).toEqual({
+      personality: null,
+      earlyActionCounts: {
+        feed: 0,
+        play: 0,
+        sleep: 0,
+        wash: 0,
+      },
+      assignedAt: null,
+    })
+  })
+
+  it('round-trips a valid v4 pet state with personality', () => {
+    const state = {
+      ...createInitialPetState('cat', 1000),
+      personality: {
+        personality: 'playful' as const,
+        earlyActionCounts: {
+          feed: 0,
+          play: 3,
+          sleep: 0,
+          wash: 0,
+        },
+        assignedAt: 1200,
+      },
+    }
+    const stored = toStoredPetState(state, PET_STORAGE_VERSION)
+
+    expect(parseStoredPetState(stored, 2000)).toEqual(state)
+  })
+
+  it('migrates v3 pet state with default personality state', () => {
+    const migrated = parseStoredPetState(
+      {
+        version: 3,
+        species: 'dog',
+        stats: {
+          fullness: 50,
+          energy: 60,
+          cleanliness: 70,
+        },
+        growth: {
+          level: 2,
+          exp: 10,
+          affinityExp: 20,
+        },
+        dailyGoal: {
+          dateKey: '1970-01-01',
+          goalId: 'recommended-care',
+          progress: 0,
+          completedAt: null,
+          claimedAt: null,
+        },
+        lastUpdatedAt: 1000,
+        lastPlayedAt: 1000,
+      },
+      1000,
+    )
+
+    expect(migrated?.personality).toEqual({
+      personality: null,
+      earlyActionCounts: {
+        feed: 0,
+        play: 0,
+        sleep: 0,
+        wash: 0,
+      },
+      assignedAt: null,
+    })
+  })
+
+  it('normalizes invalid personality data without resetting the pet', () => {
+    const parsed = parseStoredPetState(
+      {
+        version: PET_STORAGE_VERSION,
+        species: 'cat',
+        stats: {
+          fullness: 50,
+          energy: 60,
+          cleanliness: 70,
+        },
+        personality: {
+          personality: 'loud',
+          earlyActionCounts: {
+            feed: 100,
+          },
+          assignedAt: 'broken',
+        },
+        lastUpdatedAt: 1000,
+        lastPlayedAt: 1000,
+      },
+      2000,
+    )
+
+    expect(parsed?.species).toBe('cat')
+    expect(parsed?.stats).toEqual({
+      fullness: 50,
+      energy: 60,
+      cleanliness: 70,
+    })
+    expect(parsed?.personality).toEqual({
+      personality: null,
+      earlyActionCounts: {
+        feed: 0,
+        play: 0,
+        sleep: 0,
+        wash: 0,
+      },
+      assignedAt: null,
+    })
   })
 
   it('preserves legacy root settings from a v2 pet state', () => {
