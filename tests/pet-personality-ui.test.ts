@@ -239,6 +239,7 @@ describe('pet personality UI', () => {
       remaining: 2,
     })
     expect(forming.personalityName.value).toBe('성향 형성 중')
+    expect(forming.personalityDetail.value).toBe('초반 돌봄 2회를 더 완료하면 성격이 정해져요.')
 
     const assigned = component.setup(createSidePanelProps({
       personality: createPersonality({
@@ -289,12 +290,14 @@ describe('pet personality UI', () => {
       expect(personality.progress).toContain('{required}')
       expect(personality.revealLabel.length).toBeGreaterThan(0)
       expect(personality.bonusLabel.length).toBeGreaterThan(0)
+      expect(personality.bonusApplied).toContain('{name}')
       expect(personality.bonusApplied).toContain('{bonus}')
-      expect(personality.personalities.calm.name.length).toBeGreaterThan(0)
-      expect(personality.personalities.hungry.bonus.length).toBeGreaterThan(0)
-      expect(personality.personalities.playful.detail.length).toBeGreaterThan(0)
-      expect(personality.personalities.sleepy.bonus.length).toBeGreaterThan(0)
-      expect(personality.personalities.neat.name.length).toBeGreaterThan(0)
+
+      for (const personalityId of ['calm', 'hungry', 'playful', 'sleepy', 'neat'] as const) {
+        expect(personality.personalities[personalityId].name.length).toBeGreaterThan(0)
+        expect(personality.personalities[personalityId].detail.length).toBeGreaterThan(0)
+        expect(personality.personalities[personalityId].bonus.length).toBeGreaterThan(0)
+      }
     }
   })
 
