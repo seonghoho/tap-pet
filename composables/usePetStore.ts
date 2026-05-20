@@ -48,6 +48,7 @@ type ActionScheduler = (callback: () => void) => void
 type PetStoreOptions = {
   scheduleAction?: ActionScheduler
 }
+type PersonalityRevealFeedback = NonNullable<PetCareFeedback['personalityReveal']>
 
 const CLOCK_UPDATE_INTERVAL_MS = 1000 * 60
 
@@ -74,6 +75,10 @@ export function usePetStore(options: PetStoreOptions = {}) {
   const actionGeneration = useState<number>('tab-pet:action-generation', () => 0)
   const latestActionRunId = useState<number>('tab-pet:latest-action-run-id', () => 0)
   const lastCareFeedback = useState<PetCareFeedback | null>('tab-pet:last-care-feedback', () => null)
+  const pendingPersonalityReveal = useState<PersonalityRevealFeedback | null>(
+    'tab-pet:pending-personality-reveal',
+    () => null,
+  )
   const returnReport = useState<PetReturnReport | null>('tab-pet:return-report', () => null)
   const dailyGoalRewardFeedbackState = useState<PetDailyGoalRewardFeedback | null>(
     'tab-pet:daily-goal-reward-feedback',
@@ -181,6 +186,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     latestActionRunId.value += 1
     activeReaction.value = null
     lastCareFeedback.value = null
+    pendingPersonalityReveal.value = null
     returnReport.value = null
     dailyGoalRewardFeedbackState.value = null
     actionLimitRewardFeedbackState.value = null
@@ -240,6 +246,13 @@ export function usePetStore(options: PetStoreOptions = {}) {
         gainedExp: eligibleReward.gainedExp,
         gainedAffinityExp: eligibleReward.gainedAffinityExp,
       })
+      const personalityReveal =
+        !previousState.personality.personality && nextPersonality.personality
+          ? {
+              personality: nextPersonality.personality,
+              reasonActionCounts: nextPersonality.earlyActionCounts,
+            }
+          : undefined
       const result = applyCareAction({
         stats: previousState.stats,
         growth: previousState.growth,
@@ -263,6 +276,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
         lastPlayedAt: action === 'play' ? resolvedAt : previousState.lastPlayedAt,
       })
       if (latestActionRunId.value === actionRunId) {
+        const revealFeedback = personalityReveal ?? pendingPersonalityReveal.value ?? undefined
         lastCareFeedback.value = {
           action,
           statChanges: getStatChanges(previousState.stats, result.stats),
@@ -273,15 +287,12 @@ export function usePetStore(options: PetStoreOptions = {}) {
           wasReduced: result.wasReduced,
           createdAt: resolvedAt,
           levelUnlocks: getLevelUnlocksForTransition(previousState.growth.level, result.growth.level),
-          personalityReveal:
-            !previousState.personality.personality && nextPersonality.personality
-              ? {
-                  personality: nextPersonality.personality,
-                  reasonActionCounts: nextPersonality.earlyActionCounts,
-                }
-              : undefined,
+          personalityReveal: revealFeedback,
           personalityBonus: personalityBonus ?? undefined,
         }
+        pendingPersonalityReveal.value = null
+      } else if (personalityReveal) {
+        mergePersonalityRevealFeedback(personalityReveal)
       }
       if (latestActionRunId.value === actionRunId && activeReaction.value === action) {
         activeReaction.value = null
@@ -395,6 +406,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     }
     activeReaction.value = null
     lastCareFeedback.value = null
+    pendingPersonalityReveal.value = null
     returnReport.value = null
     dailyGoalRewardFeedbackState.value = null
     actionLimitRewardFeedbackState.value = null
@@ -426,6 +438,19 @@ export function usePetStore(options: PetStoreOptions = {}) {
     }
 
     callback()
+  }
+
+  function mergePersonalityRevealFeedback(personalityReveal: PersonalityRevealFeedback): void {
+    if (!lastCareFeedback.value) {
+      pendingPersonalityReveal.value = personalityReveal
+      return
+    }
+
+    lastCareFeedback.value = {
+      ...lastCareFeedback.value,
+      personalityReveal,
+    }
+    pendingPersonalityReveal.value = null
   }
 
   return {

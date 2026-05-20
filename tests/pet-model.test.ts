@@ -291,6 +291,52 @@ describe('pet store', () => {
     })
   })
 
+  it('keeps the personality reveal when an older delayed action assigns personality', () => {
+    const callbacks: Array<() => void> = []
+    const store = createScheduledStore(callbacks)
+
+    store.initializePet('cat')
+
+    store.performAction('feed')
+    callbacks[0]?.()
+    expect(store.petState.value?.personality.earlyActionCounts.feed).toBe(1)
+
+    vi.setSystemTime(6001)
+    store.performAction('feed')
+    vi.setSystemTime(12002)
+    store.performAction('play')
+
+    callbacks[2]?.()
+    expect(store.lastCareFeedback.value?.action).toBe('play')
+    expect(store.lastCareFeedback.value?.personalityReveal).toBeUndefined()
+
+    vi.setSystemTime(18003)
+    callbacks[1]?.()
+
+    expect(store.petState.value?.personality).toEqual({
+      personality: 'hungry',
+      earlyActionCounts: {
+        feed: 2,
+        play: 1,
+        sleep: 0,
+        wash: 0,
+      },
+      assignedAt: 18003,
+    })
+    expect(store.lastCareFeedback.value).toMatchObject({
+      action: 'play',
+      personalityReveal: {
+        personality: 'hungry',
+        reasonActionCounts: {
+          feed: 2,
+          play: 1,
+          sleep: 0,
+          wash: 0,
+        },
+      },
+    })
+  })
+
   it('assigns calm when early completed care actions are mixed', () => {
     const callbacks: Array<() => void> = []
     const store = createScheduledStore(callbacks)
@@ -344,13 +390,18 @@ describe('pet store', () => {
   })
 
   it('does not count blocked care actions toward personality', () => {
-    const store = usePetStore()
+    const callbacks: Array<() => void> = []
+    const store = createScheduledStore(callbacks)
 
     store.initializePet('cat')
     store.performAction('feed')
+    callbacks[0]?.()
+    expect(store.petState.value?.personality.earlyActionCounts.feed).toBe(1)
+
     store.performAction('feed')
 
-    expect(store.petState.value?.personality.earlyActionCounts.feed).toBe(0)
+    expect(callbacks).toHaveLength(1)
+    expect(store.petState.value?.personality.earlyActionCounts.feed).toBe(1)
   })
 
   it('limits care actions to five uses per thirty minute window', () => {
