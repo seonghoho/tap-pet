@@ -210,6 +210,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
           :affinity-progress="pet.affinityProgress.value"
           :daily-goal="pet.dailyGoal.value"
           :daily-goal-reward-feedback="pet.dailyGoalRewardFeedback.value"
+          :personality="currentPet.personality"
           :settings="currentPet.settings"
           @set-mode="pet.setSidePanelMode"
           @update-name="pet.updatePetName"

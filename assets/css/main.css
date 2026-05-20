@@ -440,6 +440,37 @@ a:focus-visible,
   overflow-wrap: anywhere;
 }
 
+.pet-personality {
+  background: color-mix(in srgb, var(--app-surface) 86%, var(--app-accent));
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.pet-personality__copy {
+  display: grid;
+  gap: 4px;
+}
+
+.pet-personality span,
+.pet-personality small {
+  color: var(--app-muted);
+  font-size: 0.82rem;
+}
+
+.pet-personality strong {
+  color: var(--app-text);
+  overflow-wrap: anywhere;
+}
+
+.pet-personality__bonus {
+  color: var(--app-text);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
 .level-unlocks {
   border-bottom: 1px solid var(--app-border);
   display: grid;
@@ -2126,6 +2157,26 @@ a:focus-visible,
   overflow-wrap: anywhere;
 }
 
+.care-feedback__personality {
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(96px, 0.35fr) 1fr;
+  padding: 12px;
+}
+
+.care-feedback__personality > span,
+.care-feedback__personality small {
+  color: var(--app-muted);
+  font-size: 0.82rem;
+}
+
+.care-feedback__personality strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
 .care-feedback__growth-track {
   background: var(--app-surface);
   border: 1px solid color-mix(in srgb, var(--app-success) 26%, var(--app-border));
@@ -2642,6 +2693,10 @@ a:focus-visible,
   }
 
   .care-feedback__unlock {
+    grid-template-columns: 1fr;
+  }
+
+  .care-feedback__personality {
     grid-template-columns: 1fr;
   }
 

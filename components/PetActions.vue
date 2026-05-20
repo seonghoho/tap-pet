@@ -8,6 +8,7 @@ import type {
   PetCareFeedback,
   PetCareRecommendation,
   PetLevelUnlock,
+  PetPersonality,
   PetStats,
 } from '~/types/pet'
 import type { CareActionRewardPreview } from '~/utils/petCare'
@@ -95,6 +96,37 @@ const careFeedbackSummary = computed(() => {
 const shouldShowFeedbackGrowth = computed(() => Boolean(props.careFeedback && props.levelProgress))
 const feedbackLevelUnlocks = computed(() => props.careFeedback?.levelUnlocks ?? [])
 const shouldShowFeedbackLevelUnlocks = computed(() => feedbackLevelUnlocks.value.length > 0)
+const feedbackPersonalityReveal = computed(() => props.careFeedback?.personalityReveal ?? null)
+const feedbackPersonalityBonus = computed(() => props.careFeedback?.personalityBonus ?? null)
+const shouldShowFeedbackPersonalityReveal = computed(() => Boolean(feedbackPersonalityReveal.value))
+const shouldShowFeedbackPersonalityBonus = computed(() => Boolean(feedbackPersonalityBonus.value))
+const feedbackPersonality = computed<PetPersonality | null>(
+  () => feedbackPersonalityReveal.value?.personality ?? feedbackPersonalityBonus.value?.personality ?? null,
+)
+const feedbackPersonalityName = computed(() => {
+  const personality = feedbackPersonality.value
+
+  return personality ? messages.value.personality.personalities[personality].name : ''
+})
+const feedbackPersonalityDetail = computed(() => {
+  const reveal = feedbackPersonalityReveal.value
+  if (!reveal) return ''
+
+  return messages.value.personality.personalities[reveal.personality].detail
+})
+const feedbackPersonalityBonusText = computed(() => {
+  const bonus = feedbackPersonalityBonus.value
+  if (!bonus) return ''
+
+  const bonusText = [
+    bonus.expBonus > 0 ? `+${bonus.expBonus} ${messages.value.stats.exp}` : '',
+    bonus.affinityBonus > 0 ? `+${bonus.affinityBonus} ${messages.value.stats.affinity}` : '',
+  ].filter(Boolean).join(' · ')
+
+  return messages.value.personality.bonusApplied
+    .replace('{name}', feedbackPersonalityName.value)
+    .replace('{bonus}', bonusText)
+})
 const feedbackGrowthCurrent = computed(() => props.levelProgress?.current ?? 0)
 const feedbackGrowthRequired = computed(() => props.levelProgress?.required ?? 0)
 const feedbackGrowthRemaining = computed(() =>
@@ -645,6 +677,24 @@ function getLevelUnlockDetail(unlock: PetLevelUnlock): string {
               <small>{{ getLevelUnlockDetail(unlock) }}</small>
             </li>
           </ul>
+        </div>
+
+        <div
+          v-if="shouldShowFeedbackPersonalityReveal || shouldShowFeedbackPersonalityBonus"
+          class="care-feedback__personality"
+        >
+          <span>
+            {{
+              shouldShowFeedbackPersonalityReveal
+                ? messages.personality.revealLabel
+                : messages.personality.bonusLabel
+            }}
+          </span>
+          <div>
+            <strong>{{ feedbackPersonalityName }}</strong>
+            <small v-if="shouldShowFeedbackPersonalityReveal">{{ feedbackPersonalityDetail }}</small>
+            <small v-if="shouldShowFeedbackPersonalityBonus">{{ feedbackPersonalityBonusText }}</small>
+          </div>
         </div>
       </div>
 

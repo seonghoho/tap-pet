@@ -4,11 +4,13 @@ import type {
   PetDailyGoalRewardFeedback,
   PetDailyGoalState,
   PetLevelUnlock,
+  PetPersonalityState,
   PetSettings,
 } from '~/types/pet'
 import { getExperienceMultiplier } from '~/utils/petGrowth'
 import type { ProgressInfo, AffinityProgressInfo } from '~/utils/petGrowth'
 import { getAvailableLevelUnlocks, getNextLevelUnlock } from '~/utils/petLevelUnlocks'
+import { getPetPersonalityProgress } from '~/utils/petPersonality'
 
 const props = defineProps<{
   mode: 'status' | 'settings'
@@ -18,6 +20,7 @@ const props = defineProps<{
   affinityProgress: AffinityProgressInfo
   dailyGoal: PetDailyGoalState
   dailyGoalRewardFeedback: PetDailyGoalRewardFeedback | null
+  personality: PetPersonalityState
   settings: PetSettings
 }>()
 
@@ -90,6 +93,35 @@ const progressGoalRows = computed(() => [
     detail: affinityGoalDetail.value,
   },
 ])
+const personalityProgress = computed(() => getPetPersonalityProgress(props.personality))
+const assignedPersonality = computed(() => props.personality.personality)
+const personalityName = computed(() => {
+  const personality = assignedPersonality.value
+
+  return personality
+    ? messages.value.personality.personalities[personality].name
+    : messages.value.personality.formingName
+})
+const personalityDetail = computed(() => {
+  const personality = assignedPersonality.value
+
+  if (personality) return messages.value.personality.personalities[personality].detail
+
+  return messages.value.personality.formingDetail.replace(
+    '{remaining}',
+    String(personalityProgress.value.remaining),
+  )
+})
+const personalityProgressText = computed(() =>
+  messages.value.personality.progress
+    .replace('{current}', String(personalityProgress.value.current))
+    .replace('{required}', String(personalityProgress.value.required)),
+)
+const personalityBonusText = computed(() => {
+  const personality = assignedPersonality.value
+
+  return personality ? messages.value.personality.personalities[personality].bonus : personalityProgressText.value
+})
 const availableLevelUnlocks = computed(() => getAvailableLevelUnlocks(props.level))
 const nextLevelUnlock = computed(() => getNextLevelUnlock(props.level))
 
@@ -179,6 +211,26 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
         :reward-feedback="dailyGoalRewardFeedback"
         @claim="emit('claimDailyGoal')"
       />
+
+      <section class="pet-personality" aria-labelledby="pet-personality-title">
+        <div class="pet-personality__copy">
+          <span>{{ messages.personality.heading }}</span>
+          <strong id="pet-personality-title">{{ personalityName }}</strong>
+          <small>{{ personalityDetail }}</small>
+        </div>
+
+        <p class="pet-personality__bonus">
+          {{ personalityBonusText }}
+        </p>
+        <span
+          class="pet-personality__progress"
+          role="progressbar"
+          :aria-label="personalityProgressText"
+          :aria-valuemin="0"
+          :aria-valuenow="personalityProgress.current"
+          :aria-valuemax="personalityProgress.required"
+        />
+      </section>
 
       <section class="progress-goals" aria-labelledby="progress-goals-title">
         <div class="progress-goals__copy">

@@ -149,6 +149,42 @@ export const I18N_MESSAGES = {
         },
       },
     },
+    personality: {
+      heading: 'Personality',
+      formingName: 'Personality forming',
+      formingDetail: '{remaining} more early care actions will shape this pet.',
+      progress: '{current}/{required} early care actions',
+      revealLabel: 'Personality discovered',
+      bonusLabel: 'Personality bonus',
+      bonusApplied: '{name} bonus {bonus}',
+      personalities: {
+        calm: {
+          name: 'Calm',
+          detail: 'Balanced early care made this pet steady.',
+          bonus: 'No numeric bonus. Steady care stays flexible.',
+        },
+        hungry: {
+          name: 'Warm',
+          detail: 'Food-focused early care made this pet extra cozy.',
+          bonus: 'Feed grants a small affinity bonus.',
+        },
+        playful: {
+          name: 'Playful',
+          detail: 'Play-focused early care made this pet lively.',
+          bonus: 'Play grants a small affinity bonus.',
+        },
+        sleepy: {
+          name: 'Relaxed',
+          detail: 'Rest-focused early care made this pet soft and settled.',
+          bonus: 'Sleep grants a small EXP bonus.',
+        },
+        neat: {
+          name: 'Neat',
+          detail: 'Clean-focused early care made this pet tidy.',
+          bonus: 'Wash grants a small affinity bonus.',
+        },
+      },
+    },
     returnReport: {
       heading: 'Welcome back',
       elapsed: {
@@ -552,6 +588,42 @@ export const I18N_MESSAGES = {
         },
       },
     },
+    personality: {
+      heading: '성격',
+      formingName: '성향 형성 중',
+      formingDetail: '초반 돌봄 {remaining}회를 더 완료하면 성격이 정해져요.',
+      progress: '초반 돌봄 {current}/{required}회',
+      revealLabel: '성격 발견',
+      bonusLabel: '성격 보너스',
+      bonusApplied: '{name} 보너스 {bonus}',
+      personalities: {
+        calm: {
+          name: '차분형',
+          detail: '균형 잡힌 초반 돌봄으로 차분한 성향이 되었어요.',
+          bonus: '숫자 보너스 없이 어떤 돌봄에도 안정적으로 반응해요.',
+        },
+        hungry: {
+          name: '푸근형',
+          detail: '먹이기 중심의 초반 돌봄으로 포근한 성향이 되었어요.',
+          bonus: '먹이기 때 친밀도 보너스를 조금 받아요.',
+        },
+        playful: {
+          name: '활발형',
+          detail: '놀아주기 중심의 초반 돌봄으로 활발한 성향이 되었어요.',
+          bonus: '놀아주기 때 친밀도 보너스를 조금 받아요.',
+        },
+        sleepy: {
+          name: '느긋형',
+          detail: '재우기 중심의 초반 돌봄으로 느긋한 성향이 되었어요.',
+          bonus: '재우기 때 경험치 보너스를 조금 받아요.',
+        },
+        neat: {
+          name: '단정형',
+          detail: '씻기기 중심의 초반 돌봄으로 단정한 성향이 되었어요.',
+          bonus: '씻기기 때 친밀도 보너스를 조금 받아요.',
+        },
+      },
+    },
     returnReport: {
       heading: '다시 만난 탭 펫',
       elapsed: {
@@ -952,6 +1024,42 @@ export const I18N_MESSAGES = {
         'habitat-reaction-spark': {
           name: '部屋のリアクションアクセント',
           detail: 'お世話の直後、部屋の反応が少しはっきり見えるようになります。',
+        },
+      },
+    },
+    personality: {
+      heading: '性格',
+      formingName: '性格が育っています',
+      formingDetail: 'あと{remaining}回の序盤ケアで性格が決まります。',
+      progress: '序盤ケア {current}/{required} 回',
+      revealLabel: '性格を発見',
+      bonusLabel: '性格ボーナス',
+      bonusApplied: '{name}ボーナス {bonus}',
+      personalities: {
+        calm: {
+          name: 'おだやか',
+          detail: 'バランスのよい序盤ケアで落ち着いた性格になりました。',
+          bonus: '数値ボーナスはありません。どのケアにも安定して反応します。',
+        },
+        hungry: {
+          name: 'ぬくもり',
+          detail: 'ごはん中心の序盤ケアであたたかい性格になりました。',
+          bonus: 'ごはんで親密度ボーナスを少し得ます。',
+        },
+        playful: {
+          name: 'あそび好き',
+          detail: 'あそび中心の序盤ケアで元気な性格になりました。',
+          bonus: 'あそびで親密度ボーナスを少し得ます。',
+        },
+        sleepy: {
+          name: 'のんびり',
+          detail: '休み中心の序盤ケアでやわらかい性格になりました。',
+          bonus: '休みでEXPボーナスを少し得ます。',
+        },
+        neat: {
+          name: 'きれい好き',
+          detail: 'きれいにするケア中心で整った性格になりました。',
+          bonus: 'きれいにするケアで親密度ボーナスを少し得ます。',
         },
       },
     },
