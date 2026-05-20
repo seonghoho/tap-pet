@@ -9,6 +9,7 @@ import { ACTION_LIMIT_AD_REWARD_USES } from '~/constants/pet'
 import type { PetSettings } from '~/types/pet'
 import * as petGrowth from '~/utils/petGrowth'
 import * as petLevelUnlocks from '~/utils/petLevelUnlocks'
+import * as petPersonality from '~/utils/petPersonality'
 
 const SUPPORTED_LOCALES = ['en', 'ko', 'ja'] as const
 const requireModule = createRequire(import.meta.url)
@@ -50,6 +51,7 @@ function loadScriptSetupComponent<T>(componentPath: string): SetupComponent<T> {
     if (id === '~/constants/pet') return { ACTION_LIMIT_AD_REWARD_USES }
     if (id === '~/utils/petGrowth') return petGrowth
     if (id === '~/utils/petLevelUnlocks') return petLevelUnlocks
+    if (id === '~/utils/petPersonality') return petPersonality
 
     return requireModule(id)
   }

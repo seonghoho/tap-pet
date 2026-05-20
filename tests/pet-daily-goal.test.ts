@@ -258,11 +258,11 @@ describe('pet daily goal store behavior', () => {
 })
 
 describe('pet daily goal storage migration', () => {
-  it('stores version 3 state with a daily goal', () => {
+  it('stores current version state with a daily goal', () => {
     const state = createInitialPetState('cat', 1000)
     const stored = toStoredPetState(state, PET_STORAGE_VERSION)
 
-    expect(stored.version).toBe(3)
+    expect(stored.version).toBe(PET_STORAGE_VERSION)
     expect(stored.dailyGoal).toEqual(createDailyGoal(1000))
   })
 
