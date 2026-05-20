@@ -48,7 +48,6 @@ const adsenseConfigEnabled = computed(() => String(runtimeConfig.public.adsenseE
 const adsenseEnabled = computed(() =>
   adsenseConfigEnabled.value && adsenseClient.value.length > 0 && adsenseSidebarSlot.value.length > 0,
 )
-const shouldShowAdPlacement = computed(() => adsenseEnabled.value || import.meta.dev)
 const tabPresentation = computed(() =>
   getTabPresentation({
     species: currentPet.value?.species,
@@ -220,7 +219,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
         />
         <GuidePanel v-if="currentPet" />
         <AdSenseDisplay
-          v-if="currentPet && shouldShowAdPlacement"
+          v-if="currentPet && adsenseEnabled"
           :client="adsenseClient"
           :slot="adsenseSidebarSlot"
           :enabled="adsenseEnabled"

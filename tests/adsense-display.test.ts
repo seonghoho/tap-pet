@@ -87,15 +87,18 @@ describe('adsense display configuration', () => {
     expect(appSource).not.toContain("key: 'adsense'")
   })
 
-  it('places the display ad in the side stack instead of the monetization mock', () => {
+  it('places the display ad only when AdSense is enabled and configured', () => {
     const appTemplate = readComponentTemplate('app.vue')
+    const appSource = readSource('app.vue')
 
     expect(appTemplate).not.toContain('<MonetizationMock')
     expect(appTemplate).toContain('<AdSenseDisplay')
     expect(appTemplate.indexOf('<GuidePanel')).toBeLessThan(appTemplate.indexOf('<AdSenseDisplay'))
+    expect(appTemplate).toContain('v-if="currentPet && adsenseEnabled"')
     expect(appTemplate).toContain(':client="adsenseClient"')
     expect(appTemplate).toContain(':slot="adsenseSidebarSlot"')
     expect(appTemplate).toContain(':enabled="adsenseEnabled"')
+    expect(appSource).not.toContain('shouldShowAdPlacement')
   })
 
   it('publishes an ads.txt file for the AdSense publisher ID', () => {

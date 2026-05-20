@@ -49,6 +49,13 @@ function loadScriptSetupComponent<T>(componentPath: string): SetupComponent<T> {
     if (id === 'vue') return requireModule('vue')
     if (id === '~/constants/themes') return { PET_THEMES: [] }
     if (id === '~/constants/titles') return { DISGUISE_TITLES: [], getDisguiseTitleLabel: () => '' }
+    if (id === '~/constants/premium') {
+      return {
+        PREMIUM_QUIET_SIGNAL_PACKS: [],
+        PREMIUM_THEME_PACKS: [],
+        PREMIUM_WORK_TITLE_PACKS: [],
+      }
+    }
     if (id === '~/constants/pet') return { ACTION_LIMIT_AD_REWARD_USES }
 
     return requireModule(id)
@@ -165,6 +172,14 @@ describe('pet side panel progress summary', () => {
     expect(css).toMatch(
       /@media \(max-width: 720px\)[\s\S]*\.action-panel\s*\{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/,
     )
+  })
+
+  it('keeps first-loop side panel focused by gating detailed progression sections', () => {
+    const template = readComponentTemplate('components/PetSidePanel.vue')
+
+    expect(template).toContain('v-if="hasStartedFirstCareLoop"')
+    expect(template).toContain('v-else')
+    expect(template).toContain('premium-tab-pack--compact')
   })
 })
 

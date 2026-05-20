@@ -20,29 +20,28 @@ const SUPPORTED_LOCALES = ['en', 'ko', 'ja'] as const
 const STEP_IDS = ['choose', 'care', 'tab'] as const
 
 describe('pet setup onboarding', () => {
-  it('explains the first-use care loop before species selection', () => {
-    const template = readComponentTemplate('components/PetSetup.vue')
-    const localSaveIndex = template.indexOf('messages.setup.localSave')
-    const speciesGridIndex = template.indexOf('species-grid')
-
-    expect(template).toContain('setup-flow')
-    expect(template).toContain('messages.setup.steps')
-    expect(template).toContain('messages.setup.localSave')
-    expect(localSaveIndex).toBeGreaterThan(-1)
-    expect(speciesGridIndex).toBeGreaterThan(-1)
-    expect(localSaveIndex).toBeLessThan(speciesGridIndex)
-  })
-
-  it('shows a browser tab signal preview on the setup screen', () => {
+  it('puts tab signal preview and pet choices before setup explanation details', () => {
     const template = readComponentTemplate('components/PetSetup.vue')
     const tabPreviewIndex = template.indexOf('setup-tab-demo')
     const speciesGridIndex = template.indexOf('species-grid')
+    const setupFlowIndex = template.indexOf('setup-flow')
+    const localSaveIndex = template.indexOf('messages.setup.localSave')
 
-    expect(template).toContain('setup-tab-demo')
-    expect(template).toContain('messages.setup.tabPreview')
     expect(tabPreviewIndex).toBeGreaterThan(-1)
     expect(speciesGridIndex).toBeGreaterThan(-1)
+    expect(setupFlowIndex).toBeGreaterThan(-1)
+    expect(localSaveIndex).toBeGreaterThan(-1)
     expect(tabPreviewIndex).toBeLessThan(speciesGridIndex)
+    expect(speciesGridIndex).toBeLessThan(localSaveIndex)
+    expect(localSaveIndex).toBeLessThan(setupFlowIndex)
+  })
+
+  it('keeps setup explanation as supporting content instead of the primary action', () => {
+    const template = readComponentTemplate('components/PetSetup.vue')
+
+    expect(template).toContain('setup-flow setup-flow--compact')
+    expect(template).toContain('messages.setup.steps')
+    expect(template).toContain('messages.setup.localSave')
   })
 
   it('keeps onboarding copy localized for every supported language', () => {
