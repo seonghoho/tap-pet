@@ -251,6 +251,108 @@ describe('pet store', () => {
     expect(store.lastCareFeedback.value?.action).toBe('play')
   })
 
+  it('assigns personality after the third completed early care action', () => {
+    const callbacks: Array<() => void> = []
+    const store = createScheduledStore(callbacks)
+
+    store.initializePet('cat')
+
+    store.performAction('feed')
+    callbacks[0]?.()
+    expect(store.petState.value?.personality.personality).toBeNull()
+
+    vi.setSystemTime(6001)
+    store.performAction('feed')
+    callbacks[1]?.()
+    expect(store.petState.value?.personality.personality).toBeNull()
+
+    vi.setSystemTime(12002)
+    store.performAction('play')
+    callbacks[2]?.()
+
+    expect(store.petState.value?.personality).toEqual({
+      personality: 'hungry',
+      earlyActionCounts: {
+        feed: 2,
+        play: 1,
+        sleep: 0,
+        wash: 0,
+      },
+      assignedAt: 12002,
+    })
+    expect(store.lastCareFeedback.value?.personalityReveal).toEqual({
+      personality: 'hungry',
+      reasonActionCounts: {
+        feed: 2,
+        play: 1,
+        sleep: 0,
+        wash: 0,
+      },
+    })
+  })
+
+  it('assigns calm when early completed care actions are mixed', () => {
+    const callbacks: Array<() => void> = []
+    const store = createScheduledStore(callbacks)
+
+    store.initializePet('cat')
+
+    store.performAction('feed')
+    callbacks[0]?.()
+    vi.setSystemTime(6001)
+    store.performAction('play')
+    callbacks[1]?.()
+    vi.setSystemTime(12002)
+    store.performAction('wash')
+    callbacks[2]?.()
+
+    expect(store.petState.value?.personality.personality).toBe('calm')
+    expect(store.lastCareFeedback.value?.personalityBonus).toBeUndefined()
+  })
+
+  it('applies the matching personality bonus once to eligible rewards', () => {
+    const callbacks: Array<() => void> = []
+    const store = createScheduledStore(callbacks)
+
+    store.initializePet('cat')
+    store.performAction('play')
+    callbacks[0]?.()
+    vi.setSystemTime(6001)
+    store.performAction('play')
+    callbacks[1]?.()
+    vi.setSystemTime(12002)
+    store.performAction('feed')
+    callbacks[2]?.()
+
+    expect(store.petState.value?.personality.personality).toBe('playful')
+
+    vi.setSystemTime(18003)
+    store.performAction('play')
+    callbacks[3]?.()
+
+    expect(store.lastCareFeedback.value).toMatchObject({
+      action: 'play',
+      gainedExp: 20,
+      gainedAffinityExp: 15,
+      personalityBonus: {
+        personality: 'playful',
+        action: 'play',
+        expBonus: 0,
+        affinityBonus: 1,
+      },
+    })
+  })
+
+  it('does not count blocked care actions toward personality', () => {
+    const store = usePetStore()
+
+    store.initializePet('cat')
+    store.performAction('feed')
+    store.performAction('feed')
+
+    expect(store.petState.value?.personality.earlyActionCounts.feed).toBe(0)
+  })
+
   it('limits care actions to five uses per thirty minute window', () => {
     const store = usePetStore()
 

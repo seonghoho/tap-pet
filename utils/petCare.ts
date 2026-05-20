@@ -9,6 +9,7 @@ import type {
   PetAction,
   PetCareRecommendation,
   PetGrowth,
+  PetPersonalityBonus,
   PetStatKey,
   PetStats,
   PetStatus,
@@ -26,6 +27,7 @@ export type CareActionInput = {
   stats: PetStats
   growth: PetGrowth
   action: PetAction
+  rewardBonus?: Pick<PetPersonalityBonus, 'expBonus' | 'affinityBonus'> | null
 }
 
 export type CareActionResult = {
@@ -95,12 +97,17 @@ export function applyCareAction(input: CareActionInput): CareActionResult {
   }
   const growth = normalizeGrowth(input.growth)
   const rewardPreview = getCareActionRewardPreview(input)
-  const leveledGrowth = addLevelExp(growth, rewardPreview.gainedExp)
+  const gainedExp = rewardPreview.gainedExp + normalizeRewardBonus(input.rewardBonus?.expBonus)
+  const gainedAffinityExp =
+    rewardPreview.gainedAffinityExp + normalizeRewardBonus(input.rewardBonus?.affinityBonus)
+  const leveledGrowth = addLevelExp(growth, gainedExp)
 
   return {
     stats,
-    growth: addAffinityExp(leveledGrowth, rewardPreview.gainedAffinityExp),
+    growth: addAffinityExp(leveledGrowth, gainedAffinityExp),
     ...rewardPreview,
+    gainedExp,
+    gainedAffinityExp,
   }
 }
 
@@ -151,4 +158,12 @@ export function isOvercareAction(stats: PetStats, action: PetAction): boolean {
   if (action === 'wash') return stats.cleanliness >= OVERCARE_THRESHOLD
 
   return false
+}
+
+function normalizeRewardBonus(value: unknown): number {
+  const numberValue = Number(value)
+
+  if (!Number.isFinite(numberValue)) return 0
+
+  return Math.max(0, Math.floor(numberValue))
 }

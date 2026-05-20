@@ -35,6 +35,10 @@ import {
 } from '~/utils/petDailyGoal'
 import { getAffinityLevel, getAffinityProgress, getLevelProgress } from '~/utils/petGrowth'
 import { getLevelUnlocksForTransition } from '~/utils/petLevelUnlocks'
+import {
+  getPetPersonalityBonus,
+  recordPersonalityCareAction,
+} from '~/utils/petPersonality'
 import { createPetReturnReport } from '~/utils/petReturnReport'
 import { getPetStatus } from '~/utils/petStatus'
 import { isDisguiseTitleId, isPetSpecies, isThemeId } from '~/utils/petValidation'
@@ -219,12 +223,29 @@ export function usePetStore(options: PetStoreOptions = {}) {
 
       const previousState = petState.value
       const previousAffinityLevel = getAffinityLevel(previousState.growth.affinityExp)
-      const result = applyCareAction({
+      const resolvedAt = Date.now()
+      const eligibleReward = getCareActionRewardPreview({
         stats: previousState.stats,
         growth: previousState.growth,
         action,
       })
-      const resolvedAt = Date.now()
+      const nextPersonality = recordPersonalityCareAction(
+        previousState.personality,
+        action,
+        resolvedAt,
+      )
+      const personalityBonus = getPetPersonalityBonus({
+        personality: nextPersonality.personality,
+        action,
+        gainedExp: eligibleReward.gainedExp,
+        gainedAffinityExp: eligibleReward.gainedAffinityExp,
+      })
+      const result = applyCareAction({
+        stats: previousState.stats,
+        growth: previousState.growth,
+        action,
+        rewardBonus: personalityBonus,
+      })
       const nextAffinityLevel = getAffinityLevel(result.growth.affinityExp)
       const resolvedDailyGoal = wasRecommendedCareAction
         ? progressDailyGoal(previousState.dailyGoal, {
@@ -238,6 +259,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
         stats: result.stats,
         growth: result.growth,
         dailyGoal: resolvedDailyGoal,
+        personality: nextPersonality,
         lastPlayedAt: action === 'play' ? resolvedAt : previousState.lastPlayedAt,
       })
       if (latestActionRunId.value === actionRunId) {
@@ -251,6 +273,14 @@ export function usePetStore(options: PetStoreOptions = {}) {
           wasReduced: result.wasReduced,
           createdAt: resolvedAt,
           levelUnlocks: getLevelUnlocksForTransition(previousState.growth.level, result.growth.level),
+          personalityReveal:
+            !previousState.personality.personality && nextPersonality.personality
+              ? {
+                  personality: nextPersonality.personality,
+                  reasonActionCounts: nextPersonality.earlyActionCounts,
+                }
+              : undefined,
+          personalityBonus: personalityBonus ?? undefined,
         }
       }
       if (latestActionRunId.value === actionRunId && activeReaction.value === action) {
