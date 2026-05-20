@@ -77,6 +77,18 @@ export const I18N_MESSAGES = {
         label: 'Hedgehog',
         description: 'Small signals and careful tab status changes.',
       },
+      rabbit: {
+        label: 'Rabbit',
+        description: 'Bright signals with tall ears that are easy to spot.',
+      },
+      penguin: {
+        label: 'Penguin',
+        description: 'High-contrast signals that read clearly in the tab.',
+      },
+      hamster: {
+        label: 'Hamster',
+        description: 'Soft, round signals with an extra cozy mood.',
+      },
     },
     status: {
       labels: {
@@ -528,6 +540,18 @@ export const I18N_MESSAGES = {
         label: '고슴도치',
         description: '작은 신호와 더 신중한 탭 상태 변화.',
       },
+      rabbit: {
+        label: '토끼',
+        description: '긴 귀로 탭에서도 알아보기 쉬운 밝은 신호.',
+      },
+      penguin: {
+        label: '펭귄',
+        description: '대비가 뚜렷해 탭 아이콘에서도 잘 보이는 신호.',
+      },
+      hamster: {
+        label: '햄스터',
+        description: '동글동글하고 포근한 분위기의 작은 신호.',
+      },
     },
     status: {
       labels: {
@@ -978,6 +1002,18 @@ export const I18N_MESSAGES = {
       hedgehog: {
         label: 'ハリネズミ',
         description: '小さな合図と、より慎重なタブ状態の変化。',
+      },
+      rabbit: {
+        label: 'うさぎ',
+        description: '長い耳でタブでも見つけやすい明るい合図。',
+      },
+      penguin: {
+        label: 'ペンギン',
+        description: 'コントラストが高く、タブでも読みやすい合図。',
+      },
+      hamster: {
+        label: 'ハムスター',
+        description: '丸くてやわらかい雰囲気の小さな合図。',
       },
     },
     status: {

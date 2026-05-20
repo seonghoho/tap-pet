@@ -13,6 +13,9 @@ export const DEFAULT_PET_NAMES = {
   cat: '몽이',
   dog: '초코',
   hedgehog: '밤이',
+  rabbit: '토리',
+  penguin: '펭이',
+  hamster: '콩이',
 } as const
 
 export const DEFAULT_STATS: PetStats = {

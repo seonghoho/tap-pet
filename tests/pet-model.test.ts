@@ -607,6 +607,21 @@ describe('stored pet state parsing', () => {
     expect(parseStoredPetState({ version: 999, species: 'cat' })).toBeNull()
     expect(parseStoredPetState({ version: PET_STORAGE_VERSION, species: 'bird' })).toBeNull()
   })
+
+  it('accepts newly added companion species', () => {
+    expect(parseStoredPetState({
+      version: PET_STORAGE_VERSION,
+      species: 'rabbit',
+    })?.species).toBe('rabbit')
+    expect(parseStoredPetState({
+      version: PET_STORAGE_VERSION,
+      species: 'penguin',
+    })?.species).toBe('penguin')
+    expect(parseStoredPetState({
+      version: PET_STORAGE_VERSION,
+      species: 'hamster',
+    })?.species).toBe('hamster')
+  })
 })
 
 function createTestSettings(overrides: Partial<PetSettings> = {}): PetSettings {
