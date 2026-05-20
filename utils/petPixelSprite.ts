@@ -73,6 +73,9 @@ export function getPetPixelSpriteCells(input: {
 function getSpriteBase(species: PetSpecies): PetPixelCell[] {
   if (species === 'cat') return getCatSpriteBase()
   if (species === 'dog') return getDogSpriteBase()
+  if (species === 'rabbit') return getRabbitSpriteBase()
+  if (species === 'penguin') return getPenguinSpriteBase()
+  if (species === 'hamster') return getHamsterSpriteBase()
 
   return getHedgehogSpriteBase()
 }
@@ -191,17 +194,99 @@ function getHedgehogSpriteBase(): PetPixelCell[] {
     cell(7, 20, 3, 1, 'body', 'foot'),
     cell(15, 20, 3, 1, 'body', 'foot'),
 
-    cell(10, 8, 8, 10, 'outline', 'head'),
-    cell(11, 9, 6, 8, 'body', 'head'),
-    cell(15, 11, 3, 5, 'outline', 'muzzle'),
-    cell(16, 12, 2, 3, 'body', 'muzzle'),
-    cell(17, 13, 1, 1, 'contrast', 'muzzle'),
+    cell(10, 8, 9, 10, 'outline', 'head'),
+    cell(11, 9, 7, 8, 'body', 'head'),
+    cell(16, 11, 4, 5, 'outline', 'muzzle'),
+    cell(17, 12, 3, 3, 'body', 'muzzle'),
+    cell(19, 13, 1, 1, 'contrast', 'muzzle'),
+  ]
+}
+
+function getRabbitSpriteBase(): PetPixelCell[] {
+  return [
+    cell(7, 2, 4, 9, 'outline', 'ear'),
+    cell(8, 3, 2, 7, 'body', 'ear'),
+    cell(14, 2, 4, 9, 'outline', 'ear'),
+    cell(15, 3, 2, 7, 'body', 'ear'),
+    cell(8, 4, 1, 5, 'cheek', 'ear'),
+    cell(16, 4, 1, 5, 'cheek', 'ear'),
+
+    cell(5, 8, 15, 10, 'outline', 'head'),
+    cell(6, 9, 13, 8, 'body', 'head'),
+    cell(7, 15, 11, 2, 'shade', 'head'),
+
+    cell(9, 17, 7, 3, 'outline', 'body'),
+    cell(10, 17, 5, 2, 'body', 'body'),
+    cell(10, 18, 5, 1, 'shade', 'shade'),
+
+    cell(3, 15, 3, 3, 'outline', 'tail'),
+    cell(4, 16, 1, 1, 'body', 'tail'),
+
+    cell(6, 20, 5, 2, 'outline', 'foot'),
+    cell(14, 20, 5, 2, 'outline', 'foot'),
+    cell(7, 20, 3, 1, 'body', 'foot'),
+    cell(15, 20, 3, 1, 'body', 'foot'),
+  ]
+}
+
+function getPenguinSpriteBase(): PetPixelCell[] {
+  return [
+    cell(7, 5, 10, 14, 'outline', 'head'),
+    cell(6, 9, 12, 8, 'outline', 'head'),
+    cell(8, 6, 8, 12, 'shade', 'head'),
+    cell(9, 8, 6, 10, 'body', 'muzzle'),
+
+    cell(5, 12, 2, 5, 'outline', 'ear'),
+    cell(17, 12, 2, 5, 'outline', 'ear'),
+    cell(6, 13, 1, 3, 'shade', 'ear'),
+    cell(17, 13, 1, 3, 'shade', 'ear'),
+
+    cell(9, 17, 6, 3, 'outline', 'body'),
+    cell(10, 17, 4, 2, 'body', 'body'),
+    cell(10, 18, 4, 1, 'shade', 'shade'),
+
+    cell(6, 17, 3, 2, 'outline', 'tail'),
+    cell(15, 17, 3, 2, 'outline', 'tail'),
+
+    cell(7, 20, 5, 2, 'accent', 'foot'),
+    cell(14, 20, 5, 2, 'accent', 'foot'),
+    cell(8, 21, 3, 1, 'outline', 'foot'),
+    cell(15, 21, 3, 1, 'outline', 'foot'),
+  ]
+}
+
+function getHamsterSpriteBase(): PetPixelCell[] {
+  return [
+    cell(5, 6, 5, 5, 'outline', 'ear'),
+    cell(15, 6, 5, 5, 'outline', 'ear'),
+    cell(6, 7, 3, 3, 'shade', 'ear'),
+    cell(16, 7, 3, 3, 'shade', 'ear'),
+
+    cell(4, 8, 16, 11, 'outline', 'head'),
+    cell(5, 9, 14, 9, 'body', 'head'),
+    cell(7, 13, 4, 3, 'shade', 'cheek'),
+    cell(14, 13, 4, 3, 'shade', 'cheek'),
+
+    cell(8, 17, 8, 3, 'outline', 'body'),
+    cell(9, 17, 6, 2, 'body', 'body'),
+    cell(9, 18, 6, 1, 'shade', 'shade'),
+
+    cell(3, 16, 3, 2, 'outline', 'tail'),
+    cell(4, 16, 1, 1, 'body', 'tail'),
+
+    cell(6, 20, 5, 2, 'outline', 'foot'),
+    cell(14, 20, 5, 2, 'outline', 'foot'),
+    cell(7, 20, 3, 1, 'body', 'foot'),
+    cell(15, 20, 3, 1, 'body', 'foot'),
   ]
 }
 
 function getFaceCells(status: PetStatus, species: PetSpecies): PetPixelCell[] {
   if (species === 'cat') return getCatFaceCells(status)
   if (species === 'dog') return getDogFaceCells(status)
+  if (species === 'rabbit') return getRabbitFaceCells(status)
+  if (species === 'penguin') return getPenguinFaceCells(status)
+  if (species === 'hamster') return getHamsterFaceCells(status)
 
   return getHedgehogFaceCells(status)
 }
@@ -335,18 +420,220 @@ function getDogFaceCells(status: PetStatus): PetPixelCell[] {
   ]
 }
 
+function getRabbitFaceCells(status: PetStatus): PetPixelCell[] {
+  if (status === 'sleepy') {
+    return [
+      cell(8, 12, 3, 1, 'contrast', 'face'),
+      cell(14, 12, 3, 1, 'contrast', 'face'),
+      cell(12, 14, 1, 1, 'cheek', 'face'),
+      cell(11, 16, 3, 1, 'contrast', 'face'),
+    ]
+  }
+
+  if (status === 'dirty') {
+    return [
+      cell(9, 12, 1, 1, 'contrast', 'face'),
+      cell(15, 12, 1, 1, 'contrast', 'face'),
+      cell(12, 14, 1, 1, 'cheek', 'face'),
+      cell(10, 16, 1, 1, 'contrast', 'face'),
+      cell(12, 17, 2, 1, 'contrast', 'face'),
+      cell(14, 16, 1, 1, 'contrast', 'face'),
+    ]
+  }
+
+  if (status === 'bored') {
+    return [
+      cell(8, 12, 3, 1, 'contrast', 'face'),
+      cell(14, 12, 3, 1, 'contrast', 'face'),
+      cell(12, 14, 1, 1, 'cheek', 'face'),
+      cell(10, 16, 5, 1, 'contrast', 'face'),
+    ]
+  }
+
+  if (status === 'hungry') {
+    return [
+      cell(9, 12, 1, 1, 'contrast', 'face'),
+      cell(15, 12, 1, 1, 'contrast', 'face'),
+      cell(12, 14, 1, 1, 'cheek', 'face'),
+      cell(11, 16, 3, 2, 'contrast', 'face'),
+    ]
+  }
+
+  if (status === 'excited') {
+    return [
+      cell(8, 11, 2, 2, 'contrast', 'face'),
+      cell(15, 11, 2, 2, 'contrast', 'face'),
+      cell(12, 14, 1, 1, 'cheek', 'face'),
+      cell(10, 16, 1, 1, 'contrast', 'face'),
+      cell(11, 17, 1, 1, 'contrast', 'face'),
+      cell(12, 16, 1, 1, 'contrast', 'face'),
+      cell(13, 17, 1, 1, 'contrast', 'face'),
+      cell(14, 16, 1, 1, 'contrast', 'face'),
+      cell(7, 14, 1, 1, 'cheek', 'cheek'),
+      cell(17, 14, 1, 1, 'cheek', 'cheek'),
+    ]
+  }
+
+  return [
+    cell(9, 12, 1, 1, 'contrast', 'face'),
+    cell(15, 12, 1, 1, 'contrast', 'face'),
+    cell(12, 14, 1, 1, 'cheek', 'face'),
+    cell(10, 16, 1, 1, 'contrast', 'face'),
+    cell(11, 17, 1, 1, 'contrast', 'face'),
+    cell(12, 16, 1, 1, 'contrast', 'face'),
+    cell(13, 17, 1, 1, 'contrast', 'face'),
+    cell(14, 16, 1, 1, 'contrast', 'face'),
+    cell(7, 14, 1, 1, 'cheek', 'cheek'),
+    cell(17, 14, 1, 1, 'cheek', 'cheek'),
+  ]
+}
+
+function getPenguinFaceCells(status: PetStatus): PetPixelCell[] {
+  if (status === 'sleepy') {
+    return [
+      cell(8, 10, 3, 1, 'contrast', 'face'),
+      cell(14, 10, 3, 1, 'contrast', 'face'),
+      cell(11, 12, 3, 2, 'accent', 'muzzle'),
+      cell(11, 15, 3, 1, 'contrast', 'face'),
+    ]
+  }
+
+  if (status === 'dirty') {
+    return [
+      cell(9, 10, 1, 1, 'contrast', 'face'),
+      cell(15, 10, 1, 1, 'contrast', 'face'),
+      cell(11, 12, 3, 2, 'accent', 'muzzle'),
+      cell(11, 15, 3, 1, 'contrast', 'face'),
+      cell(8, 14, 1, 1, 'dirt', 'dirt'),
+    ]
+  }
+
+  if (status === 'bored') {
+    return [
+      cell(8, 10, 3, 1, 'contrast', 'face'),
+      cell(14, 10, 3, 1, 'contrast', 'face'),
+      cell(11, 12, 3, 2, 'accent', 'muzzle'),
+      cell(10, 15, 5, 1, 'contrast', 'face'),
+    ]
+  }
+
+  if (status === 'hungry') {
+    return [
+      cell(9, 10, 1, 1, 'contrast', 'face'),
+      cell(15, 10, 1, 1, 'contrast', 'face'),
+      cell(11, 12, 4, 3, 'accent', 'muzzle'),
+      cell(12, 14, 1, 1, 'contrast', 'face'),
+    ]
+  }
+
+  if (status === 'excited') {
+    return [
+      cell(8, 9, 2, 2, 'contrast', 'face'),
+      cell(15, 9, 2, 2, 'contrast', 'face'),
+      cell(11, 12, 3, 2, 'accent', 'muzzle'),
+      cell(10, 15, 1, 1, 'contrast', 'face'),
+      cell(11, 16, 3, 1, 'contrast', 'face'),
+      cell(14, 15, 1, 1, 'contrast', 'face'),
+    ]
+  }
+
+  return [
+    cell(9, 10, 1, 1, 'contrast', 'face'),
+    cell(15, 10, 1, 1, 'contrast', 'face'),
+    cell(11, 12, 3, 2, 'accent', 'muzzle'),
+    cell(10, 15, 1, 1, 'contrast', 'face'),
+    cell(11, 16, 3, 1, 'contrast', 'face'),
+    cell(14, 15, 1, 1, 'contrast', 'face'),
+  ]
+}
+
+function getHamsterFaceCells(status: PetStatus): PetPixelCell[] {
+  if (status === 'sleepy') {
+    return [
+      cell(8, 12, 3, 1, 'contrast', 'face'),
+      cell(14, 12, 3, 1, 'contrast', 'face'),
+      cell(12, 14, 1, 1, 'cheek', 'face'),
+      cell(11, 16, 3, 1, 'contrast', 'face'),
+    ]
+  }
+
+  if (status === 'dirty') {
+    return [
+      cell(9, 12, 1, 1, 'contrast', 'face'),
+      cell(15, 12, 1, 1, 'contrast', 'face'),
+      cell(12, 14, 1, 1, 'cheek', 'face'),
+      cell(10, 16, 1, 1, 'contrast', 'face'),
+      cell(12, 17, 2, 1, 'contrast', 'face'),
+      cell(14, 16, 1, 1, 'contrast', 'face'),
+    ]
+  }
+
+  if (status === 'bored') {
+    return [
+      cell(8, 12, 3, 1, 'contrast', 'face'),
+      cell(14, 12, 3, 1, 'contrast', 'face'),
+      cell(12, 14, 1, 1, 'cheek', 'face'),
+      cell(10, 16, 5, 1, 'contrast', 'face'),
+    ]
+  }
+
+  if (status === 'hungry') {
+    return [
+      cell(9, 12, 1, 1, 'contrast', 'face'),
+      cell(15, 12, 1, 1, 'contrast', 'face'),
+      cell(12, 14, 1, 1, 'cheek', 'face'),
+      cell(11, 16, 3, 2, 'contrast', 'face'),
+    ]
+  }
+
+  if (status === 'excited') {
+    return [
+      cell(8, 11, 2, 2, 'contrast', 'face'),
+      cell(15, 11, 2, 2, 'contrast', 'face'),
+      cell(12, 14, 1, 1, 'cheek', 'face'),
+      cell(10, 16, 1, 1, 'contrast', 'face'),
+      cell(11, 17, 1, 1, 'contrast', 'face'),
+      cell(12, 16, 1, 1, 'contrast', 'face'),
+      cell(13, 17, 1, 1, 'contrast', 'face'),
+      cell(14, 16, 1, 1, 'contrast', 'face'),
+      cell(7, 14, 1, 1, 'cheek', 'cheek'),
+      cell(17, 14, 1, 1, 'cheek', 'cheek'),
+    ]
+  }
+
+  return [
+    cell(9, 12, 1, 1, 'contrast', 'face'),
+    cell(15, 12, 1, 1, 'contrast', 'face'),
+    cell(12, 14, 1, 1, 'cheek', 'face'),
+    cell(10, 16, 1, 1, 'contrast', 'face'),
+    cell(11, 17, 1, 1, 'contrast', 'face'),
+    cell(12, 16, 1, 1, 'contrast', 'face'),
+    cell(13, 17, 1, 1, 'contrast', 'face'),
+    cell(14, 16, 1, 1, 'contrast', 'face'),
+    cell(7, 14, 1, 1, 'cheek', 'cheek'),
+    cell(17, 14, 1, 1, 'cheek', 'cheek'),
+  ]
+}
+
 function getHedgehogFaceCells(status: PetStatus): PetPixelCell[] {
   if (status === 'sleepy') {
     return [
       cell(12, 11, 3, 1, 'contrast', 'face'),
-      cell(14, 15, 1, 1, 'contrast', 'face'),
+      cell(16, 13, 2, 1, 'contrast', 'face'),
+      cell(14, 16, 1, 1, 'contrast', 'face'),
+      cell(16, 16, 1, 1, 'contrast', 'face'),
+      cell(17, 15, 1, 1, 'cheek', 'cheek'),
+      cell(12, 14, 1, 1, 'cheek', 'cheek'),
     ]
   }
 
   if (status === 'dirty') {
     return [
       cell(12, 11, 1, 1, 'contrast', 'face'),
-      cell(14, 15, 2, 1, 'contrast', 'face'),
+      cell(16, 13, 1, 1, 'contrast', 'face'),
+      cell(14, 16, 2, 1, 'contrast', 'face'),
+      cell(17, 15, 1, 1, 'cheek', 'cheek'),
+      cell(12, 14, 1, 1, 'cheek', 'cheek'),
       cell(11, 13, 1, 1, 'dirt', 'dirt'),
     ]
   }
@@ -354,34 +641,47 @@ function getHedgehogFaceCells(status: PetStatus): PetPixelCell[] {
   if (status === 'bored') {
     return [
       cell(12, 11, 3, 1, 'contrast', 'face'),
-      cell(13, 15, 3, 1, 'contrast', 'face'),
+      cell(16, 13, 2, 1, 'contrast', 'face'),
+      cell(13, 16, 4, 1, 'contrast', 'face'),
+      cell(17, 15, 1, 1, 'cheek', 'cheek'),
+      cell(12, 14, 1, 1, 'cheek', 'cheek'),
     ]
   }
 
   if (status === 'hungry') {
     return [
       cell(12, 11, 1, 1, 'contrast', 'face'),
-      cell(15, 14, 2, 2, 'contrast', 'face'),
-      cell(14, 15, 1, 1, 'cheek', 'face'),
+      cell(16, 13, 1, 1, 'contrast', 'face'),
+      cell(15, 15, 3, 2, 'contrast', 'face'),
+      cell(17, 15, 1, 1, 'cheek', 'cheek'),
+      cell(12, 14, 1, 1, 'cheek', 'cheek'),
     ]
   }
 
   if (status === 'excited') {
     return [
       cell(12, 10, 2, 2, 'contrast', 'face'),
-      cell(13, 14, 1, 1, 'contrast', 'face'),
-      cell(14, 15, 2, 1, 'contrast', 'face'),
-      cell(16, 14, 1, 1, 'contrast', 'face'),
+      cell(16, 12, 2, 2, 'contrast', 'face'),
+      cell(13, 15, 1, 1, 'contrast', 'face'),
+      cell(14, 16, 1, 1, 'contrast', 'face'),
+      cell(15, 15, 1, 1, 'contrast', 'face'),
+      cell(16, 16, 1, 1, 'contrast', 'face'),
+      cell(17, 15, 1, 1, 'contrast', 'face'),
       cell(11, 13, 1, 1, 'cheek', 'cheek'),
+      cell(18, 14, 1, 1, 'cheek', 'cheek'),
     ]
   }
 
   return [
     cell(12, 11, 1, 1, 'contrast', 'face'),
-    cell(13, 14, 1, 1, 'contrast', 'face'),
-    cell(14, 15, 2, 1, 'contrast', 'face'),
-    cell(16, 14, 1, 1, 'contrast', 'face'),
+    cell(16, 13, 1, 1, 'contrast', 'face'),
+    cell(13, 15, 1, 1, 'contrast', 'face'),
+    cell(14, 16, 1, 1, 'contrast', 'face'),
+    cell(15, 15, 1, 1, 'contrast', 'face'),
+    cell(16, 16, 1, 1, 'contrast', 'face'),
+    cell(17, 15, 1, 1, 'contrast', 'face'),
     cell(11, 13, 1, 1, 'cheek', 'cheek'),
+    cell(18, 14, 1, 1, 'cheek', 'cheek'),
   ]
 }
 

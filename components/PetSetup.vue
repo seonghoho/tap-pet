@@ -18,6 +18,15 @@ const options: Array<{
   {
     species: 'hedgehog',
   },
+  {
+    species: 'rabbit',
+  },
+  {
+    species: 'penguin',
+  },
+  {
+    species: 'hamster',
+  },
 ]
 </script>
 

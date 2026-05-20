@@ -4,7 +4,7 @@ import type { PetSpecies, PetStatus } from '~/types/pet'
 import { getFaviconSvg } from '~/utils/tabPresentation'
 import { getPetPixelSpriteCells, renderPetPixelSpriteSvg } from '~/utils/petPixelSprite'
 
-const SPECIES: PetSpecies[] = ['cat', 'dog', 'hedgehog']
+const SPECIES: PetSpecies[] = ['cat', 'dog', 'hedgehog', 'rabbit', 'penguin', 'hamster']
 const STATUSES: PetStatus[] = ['fine', 'hungry', 'sleepy', 'dirty', 'bored', 'happy', 'excited']
 
 describe('pet pixel sprite', () => {
@@ -59,7 +59,7 @@ describe('pet pixel sprite', () => {
     expect(dogMuzzleCells.length).toBeGreaterThan(0)
   })
 
-  it('keeps hedgehog identity cute with a rounded curled silhouette', () => {
+  it('keeps hedgehog identity cute with a clearer face-forward silhouette', () => {
     const hedgehogCells = getPetPixelSpriteCells({
       species: 'hedgehog',
       status: 'happy',
@@ -71,15 +71,32 @@ describe('pet pixel sprite', () => {
     const muzzleCells = hedgehogCells.filter((cell) => cell.role === 'muzzle')
     const cheekCells = hedgehogCells.filter((cell) => cell.role === 'cheek')
     const tailCells = hedgehogCells.filter((cell) => cell.role === 'tail')
+    const faceCells = hedgehogCells.filter((cell) => cell.role === 'face')
 
     expect(spineCells.length).toBeGreaterThanOrEqual(3)
     expect(Math.min(...spineCells.map((cell) => cell.y))).toBeGreaterThanOrEqual(6)
     expect(Math.min(...headCells.map((cell) => cell.x))).toBeLessThanOrEqual(11)
     expect(Math.max(...headCells.map((cell) => cell.x + cell.width))).toBeLessThanOrEqual(19)
     expect(muzzleCells.length).toBeGreaterThan(0)
-    expect(Math.max(...muzzleCells.map((cell) => cell.x + cell.width))).toBeLessThanOrEqual(18)
-    expect(cheekCells.length).toBeGreaterThan(0)
+    expect(Math.max(...muzzleCells.map((cell) => cell.x + cell.width))).toBeGreaterThanOrEqual(20)
+    expect(faceCells.length).toBeGreaterThanOrEqual(5)
+    expect(cheekCells.length).toBeGreaterThanOrEqual(2)
     expect(tailCells.length).toBeGreaterThan(0)
+  })
+
+  it('adds rabbit, penguin, and hamster silhouettes with distinct favicon-scale features', () => {
+    const rabbitCells = getPetPixelSpriteCells({ species: 'rabbit', status: 'happy' })
+    const penguinCells = getPetPixelSpriteCells({ species: 'penguin', status: 'happy' })
+    const hamsterCells = getPetPixelSpriteCells({ species: 'hamster', status: 'happy' })
+    const rabbitEarCells = rabbitCells.filter((cell) => cell.role === 'ear')
+    const penguinMuzzleCells = penguinCells.filter((cell) => cell.role === 'muzzle')
+    const hamsterCheekCells = hamsterCells.filter((cell) => cell.role === 'cheek')
+
+    expect(Math.min(...rabbitEarCells.map((cell) => cell.y))).toBeLessThanOrEqual(3)
+    expect(Math.max(...rabbitEarCells.map((cell) => cell.y + cell.height))).toBeGreaterThanOrEqual(10)
+    expect(penguinMuzzleCells.some((cell) => cell.color === 'accent')).toBe(true)
+    expect(hamsterCheekCells.length).toBeGreaterThanOrEqual(2)
+    expect(hamsterCheekCells.some((cell) => cell.width >= 3)).toBe(true)
   })
 
   it('gives the cat a softer cat-specific silhouette instead of a dog-like face', () => {

@@ -204,6 +204,19 @@ describe('pet storage validation', () => {
     expect(state.name).toBe('밤이')
   })
 
+  it('round-trips rabbit, penguin, and hamster pet states', () => {
+    expect(createInitialPetState('rabbit', 1000).name).toBe('토리')
+    expect(createInitialPetState('penguin', 1000).name).toBe('펭이')
+    expect(createInitialPetState('hamster', 1000).name).toBe('콩이')
+
+    for (const species of ['rabbit', 'penguin', 'hamster'] as const) {
+      const state = createInitialPetState(species, 1000)
+      const stored = toStoredPetState(state, PET_STORAGE_VERSION)
+
+      expect(parseStoredPetState(stored, 2000)).toEqual(state)
+    }
+  })
+
   it('preserves valid new theme ids when migrating v1 state', () => {
     const migrated = parseStoredPetState(
       {

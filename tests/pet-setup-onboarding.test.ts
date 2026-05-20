@@ -44,6 +44,14 @@ describe('pet setup onboarding', () => {
     expect(template).toContain('messages.setup.localSave')
   })
 
+  it('offers rabbit, penguin, and hamster as selectable tab pets', () => {
+    const source = readSource('components/PetSetup.vue')
+
+    expect(source).toContain("species: 'rabbit'")
+    expect(source).toContain("species: 'penguin'")
+    expect(source).toContain("species: 'hamster'")
+  })
+
   it('keeps onboarding copy localized for every supported language', () => {
     for (const locale of SUPPORTED_LOCALES) {
       const setup = I18N_MESSAGES[locale].setup

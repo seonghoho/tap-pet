@@ -107,6 +107,9 @@ describe('getFaviconSvg', () => {
     expect(getFaviconSvg('cat', 'happy', 'system')).toMatch(/^<svg[\s\S]*<\/svg>$/)
     expect(getFaviconSvg('dog', 'sleepy', 'light')).toMatch(/^<svg[\s\S]*<\/svg>$/)
     expect(getFaviconSvg('hedgehog', 'excited', 'dark')).toMatch(/^<svg[\s\S]*<\/svg>$/)
+    expect(getFaviconSvg('rabbit', 'happy', 'system')).toMatch(/^<svg[\s\S]*<\/svg>$/)
+    expect(getFaviconSvg('penguin', 'hungry', 'light')).toMatch(/^<svg[\s\S]*<\/svg>$/)
+    expect(getFaviconSvg('hamster', 'dirty', 'dark')).toMatch(/^<svg[\s\S]*<\/svg>$/)
   })
 
   it('produces different output for different statuses', () => {

@@ -26,7 +26,7 @@ import { createDailyGoal, normalizeDailyGoalState } from '~/utils/petDailyGoal'
 import { normalizeGrowth } from '~/utils/petGrowth'
 import { createPetPersonalityState, normalizePetPersonalityState } from '~/utils/petPersonality'
 
-const PET_SPECIES = ['cat', 'dog', 'hedgehog'] as const
+const PET_SPECIES = ['cat', 'dog', 'hedgehog', 'rabbit', 'penguin', 'hamster'] as const
 
 export function clampStat(value: number): number {
   if (!Number.isFinite(value)) return STAT_MIN
