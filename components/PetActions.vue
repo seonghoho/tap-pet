@@ -278,34 +278,20 @@ const recommendedActionCooldownRemaining = computed(() => {
 
   return Math.max(0, props.cooldowns[recommendation.action] - now.value)
 })
-const recommendationCtaStatus = computed(() =>
-  recommendedActionCooldownRemaining.value > 0 ? 'cooldown' : 'ready',
-)
-const recommendationCtaStatusText = computed(() => {
-  if (!shouldShowRecommendation.value) return ''
-
-  if (recommendationCtaStatus.value === 'cooldown') {
-    return messages.value.careRecommendation.ctaCooldown.replace(
-      '{time}',
-      formatRemainingTime(recommendedActionCooldownRemaining.value),
-    )
-  }
-
-  return messages.value.careRecommendation.ctaReady
-})
-const recommendationCtaStatusClass = computed(() =>
-  `action-recommendation__cta--${recommendationCtaStatus.value}`,
-)
 const nextAvailabilityCoolingAction = computed(() => {
   const coolingAction = nextCoolingAction.value
   if (!coolingAction) return null
 
-  const recommendedCooldownAction =
-    shouldShowRecommendation.value && recommendationCtaStatus.value === 'cooldown'
-      ? props.recommendedCareAction?.action
-      : null
+  const recommendation = props.recommendedCareAction
 
-  if (coolingAction.id === recommendedCooldownAction) return null
+  if (
+    shouldShowRecommendation.value &&
+    recommendation &&
+    coolingAction.id === recommendation.action &&
+    recommendedActionCooldownRemaining.value > 0
+  ) {
+    return null
+  }
 
   return coolingAction
 })
@@ -585,13 +571,6 @@ function getLevelUnlockDetail(unlock: PetLevelUnlock): string {
       </div>
       <div class="action-recommendation__support">
         <small>{{ recommendationDetail }}</small>
-        <span
-          v-if="recommendationCtaStatusText"
-          class="action-recommendation__cta"
-          :class="recommendationCtaStatusClass"
-        >
-          {{ recommendationCtaStatusText }}
-        </span>
         <span v-if="shouldShowRecommendationEvidence" class="action-recommendation__evidence">
           {{ recommendationEvidenceText }}
         </span>

@@ -212,97 +212,136 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
         @claim="emit('claimDailyGoal')"
       />
 
-      <section class="pet-personality" aria-labelledby="pet-personality-title">
-        <div class="pet-personality__copy">
-          <span>{{ messages.personality.heading }}</span>
-          <strong id="pet-personality-title">{{ personalityName }}</strong>
-          <small>{{ personalityDetail }}</small>
+      <section class="premium-tab-pack premium-tab-pack--compact" aria-labelledby="premium-tab-pack-preview-title">
+        <div class="premium-tab-pack__header">
+          <span>{{ messages.premium.lockedLabel }}</span>
+          <strong id="premium-tab-pack-preview-title">{{ messages.premium.heading }}</strong>
+          <small>{{ messages.premium.description }}</small>
         </div>
 
-        <p class="pet-personality__bonus">
-          {{ personalityBonusText }}
-        </p>
-        <span
-          class="pet-personality__progress"
-          role="progressbar"
-          :aria-label="personalityProgressText"
-          :aria-valuemin="0"
-          :aria-valuenow="personalityProgress.current"
-          :aria-valuemax="personalityProgress.required"
-        />
-      </section>
-
-      <section class="progress-goals" aria-labelledby="progress-goals-title">
-        <div class="progress-goals__copy">
-          <strong id="progress-goals-title">{{ messages.sidePanelProgress.progressGoalHeading }}</strong>
-        </div>
-
-        <div class="progress-goals__list">
-          <div
-            v-for="goal in progressGoalRows"
-            :key="goal.id"
-            class="progress-goal"
-          >
-            <span>{{ goal.label }}</span>
-            <strong>{{ goal.text }}</strong>
-            <small>{{ goal.detail }}</small>
+        <div class="premium-lock-group">
+          <div class="premium-lock-row premium-lock-row--static">
+            <span>{{ messages.premium.workTitlePack }}</span>
+            <small>{{ messages.premium.workTitlePackDetail }}</small>
+            <em>{{ messages.premium.lockedLabel }}</em>
+          </div>
+          <div class="premium-lock-row premium-lock-row--static">
+            <span>{{ messages.premium.quietSignalPack }}</span>
+            <small>{{ messages.premium.quietSignalPackDetail }}</small>
+            <em>{{ messages.premium.lockedLabel }}</em>
           </div>
         </div>
       </section>
 
-      <section class="level-unlocks" aria-labelledby="level-unlocks-title">
+      <template v-if="hasStartedFirstCareLoop">
+        <section class="pet-personality" aria-labelledby="pet-personality-title">
+          <div class="pet-personality__copy">
+            <span>{{ messages.personality.heading }}</span>
+            <strong id="pet-personality-title">{{ personalityName }}</strong>
+            <small>{{ personalityDetail }}</small>
+          </div>
+
+          <p class="pet-personality__bonus">
+            {{ personalityBonusText }}
+          </p>
+          <span
+            class="pet-personality__progress"
+            role="progressbar"
+            :aria-label="personalityProgressText"
+            :aria-valuemin="0"
+            :aria-valuenow="personalityProgress.current"
+            :aria-valuemax="personalityProgress.required"
+          />
+        </section>
+
+        <section class="progress-goals" aria-labelledby="progress-goals-title">
+          <div class="progress-goals__copy">
+            <strong id="progress-goals-title">{{ messages.sidePanelProgress.progressGoalHeading }}</strong>
+          </div>
+
+          <div class="progress-goals__list">
+            <div
+              v-for="goal in progressGoalRows"
+              :key="goal.id"
+              class="progress-goal"
+            >
+              <span>{{ goal.label }}</span>
+              <strong>{{ goal.text }}</strong>
+              <small>{{ goal.detail }}</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="level-unlocks" aria-labelledby="level-unlocks-title">
+          <div class="level-unlocks__copy">
+            <strong id="level-unlocks-title">{{ messages.levelUnlocks.heading }}</strong>
+            <small>{{ messages.levelUnlocks.description }}</small>
+          </div>
+
+          <div class="level-unlocks__list">
+            <div
+              v-for="unlock in availableLevelUnlocks"
+              :key="unlock.id"
+              class="level-unlock"
+            >
+              <span>{{ messages.levelUnlocks.availableLabel }} · {{ getLevelUnlockRequirement(unlock) }}</span>
+              <strong>{{ getLevelUnlockName(unlock) }}</strong>
+              <small>{{ getLevelUnlockDetail(unlock) }}</small>
+            </div>
+
+            <div
+              v-if="nextLevelUnlock"
+              class="level-unlock level-unlock--next"
+            >
+              <span>{{ messages.levelUnlocks.nextLabel }} · {{ getLevelUnlockRequirement(nextLevelUnlock) }}</span>
+              <strong>{{ getLevelUnlockName(nextLevelUnlock) }}</strong>
+              <small>{{ getLevelUnlockDetail(nextLevelUnlock) }}</small>
+            </div>
+          </div>
+
+          <p v-if="!nextLevelUnlock" class="level-unlocks__complete">
+            {{ messages.levelUnlocks.allUnlocked }}
+          </p>
+        </section>
+
+        <div class="progress-list">
+          <div class="stat-row">
+            <div class="stat-row__label">
+              <span>{{ messages.stats.level }} {{ level }}</span>
+              <strong>{{ levelProgress.current }} / {{ levelProgress.required }} {{ messages.stats.exp }}</strong>
+            </div>
+            <div class="stat-track" aria-hidden="true">
+              <div class="stat-fill" :style="{ width: `${levelProgress.percent}%` }" />
+            </div>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat-row__label">
+              <span>{{ messages.stats.affinity }} {{ affinityProgress.level }}</span>
+              <strong>{{ affinityProgress.current }} / {{ affinityProgress.required }}</strong>
+            </div>
+            <div class="stat-track" aria-hidden="true">
+              <div class="stat-fill" :style="{ width: `${affinityProgress.percent}%` }" />
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <section v-else class="level-unlocks level-unlocks--compact" aria-labelledby="level-unlocks-title">
         <div class="level-unlocks__copy">
           <strong id="level-unlocks-title">{{ messages.levelUnlocks.heading }}</strong>
           <small>{{ messages.levelUnlocks.description }}</small>
         </div>
 
-        <div class="level-unlocks__list">
-          <div
-            v-for="unlock in availableLevelUnlocks"
-            :key="unlock.id"
-            class="level-unlock"
-          >
-            <span>{{ messages.levelUnlocks.availableLabel }} · {{ getLevelUnlockRequirement(unlock) }}</span>
-            <strong>{{ getLevelUnlockName(unlock) }}</strong>
-            <small>{{ getLevelUnlockDetail(unlock) }}</small>
-          </div>
-
-          <div
-            v-if="nextLevelUnlock"
-            class="level-unlock level-unlock--next"
-          >
+        <div
+          v-if="nextLevelUnlock"
+          class="level-unlock level-unlock--next"
+        >
             <span>{{ messages.levelUnlocks.nextLabel }} · {{ getLevelUnlockRequirement(nextLevelUnlock) }}</span>
             <strong>{{ getLevelUnlockName(nextLevelUnlock) }}</strong>
             <small>{{ getLevelUnlockDetail(nextLevelUnlock) }}</small>
-          </div>
         </div>
-
-        <p v-if="!nextLevelUnlock" class="level-unlocks__complete">
-          {{ messages.levelUnlocks.allUnlocked }}
-        </p>
       </section>
-
-      <div class="progress-list">
-        <div class="stat-row">
-          <div class="stat-row__label">
-            <span>{{ messages.stats.level }} {{ level }}</span>
-            <strong>{{ levelProgress.current }} / {{ levelProgress.required }} {{ messages.stats.exp }}</strong>
-          </div>
-          <div class="stat-track" aria-hidden="true">
-            <div class="stat-fill" :style="{ width: `${levelProgress.percent}%` }" />
-          </div>
-        </div>
-
-        <div class="stat-row">
-          <div class="stat-row__label">
-            <span>{{ messages.stats.affinity }} {{ affinityProgress.level }}</span>
-            <strong>{{ affinityProgress.current }} / {{ affinityProgress.required }}</strong>
-          </div>
-          <div class="stat-track" aria-hidden="true">
-            <div class="stat-fill" :style="{ width: `${affinityProgress.percent}%` }" />
-          </div>
-        </div>
-      </div>
     </div>
 
     <PetSettingsPanel

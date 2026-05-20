@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import {
+  PREMIUM_QUIET_SIGNAL_PACKS,
+  PREMIUM_THEME_PACKS,
+  PREMIUM_WORK_TITLE_PACKS,
+} from '~/constants/premium'
 import { PET_THEMES } from '~/constants/themes'
 import { DISGUISE_TITLES, getDisguiseTitleLabel } from '~/constants/titles'
+import type { PremiumMockItem } from '~/constants/premium'
 import type {
   DisguiseTitleId,
   PetSettings,
@@ -112,6 +118,14 @@ function setTheme(themeId: ThemeId): void {
   emit('updateSettings', { themeId })
 }
 
+function getPremiumValue(item: PremiumMockItem): string {
+  return item.values[locale.value]
+}
+
+function getPremiumDetail(item: PremiumMockItem): string {
+  return item.detail[locale.value]
+}
+
 function requestReset(): void {
   isResetConfirming.value = true
 }
@@ -203,6 +217,61 @@ function confirmReset(): void {
         @change="commitCustomTitle"
       >
     </label>
+
+    <section class="premium-tab-pack" aria-labelledby="premium-tab-pack-heading">
+      <div class="premium-tab-pack__header">
+        <span>{{ messages.premium.lockedLabel }}</span>
+        <strong id="premium-tab-pack-heading">{{ messages.premium.heading }}</strong>
+        <small>{{ messages.premium.description }}</small>
+      </div>
+
+      <div class="premium-lock-group">
+        <strong>{{ messages.premium.workTitlePack }}</strong>
+        <button
+          v-for="item in PREMIUM_WORK_TITLE_PACKS"
+          :key="item.id"
+          class="premium-lock-row"
+          type="button"
+          :disabled="true"
+        >
+          <span>{{ getPremiumValue(item) }}</span>
+          <small>{{ getPremiumDetail(item) }}</small>
+          <em>{{ messages.premium.lockedLabel }}</em>
+        </button>
+      </div>
+
+      <div class="premium-lock-group">
+        <strong>{{ messages.premium.quietSignalPack }}</strong>
+        <button
+          v-for="item in PREMIUM_QUIET_SIGNAL_PACKS"
+          :key="item.id"
+          class="premium-lock-row"
+          type="button"
+          :disabled="true"
+        >
+          <span>{{ getPremiumValue(item) }}</span>
+          <small>{{ getPremiumDetail(item) }}</small>
+          <em>{{ messages.premium.lockedLabel }}</em>
+        </button>
+      </div>
+
+      <div class="premium-lock-group">
+        <strong>{{ messages.premium.themePack }}</strong>
+        <button
+          v-for="item in PREMIUM_THEME_PACKS"
+          :key="item.id"
+          class="premium-lock-row"
+          type="button"
+          :disabled="true"
+        >
+          <span>{{ getPremiumValue(item) }}</span>
+          <small>{{ getPremiumDetail(item) }}</small>
+          <em>{{ messages.premium.lockedLabel }}</em>
+        </button>
+      </div>
+
+      <p>{{ messages.premium.unavailable }}</p>
+    </section>
 
     <label class="settings-checkbox">
       <input

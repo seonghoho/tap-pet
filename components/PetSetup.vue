@@ -31,20 +31,6 @@ const options: Array<{
       </p>
     </div>
 
-    <div class="setup-flow" :aria-label="messages.setup.title">
-      <div
-        v-for="(step, index) in messages.setup.steps"
-        :key="step.id"
-        class="setup-flow__item"
-      >
-        <span class="setup-flow__index">{{ index + 1 }}</span>
-        <span>
-          <strong>{{ step.title }}</strong>
-          <small>{{ step.description }}</small>
-        </span>
-      </div>
-    </div>
-
     <div class="setup-tab-demo" :aria-label="messages.setup.tabPreview.label">
       <div>
         <strong>{{ messages.setup.tabPreview.label }}</strong>
@@ -55,8 +41,6 @@ const options: Array<{
         <span>{{ messages.setup.tabPreview.alert }}</span>
       </div>
     </div>
-
-    <p class="setup-save-note">{{ messages.setup.localSave }}</p>
 
     <div class="species-grid">
       <button
@@ -78,6 +62,22 @@ const options: Array<{
           <small>{{ messages.species[option.species].description }}</small>
         </span>
       </button>
+    </div>
+
+    <p class="setup-save-note">{{ messages.setup.localSave }}</p>
+
+    <div class="setup-flow setup-flow--compact" :aria-label="messages.setup.title">
+      <div
+        v-for="(step, index) in messages.setup.steps"
+        :key="step.id"
+        class="setup-flow__item"
+      >
+        <span class="setup-flow__index">{{ index + 1 }}</span>
+        <span>
+          <strong>{{ step.title }}</strong>
+          <small>{{ step.description }}</small>
+        </span>
+      </div>
     </div>
   </div>
 </template>

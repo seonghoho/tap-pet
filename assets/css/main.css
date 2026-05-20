@@ -718,6 +718,103 @@ a:focus-visible,
   gap: 8px;
 }
 
+.premium-tab-pack {
+  border-top: 1px solid var(--app-border);
+  display: grid;
+  gap: 12px;
+  padding-top: 14px;
+}
+
+.premium-tab-pack--compact {
+  background: color-mix(in srgb, var(--app-accent) 6%, var(--app-surface));
+  border: 1px solid color-mix(in srgb, var(--app-accent) 22%, var(--app-border));
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.premium-tab-pack__header {
+  display: grid;
+  gap: 4px;
+}
+
+.premium-tab-pack__header span {
+  color: var(--app-accent);
+  font-size: 0.74rem;
+  font-weight: 900;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.premium-tab-pack__header strong {
+  line-height: 1.25;
+}
+
+.premium-tab-pack__header small,
+.premium-tab-pack p {
+  color: var(--app-muted);
+  line-height: 1.35;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.premium-lock-group {
+  display: grid;
+  gap: 8px;
+}
+
+.premium-lock-group > strong {
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
+.premium-lock-row {
+  align-items: center;
+  background: var(--app-surface-strong);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  color: var(--app-text);
+  display: grid;
+  gap: 4px 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 48px;
+  padding: 9px 10px;
+  text-align: left;
+}
+
+.premium-lock-row:disabled {
+  cursor: not-allowed;
+  opacity: 0.82;
+}
+
+.premium-lock-row--static {
+  opacity: 1;
+}
+
+.premium-lock-row span {
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.premium-lock-row small {
+  color: var(--app-muted);
+  grid-column: 1 / -1;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.premium-lock-row em {
+  background: color-mix(in srgb, var(--app-accent) 12%, var(--app-surface));
+  border: 1px solid color-mix(in srgb, var(--app-accent) 30%, var(--app-border));
+  border-radius: 999px;
+  color: var(--app-accent);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1.2;
+  padding: 4px 7px;
+}
+
 .segmented-control {
   background: var(--app-surface-strong);
   border: 1px solid var(--app-border);
@@ -802,6 +899,15 @@ a:focus-visible,
   min-height: 104px;
   min-width: 0;
   padding: 12px;
+}
+
+.setup-flow--compact .setup-flow__item {
+  min-height: auto;
+  padding: 10px;
+}
+
+.setup-flow--compact .setup-flow__item small {
+  font-size: 0.82rem;
 }
 
 .setup-flow__index {
@@ -1748,34 +1854,6 @@ a:focus-visible,
   width: fit-content;
 }
 
-.action-recommendation__cta {
-  background: color-mix(in srgb, var(--app-success) 12%, var(--app-surface));
-  border: 1px solid color-mix(in srgb, var(--app-success) 30%, var(--app-border));
-  border-radius: 999px;
-  box-sizing: border-box;
-  color: var(--app-text);
-  display: inline-block;
-  font-size: 0.78rem;
-  font-weight: 900;
-  line-height: 1.25;
-  max-width: 100%;
-  min-width: 0;
-  overflow-wrap: anywhere;
-  padding: 5px 8px;
-  text-align: right;
-  width: fit-content;
-}
-
-.action-recommendation__cta--ready {
-  background: color-mix(in srgb, var(--app-success) 12%, var(--app-surface));
-  border-color: color-mix(in srgb, var(--app-success) 30%, var(--app-border));
-}
-
-.action-recommendation__cta--cooldown {
-  background: color-mix(in srgb, var(--app-warning) 11%, var(--app-surface));
-  border-color: color-mix(in srgb, var(--app-warning) 34%, var(--app-border));
-}
-
 .action-recommendation__evidence {
   background: color-mix(in srgb, var(--app-accent) 9%, var(--app-surface));
   border: 1px solid color-mix(in srgb, var(--app-accent) 26%, var(--app-border));
@@ -2660,10 +2738,6 @@ a:focus-visible,
   }
 
   .action-recommendation__reward {
-    text-align: left;
-  }
-
-  .action-recommendation__cta {
     text-align: left;
   }
 
