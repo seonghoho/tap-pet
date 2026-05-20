@@ -1,7 +1,7 @@
 import type { PetAction, PetGrowth, PetSettings, PetStats } from '~/types/pet'
 
 export const PET_STORAGE_KEY = 'tab-pet:state'
-export const PET_STORAGE_VERSION = 3
+export const PET_STORAGE_VERSION = 4
 
 export const DAILY_GOAL_REWARD_EXP = 20
 export const DAILY_GOAL_REWARD_AFFINITY_EXP = 4
@@ -96,6 +96,8 @@ export const ACTION_LIMIT_WINDOW_MS = 1000 * 60 * 30
 export const ACTION_LIMIT_BASE_USES = 5
 export const ACTION_LIMIT_AD_REWARD_USES = 5
 export const ACTION_LIMIT_REWARD_FEEDBACK_TTL_MS = 1000 * 12
+export const PET_PERSONALITY_ASSIGNMENT_ACTION_COUNT = 3
+export const PET_PERSONALITY_REWARD_BONUS_RATE = 0.1
 
 export const PET_RETURN_REPORT_MIN_ELAPSED_MS = 1000 * 60 * 30
 export const PET_RETURN_REPORT_SHORT_MAX_MS = 1000 * 60 * 60 * 2

@@ -7,6 +7,7 @@ export type PetDisplayStatus = PetNeedStatus | 'happy' | 'excited'
 export type PetStatus = PetDisplayStatus
 
 export type PetAction = 'feed' | 'play' | 'sleep' | 'wash'
+export type PetPersonality = 'calm' | 'hungry' | 'playful' | 'sleepy' | 'neat'
 export type PetStatKey = keyof PetStats
 export type PetCareRecommendationReason = 'need' | 'lowest-stat'
 
@@ -70,6 +71,19 @@ export type PetActionLimitRewardFeedback = {
   createdAt: number
 }
 
+export type PetPersonalityState = {
+  personality: PetPersonality | null
+  earlyActionCounts: Record<PetAction, number>
+  assignedAt: number | null
+}
+
+export type PetPersonalityBonus = {
+  personality: PetPersonality
+  action: PetAction
+  expBonus: number
+  affinityBonus: number
+}
+
 export type PetCareFeedback = {
   action: PetAction
   statChanges: PetStats
@@ -80,6 +94,11 @@ export type PetCareFeedback = {
   wasReduced: boolean
   createdAt: number
   levelUnlocks?: readonly PetLevelUnlock[]
+  personalityReveal?: {
+    personality: PetPersonality
+    reasonActionCounts: Record<PetAction, number>
+  }
+  personalityBonus?: PetPersonalityBonus
 }
 
 export type PetReturnReportBucket = 'short' | 'medium' | 'long' | 'capped'
@@ -131,6 +150,7 @@ export type PetState = {
   settings: PetSettings
   actionLimit: PetActionLimit
   dailyGoal: PetDailyGoalState
+  personality: PetPersonalityState
   lastUpdatedAt: number
   lastPlayedAt: number
 }
