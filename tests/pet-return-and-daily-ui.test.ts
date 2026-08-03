@@ -21,9 +21,9 @@ function readSource(sourcePath: string): string {
 describe('return report and daily goal UI', () => {
   it('renders the return report above care actions in the main pet flow', () => {
     const template = readComponentTemplate('app.vue')
-    const statusIndex = template.indexOf('<PetStatusPanel')
+    const statusIndex = template.indexOf('<PetCanvas')
     const reportIndex = template.indexOf('<PetReturnReport')
-    const actionsIndex = template.indexOf('<PetActions')
+    const actionsIndex = template.indexOf('<PetCareDock')
 
     expect(statusIndex).toBeGreaterThan(-1)
     expect(reportIndex).toBeGreaterThan(statusIndex)
@@ -31,12 +31,12 @@ describe('return report and daily goal UI', () => {
     expect(template).toContain(':report="pet.returnReport.value"')
   })
 
-  it('passes daily goal state into the side panel', () => {
+  it('keeps daily goal state out of the primary app shell', () => {
     const template = readComponentTemplate('app.vue')
 
-    expect(template).toContain(':daily-goal="pet.dailyGoal.value"')
-    expect(template).toContain(':daily-goal-reward-feedback="pet.dailyGoalRewardFeedback.value"')
-    expect(template).toContain('@claim-daily-goal="pet.claimDailyGoalReward"')
+    expect(template).not.toContain(':daily-goal="pet.dailyGoal.value"')
+    expect(template).not.toContain(':daily-goal-reward-feedback="pet.dailyGoalRewardFeedback.value"')
+    expect(template).not.toContain('@claim-daily-goal="pet.claimDailyGoalReward"')
   })
 
   it('renders the daily goal inside the side panel status body', () => {

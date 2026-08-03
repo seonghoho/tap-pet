@@ -155,22 +155,20 @@ describe('pet recommendation evidence', () => {
     vi.useRealTimers()
   })
 
-  it('passes current stats into the action controls', () => {
+  it('passes current stats into the compact needs display', () => {
     const appTemplate = readComponentTemplate('app.vue')
-    const source = readSource('components/PetActions.vue')
+    const source = readSource('components/PetNeeds.vue')
 
-    expect(getComponentPropExpression(appTemplate, 'PetActions', 'stats')).toBe('currentPet.stats')
+    expect(getComponentPropExpression(appTemplate, 'PetNeeds', 'stats')).toBe('currentPet.stats')
     expect(source).toContain('stats: PetStats')
   })
 
-  it('passes last played time into the action controls', () => {
+  it('keeps last-play evidence out of the focused care dock', () => {
     const appTemplate = readComponentTemplate('app.vue')
-    const source = readSource('components/PetActions.vue')
+    const source = readSource('components/PetCareDock.vue')
 
-    expect(getComponentPropExpression(appTemplate, 'PetActions', 'last-played-at')).toBe(
-      'currentPet.lastPlayedAt',
-    )
-    expect(source).toContain('lastPlayedAt: number')
+    expect(getComponentPropExpression(appTemplate, 'PetCareDock', 'last-played-at')).toBeUndefined()
+    expect(source).not.toContain('lastPlayedAt: number')
   })
 
   it('summarizes the recommended stat and current value', () => {

@@ -22,20 +22,19 @@ describe('pet settings shortcut', () => {
   it('shows a topbar shortcut only after a pet exists', () => {
     const template = readComponentTemplate('app.vue')
 
-    expect(template).toContain('tab-settings-shortcut')
+    expect(template).toContain('living-settings-button')
     expect(template).toContain('v-if="currentPet"')
-    expect(template).toContain('@click="openTabSettings"')
+    expect(template).toContain('@click="openSettings"')
   })
 
-  it('opens the settings side panel and scrolls it into view', () => {
+  it('opens an accessible settings drawer and restores focus on close', () => {
     const source = readSource('app.vue')
     const template = readComponentTemplate('app.vue')
 
-    expect(source).toContain('const sidePanelElement = ref<HTMLElement | null>(null)')
-    expect(source).toContain("pet.setSidePanelMode('settings')")
-    expect(source).toContain('sidePanelElement.value?.scrollIntoView')
-    expect(template).toContain('ref="sidePanelElement"')
-    expect(template).toContain('id="tab-settings"')
+    expect(source).toContain('const isSettingsOpen = ref(false)')
+    expect(source).toContain('previouslyFocusedElement?.focus()')
+    expect(template).toContain('class="settings-drawer"')
+    expect(template).toContain('aria-modal="true"')
   })
 
   it('keeps shortcut copy localized for every supported language', () => {
@@ -44,15 +43,11 @@ describe('pet settings shortcut', () => {
     }
   })
 
-  it('defines responsive shortcut styles', () => {
+  it('defines responsive drawer shortcut styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.tab-settings-shortcut')
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.tab-settings-shortcut\s*\{[^}]*flex: 1;/,
-    )
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.tab-settings-shortcut\s*\{[^}]*min-width: 0;/,
-    )
+    expect(css).toContain('.living-settings-button')
+    expect(css).toMatch(/@media \(max-width: 720px\)[\s\S]*\.living-settings-button/)
+    expect(css).toMatch(/@media \(max-width: 720px\)[\s\S]*\.settings-drawer\s*\{[^}]*width: 100%;/)
   })
 })

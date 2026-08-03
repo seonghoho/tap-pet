@@ -67,23 +67,22 @@ describe('ux monetization component wiring', () => {
     expect(petTypes).not.toContain('premiumTitlePackId')
   })
 
-  it('exposes premium tab-pack UI in the settings panel', () => {
+  it('keeps premium tab-pack UI out of the focused settings panel', () => {
     const settingsTemplate = readComponentTemplate('components/PetSettingsPanel.vue')
 
-    expect(settingsTemplate).toContain('premium-tab-pack')
-    expect(settingsTemplate).toContain('PREMIUM_WORK_TITLE_PACKS')
-    expect(settingsTemplate).toContain('PREMIUM_QUIET_SIGNAL_PACKS')
-    expect(settingsTemplate).toContain('PREMIUM_THEME_PACKS')
+    expect(settingsTemplate).not.toContain('premium-tab-pack')
+    expect(settingsTemplate).not.toContain('PREMIUM_WORK_TITLE_PACKS')
+    expect(settingsTemplate).not.toContain('PREMIUM_QUIET_SIGNAL_PACKS')
+    expect(settingsTemplate).not.toContain('PREMIUM_THEME_PACKS')
   })
 
-  it('renders premium locked rows as disabled controls in settings', () => {
+  it('keeps settings focused on pet and tab controls', () => {
     const settingsTemplate = readComponentTemplate('components/PetSettingsPanel.vue')
 
-    expect(settingsTemplate).toContain('class="premium-tab-pack"')
-    expect(settingsTemplate).toContain('class="premium-lock-row"')
-    expect(settingsTemplate).toContain(':disabled="true"')
-    expect(settingsTemplate).toContain('messages.premium.lockedLabel')
-    expect(settingsTemplate).not.toContain('@click="setPremium')
+    expect(settingsTemplate).toContain('messages.settings.petName')
+    expect(settingsTemplate).toContain('messages.settings.titleMode')
+    expect(settingsTemplate).toContain('messages.settings.themeMode')
+    expect(settingsTemplate).not.toContain('messages.premium.lockedLabel')
   })
 
   it('shows premium tab-pack preview from the side panel status mode', () => {

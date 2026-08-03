@@ -7,11 +7,11 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Project Dashboard',
+      title: 'Tab Pet — your quiet browser companion',
       meta: [
         {
           name: 'description',
-          content: 'A browser-tab pet MVP that reacts through title and favicon.',
+          content: 'A tiny local pet that lives in your browser tab and reacts when it needs care.',
         },
       ],
       script: process.env.NUXT_PUBLIC_ADSENSE_ENABLED === 'true'

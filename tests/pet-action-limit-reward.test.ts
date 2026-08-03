@@ -25,12 +25,11 @@ function getComponentPropExpression(template: string, componentName: string, pro
 }
 
 describe('pet action limit reward feedback', () => {
-  it('passes action limit reward feedback into action controls', () => {
+  it('keeps action-limit reward feedback out of the focused care dock', () => {
     const template = readComponentTemplate('app.vue')
 
-    expect(getComponentPropExpression(template, 'PetActions', 'action-limit-reward-feedback')).toBe(
-      'pet.actionLimitRewardFeedback.value',
-    )
+    expect(getComponentPropExpression(template, 'PetCareDock', 'action-limit-reward-feedback')).toBeUndefined()
+    expect(template).not.toContain('pet.actionLimitRewardFeedback.value')
   })
 
   it('renders a reward grant confirmation near the action limit controls', () => {

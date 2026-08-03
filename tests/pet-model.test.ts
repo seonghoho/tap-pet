@@ -4,7 +4,6 @@ import {
   ACTION_LIMIT_AD_REWARD_USES,
   ACTION_LIMIT_BASE_USES,
   ACTION_LIMIT_REWARD_FEEDBACK_TTL_MS,
-  ACTION_LIMIT_WINDOW_MS,
   ACTION_REACTION_HOLD_MS,
   PET_STORAGE_VERSION,
 } from '~/constants/pet'
@@ -404,8 +403,9 @@ describe('pet store', () => {
     expect(store.petState.value?.personality.earlyActionCounts.feed).toBe(1)
   })
 
-  it('limits care actions to five uses per thirty minute window', () => {
-    const store = usePetStore()
+  it('keeps normal care available after the legacy use counter is exhausted', () => {
+    const callbacks: Array<() => void> = []
+    const store = createScheduledStore(callbacks)
 
     store.initializePet('cat')
     const actions = ['feed', 'play', 'sleep', 'wash', 'feed'] as const
@@ -413,19 +413,21 @@ describe('pet store', () => {
     actions.forEach((action, index) => {
       vi.setSystemTime(1000 + index * 6000)
       store.performAction(action)
+      callbacks[index]?.()
     })
 
     expect(store.actionLimitInfo.value.limit).toBe(ACTION_LIMIT_BASE_USES)
     expect(store.actionLimitInfo.value.remaining).toBe(0)
 
-    const limitedState = store.petState.value
+    const beforeExtraCare = store.petState.value
     vi.setSystemTime(1000 + actions.length * 6000)
     store.performAction('play')
-    expect(store.petState.value).toEqual(limitedState)
+    expect(callbacks).toHaveLength(6)
+    callbacks[5]?.()
 
-    vi.setSystemTime(1000 + ACTION_LIMIT_WINDOW_MS + 1)
-    store.performAction('play')
-    expect(store.actionLimitInfo.value.remaining).toBe(ACTION_LIMIT_BASE_USES - 1)
+    expect(store.petState.value?.stats).not.toEqual(beforeExtraCare?.stats)
+    expect(store.lastCareFeedback.value?.action).toBe('play')
+    expect(store.actionLimitInfo.value.remaining).toBe(0)
   })
 
   it('grants additional care uses after a rewarded ad hook succeeds', () => {

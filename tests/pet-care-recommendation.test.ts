@@ -90,7 +90,7 @@ describe('pet care recommendation', () => {
   it('passes recommended care from the store into action controls', () => {
     const template = readComponentTemplate('app.vue')
 
-    expect(getComponentPropExpression(template, 'PetActions', 'recommended-care-action')).toBe(
+    expect(getComponentPropExpression(template, 'PetCareDock', 'recommended-care-action')).toBe(
       'pet.recommendedCareAction.value',
     )
   })

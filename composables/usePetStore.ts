@@ -204,7 +204,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
 
     const startedAt = Date.now()
     const consumedLimit = consumeActionLimitUse(petState.value.actionLimit, startedAt)
-    if (!consumedLimit) return
+      ?? petState.value.actionLimit
 
     lastCareFeedback.value = null
     returnReport.value = null

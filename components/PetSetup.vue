@@ -1,92 +1,93 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import type { PetSpecies } from '~/types/pet'
 
 const emit = defineEmits<{
   select: [species: PetSpecies]
 }>()
-const { messages } = useLocale()
 
-const options: Array<{
-  species: PetSpecies
-}> = [
-  {
-    species: 'cat',
-  },
-  {
-    species: 'dog',
-  },
-  {
-    species: 'hedgehog',
-  },
-  {
-    species: 'rabbit',
-  },
-  {
-    species: 'penguin',
-  },
-  {
-    species: 'hamster',
-  },
+const { messages } = useLocale()
+const selectedSpecies = ref<PetSpecies>('cat')
+const speciesOptions: readonly PetSpecies[] = [
+  'cat',
+  'dog',
+  'hedgehog',
+  'rabbit',
+  'penguin',
+  'hamster',
 ]
+
+const selectedLabel = computed(() => messages.value.species[selectedSpecies.value].label)
+const selectedDescription = computed(
+  () => messages.value.species[selectedSpecies.value].description,
+)
+const previewAriaLabel = computed(
+  () => `${selectedLabel.value} ${messages.value.status.aria.happy}`,
+)
 </script>
 
 <template>
-  <div class="setup-panel">
-    <div class="section-heading">
+  <section class="setup-stage">
+    <div class="setup-stage__intro">
       <p class="eyebrow">{{ messages.setup.eyebrow }}</p>
       <h2>{{ messages.setup.title }}</h2>
-      <p>
-        {{ messages.setup.description }}
-      </p>
+      <p>{{ messages.setup.description }}</p>
     </div>
 
-    <div class="setup-tab-demo" :aria-label="messages.setup.tabPreview.label">
-      <div>
-        <strong>{{ messages.setup.tabPreview.label }}</strong>
-        <small>{{ messages.setup.tabPreview.hint }}</small>
+    <div class="setup-stage__scene">
+      <PetCanvas
+        :species="selectedSpecies"
+        status="happy"
+        :label="previewAriaLabel"
+      />
+
+      <div class="setup-stage__caption">
+        <span>{{ selectedLabel }}</span>
+        <p>{{ selectedDescription }}</p>
       </div>
-      <div class="setup-tab-demo__tabs" aria-hidden="true">
-        <span>{{ messages.setup.tabPreview.normal }}</span>
-        <span>{{ messages.setup.tabPreview.alert }}</span>
-      </div>
-    </div>
 
-    <div class="species-grid">
-      <button
-        v-for="option in options"
-        :key="option.species"
-        class="species-option"
-        type="button"
-        @click="emit('select', option.species)"
-      >
-        <PetAvatar
-          :species="option.species"
-          status="happy"
-          theme-id="system"
-          :aria-label="`${messages.species[option.species].label} ${messages.status.aria.happy}`"
-          compact
-        />
+      <div class="setup-tab-signal" :aria-label="messages.setup.tabPreview.label">
+        <span class="setup-tab-signal__dot" aria-hidden="true" />
         <span>
-          <strong>{{ messages.species[option.species].label }}</strong>
-          <small>{{ messages.species[option.species].description }}</small>
-        </span>
-      </button>
-    </div>
-
-    <p class="setup-save-note">{{ messages.setup.localSave }}</p>
-
-    <div class="setup-flow setup-flow--compact" :aria-label="messages.setup.title">
-      <div
-        v-for="(step, index) in messages.setup.steps"
-        :key="step.id"
-        class="setup-flow__item"
-      >
-        <span class="setup-flow__index">{{ index + 1 }}</span>
-        <span>
-          <strong>{{ step.title }}</strong>
-          <small>{{ step.description }}</small>
+          <small>{{ messages.setup.tabPreview.label }}</small>
+          <strong>{{ messages.setup.tabPreview.normal }}</strong>
         </span>
       </div>
     </div>
-  </div>
+
+    <div class="setup-stage__controls">
+      <div class="species-rail" :aria-label="messages.setup.title">
+        <button
+          v-for="species in speciesOptions"
+          :key="species"
+          class="species-rail__button"
+          type="button"
+          :data-species="species"
+          :aria-pressed="selectedSpecies === species"
+          @click="selectedSpecies = species"
+        >
+          <span class="species-rail__mark" aria-hidden="true">
+            {{ messages.species[species].label.slice(0, 1) }}
+          </span>
+          <span>{{ messages.species[species].label }}</span>
+        </button>
+      </div>
+
+      <div class="setup-stage__confirm">
+        <p class="setup-save-note">{{ messages.setup.localSave }}</p>
+        <button
+          class="setup-confirm-button"
+          type="button"
+          data-testid="confirm-pet"
+          @click="emit('select', selectedSpecies)"
+        >
+          <span>{{ messages.setup.title }}</span>
+          <strong>{{ selectedLabel }}</strong>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m9 5 7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
 </template>

@@ -52,12 +52,14 @@ describe('pet habitat action reactions', () => {
     expect(css).toContain('@keyframes habitat-wash-bubble')
   })
 
-  it('passes pet level into habitat so level rewards can affect reactions', () => {
+  it('keeps legacy level rewards out of the primary canvas reaction surface', () => {
     const appTemplate = readComponentTemplate('app.vue')
     const statusTemplate = readComponentTemplate('components/PetStatusPanel.vue')
     const statusSource = readSource('components/PetStatusPanel.vue')
 
-    expect(appTemplate).toContain(':level="currentPet.growth.level"')
+    expect(appTemplate).toContain('<PetCanvas')
+    expect(appTemplate).toContain(':active-reaction="pet.activeReaction.value"')
+    expect(appTemplate).not.toContain(':level="currentPet.growth.level"')
     expect(statusSource).toContain('level: number')
     expect(statusTemplate).toContain(':level="level"')
   })

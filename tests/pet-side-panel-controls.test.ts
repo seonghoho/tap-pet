@@ -139,20 +139,17 @@ describe('pet side panel progress summary', () => {
     expect(template).not.toContain('<PetStatusPanel')
   })
 
-  it('keeps duplicated status props out of the side panel mount', () => {
+  it('keeps the legacy side panel out of the living canvas shell', () => {
     const template = readComponentTemplate('app.vue')
 
-    expect(getComponentPropExpression(template, 'PetSidePanel', 'species')).toBeUndefined()
-    expect(getComponentPropExpression(template, 'PetSidePanel', 'status')).toBeUndefined()
-    expect(getComponentPropExpression(template, 'PetSidePanel', 'stats')).toBeUndefined()
-    expect(getComponentPropExpression(template, 'PetSidePanel', 'status-theme-id')).toBeUndefined()
-    expect(getComponentPropExpression(template, 'PetSidePanel', 'level-progress')).toBe('pet.levelProgress.value')
+    expect(template).not.toContain('<PetSidePanel')
+    expect(getComponentPropExpression(template, 'PetNeeds', 'stats')).toBe('currentPet.stats')
   })
 
-  it('passes recent care feedback into the action controls', () => {
+  it('passes recent care feedback into the focused care dock', () => {
     const template = readComponentTemplate('app.vue')
 
-    expect(getComponentPropExpression(template, 'PetActions', 'care-feedback')).toBe('pet.lastCareFeedback.value')
+    expect(getComponentPropExpression(template, 'PetCareDock', 'care-feedback')).toBe('pet.lastCareFeedback.value')
   })
 
   it('uses softer dedicated gauge colors instead of the primary action colors', () => {
@@ -190,7 +187,8 @@ describe('pet reset placement', () => {
     const settingsPanelTemplate = readComponentTemplate('components/PetSettingsPanel.vue')
 
     expect(appTemplate).not.toContain('@click="pet.resetPet"')
-    expect(appTemplate).toContain('@reset="pet.resetPet"')
+    expect(appTemplate).toContain('@reset="handleReset"')
+    expect(readSource('app.vue')).toContain('pet.resetPet()')
     expect(sidePanelTemplate).toContain('@reset="emit(\'reset\')"')
     expect(settingsPanelTemplate).toContain('settings-danger-zone')
   })

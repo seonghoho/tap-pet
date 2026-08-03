@@ -1,7 +1,13 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 const STORAGE_KEY = 'tab-pet:state'
 const LOCALE_KEY = 'tab-pet:locale'
+
+async function choosePet(page: Page, species = 'rabbit'): Promise<void> {
+  await page.locator(`[data-species="${species}"]`).click()
+  await page.getByTestId('confirm-pet').click()
+  await expect(page.locator('.living-habitat')).toBeVisible()
+}
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
@@ -15,77 +21,93 @@ test.beforeEach(async ({ page }) => {
   await page.reload()
 })
 
-test('first load shows the species selection screen', async ({ page }) => {
-  await page.goto('/')
-
-  await expect(page.getByRole('button', { name: /고양이/ })).toBeVisible()
-  await expect(page.getByRole('button', { name: /강아지/ })).toBeVisible()
-  await expect(page.getByRole('button', { name: /고슴도치/ })).toBeVisible()
+test('first load shows one living preview and six species choices', async ({ page }) => {
+  await expect(page.locator('.setup-stage__scene canvas')).toBeVisible()
+  await expect(page.locator('[data-species]')).toHaveCount(6)
+  await expect(page.locator('[data-species="cat"]')).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByTestId('confirm-pet')).toBeVisible()
 })
 
-test('selecting a species reveals the care panel', async ({ page }) => {
-  await page.goto('/')
+test('confirming a species reveals the living care habitat', async ({ page }) => {
+  await choosePet(page)
 
-  await page.getByRole('button', { name: /고양이/ }).first().click()
+  await expect(page.locator('.living-habitat canvas')).toHaveAttribute('aria-label', /토리|토끼/)
+  await expect(page.locator('button[data-action]')).toHaveCount(4)
+  await expect(page.locator('.pet-needs [role="meter"]')).toHaveCount(3)
+})
 
-  await expect(page.getByRole('button', { name: /먹이|밥/ })).toBeVisible()
-  await expect(page.locator('.pet-status').getByText('배부름', { exact: true })).toBeVisible()
+test('a care action produces a canvas reaction and concise feedback', async ({ page }) => {
+  await choosePet(page, 'hamster')
+
+  const recommendedAction = page.locator('button[data-recommended="true"]')
+  await expect(recommendedAction).toHaveCount(1)
+  await recommendedAction.click()
+  await expect(recommendedAction).toBeDisabled()
+  await expect(page.locator('.care-dock__feedback')).toBeVisible({ timeout: 6_000 })
 })
 
 test('reload restores the selected species', async ({ page }) => {
-  await page.goto('/')
-  await page.getByRole('button', { name: /고양이/ }).first().click()
-  await expect(page.getByRole('button', { name: /먹이|밥/ })).toBeVisible()
+  await choosePet(page, 'penguin')
 
   await page.reload()
 
-  await expect(page.getByRole('button', { name: /먹이|밥/ })).toBeVisible()
+  await expect(page.locator('.living-habitat')).toBeVisible()
+  await expect(page.locator('.living-habitat canvas')).toHaveAttribute('aria-label', /펭이|펭귄/)
+})
+
+test('settings open as a dismissible dialog', async ({ page }) => {
+  await choosePet(page, 'cat')
+
+  await page.getByRole('button', { name: '탭 설정' }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await expect(page.getByRole('dialog').getByText('펫 이름')).toBeVisible()
+
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog')).toBeHidden()
 })
 
 test('a corrupted localStorage payload falls back to species selection', async ({ page }) => {
-  await page.addInitScript(
-    ({ storageKey }) => {
-      window.localStorage.setItem(storageKey, '{not really json')
-    },
-    { storageKey: STORAGE_KEY },
-  )
+  await page.evaluate(({ storageKey }) => {
+    window.localStorage.setItem(storageKey, '{not really json')
+  }, { storageKey: STORAGE_KEY })
+  await page.reload()
 
-  await page.goto('/')
-
-  await expect(page.getByRole('button', { name: /고양이/ })).toBeVisible()
+  await expect(page.locator('.setup-stage__scene canvas')).toBeVisible()
+  await expect(page.getByTestId('confirm-pet')).toBeVisible()
 })
 
 test('document.title is non-empty after the app mounts', async ({ page }) => {
-  await page.goto('/')
-
   await expect.poll(async () => (await page.title()).length).toBeGreaterThan(0)
 })
 
 test('no horizontal overflow on a narrow mobile viewport', async ({ page }) => {
   test.skip(test.info().project.name !== 'mobile-chrome', 'mobile-only check')
 
-  await page.goto('/')
+  await expect(page.locator('.setup-stage__scene')).toBeVisible()
+  const setupOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  )
+  expect(setupOverflow).toBeLessThanOrEqual(1)
 
-  const overflow = await page.evaluate(() => {
-    return document.documentElement.scrollWidth - document.documentElement.clientWidth
-  })
-
-  expect(overflow).toBeLessThanOrEqual(1)
+  await choosePet(page)
+  const habitatOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  )
+  expect(habitatOverflow).toBeLessThanOrEqual(1)
 })
 
-test('returning after absence shows a return report', async ({ page }) => {
+test('returning after absence shows a compact return report', async ({ page }) => {
   const staleTimestamp = Date.now() - 1000 * 60 * 60 * 3
 
-  await page.addInitScript(
-    ({ storageKey, localeKey, staleTimestamp }) => {
+  await page.evaluate(
+    ({ storageKey, staleTimestamp }) => {
       const date = new Date()
       const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 
-      window.localStorage.setItem(localeKey, 'ko')
       window.localStorage.setItem(
         storageKey,
         JSON.stringify({
-          version: 3,
+          version: 4,
           species: 'cat',
           name: '몽이',
           stats: {
@@ -118,38 +140,25 @@ test('returning after absence shows a return report', async ({ page }) => {
             completedAt: null,
             claimedAt: null,
           },
+          personality: {
+            personality: null,
+            earlyActionCounts: {
+              feed: 0,
+              play: 0,
+              sleep: 0,
+              wash: 0,
+            },
+            assignedAt: null,
+          },
           lastUpdatedAt: staleTimestamp,
           lastPlayedAt: staleTimestamp,
         }),
       )
     },
-    { storageKey: STORAGE_KEY, localeKey: LOCALE_KEY, staleTimestamp },
+    { storageKey: STORAGE_KEY, staleTimestamp },
   )
+  await page.reload()
 
-  await page.goto('/')
-
+  await expect(page.locator('.living-return')).toBeVisible()
   await expect(page.locator('.return-report').getByText('다시 만난 탭 펫', { exact: true })).toBeVisible()
-})
-
-test('completing recommended care completes the daily goal and claims reward', async ({ page }) => {
-  await page.goto('/')
-  await page.getByRole('button', { name: /고양이/ }).first().click()
-
-  await expect(page.getByText('오늘의 목표')).toBeVisible()
-
-  const recommendedCard = page.locator('.action-recommendation')
-  const recommendedText = await recommendedCard.textContent()
-  const actionName = recommendedText?.includes('놀이')
-    ? /놀이/
-    : recommendedText?.includes('잠')
-      ? /잠/
-      : recommendedText?.includes('목욕')
-        ? /목욕/
-        : /먹이|밥/
-
-  await page.getByRole('button', { name: actionName }).first().click()
-  await expect(page.getByText('오늘 목표를 완료했어요.')).toBeVisible({ timeout: 6000 })
-
-  await page.getByRole('button', { name: '보상 받기' }).click()
-  await expect(page.getByText('오늘 보상을 받았어요.')).toBeVisible()
 })

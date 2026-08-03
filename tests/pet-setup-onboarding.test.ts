@@ -17,46 +17,40 @@ function readSource(sourcePath: string): string {
 }
 
 const SUPPORTED_LOCALES = ['en', 'ko', 'ja'] as const
-const STEP_IDS = ['choose', 'care', 'tab'] as const
-
 describe('pet setup onboarding', () => {
-  it('puts tab signal preview and pet choices before setup explanation details', () => {
+  it('uses one living preview and a compact species rail', () => {
     const template = readComponentTemplate('components/PetSetup.vue')
-    const tabPreviewIndex = template.indexOf('setup-tab-demo')
-    const speciesGridIndex = template.indexOf('species-grid')
-    const setupFlowIndex = template.indexOf('setup-flow')
-    const localSaveIndex = template.indexOf('messages.setup.localSave')
+    const source = readSource('components/PetSetup.vue')
 
-    expect(tabPreviewIndex).toBeGreaterThan(-1)
-    expect(speciesGridIndex).toBeGreaterThan(-1)
-    expect(setupFlowIndex).toBeGreaterThan(-1)
-    expect(localSaveIndex).toBeGreaterThan(-1)
-    expect(tabPreviewIndex).toBeLessThan(speciesGridIndex)
-    expect(speciesGridIndex).toBeLessThan(localSaveIndex)
-    expect(localSaveIndex).toBeLessThan(setupFlowIndex)
+    expect(template).toContain('<PetCanvas')
+    expect(template).toContain('class="species-rail"')
+    expect(template).toContain(':data-species="species"')
+    expect(template).toContain(':aria-pressed="selectedSpecies === species"')
+    expect(source).toContain("const selectedSpecies = ref<PetSpecies>('cat')")
   })
 
-  it('keeps setup explanation as supporting content instead of the primary action', () => {
+  it('previews a species before emitting one explicit confirmation', () => {
     const template = readComponentTemplate('components/PetSetup.vue')
+    const source = readSource('components/PetSetup.vue')
 
-    expect(template).toContain('setup-flow setup-flow--compact')
-    expect(template).toContain('messages.setup.steps')
+    expect(template).toContain('data-testid="confirm-pet"')
+    expect(template).toContain("@click=\"emit('select', selectedSpecies)\"")
     expect(template).toContain('messages.setup.localSave')
+    expect(source).not.toContain("@click=\"emit('select', option.species)\"")
   })
 
   it('offers rabbit, penguin, and hamster as selectable tab pets', () => {
     const source = readSource('components/PetSetup.vue')
 
-    expect(source).toContain("species: 'rabbit'")
-    expect(source).toContain("species: 'penguin'")
-    expect(source).toContain("species: 'hamster'")
+    expect(source).toContain("'rabbit'")
+    expect(source).toContain("'penguin'")
+    expect(source).toContain("'hamster'")
   })
 
   it('keeps onboarding copy localized for every supported language', () => {
     for (const locale of SUPPORTED_LOCALES) {
       const setup = I18N_MESSAGES[locale].setup
 
-      expect(setup.steps.map((step) => step.id)).toEqual(STEP_IDS)
       expect(setup.steps.every((step) => step.title.length > 0)).toBe(true)
       expect(setup.steps.every((step) => step.description.length > 0)).toBe(true)
       expect(setup.localSave.length).toBeGreaterThan(0)
@@ -71,13 +65,8 @@ describe('pet setup onboarding', () => {
   it('defines responsive setup styles for the onboarding blocks', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.setup-flow')
-    expect(css).toContain('.setup-tab-demo')
-    expect(css).toMatch(/\.app-shell\s*\{[^}]*width: 100%;/)
-    expect(css).toMatch(/\.main-panel,\n\.control-panel\s*\{[^}]*min-width: 0;/)
-    expect(css).toMatch(/@media \(max-width: 720px\)[\s\S]*\.locale-button\s*\{[^}]*min-width: 0;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.setup-tab-demo\s*\{\s*grid-template-columns: 1fr;/,
-    )
+    expect(css).toContain('.setup-stage')
+    expect(css).toContain('.species-rail')
+    expect(css).toMatch(/@media \(max-width: 720px\)[\s\S]*\.species-rail/)
   })
 })

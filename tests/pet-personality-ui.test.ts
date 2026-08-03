@@ -197,10 +197,11 @@ describe('pet personality UI', () => {
     vi.useRealTimers()
   })
 
-  it('passes personality state into the side panel', () => {
+  it('keeps personality progression out of the primary app shell', () => {
     const template = readComponentTemplate('app.vue')
 
-    expect(template).toContain(':personality="currentPet.personality"')
+    expect(template).not.toContain(':personality="currentPet.personality"')
+    expect(template).not.toContain('<PetSidePanel')
   })
 
   it('renders personality sections in the side panel and care feedback', () => {

@@ -232,12 +232,11 @@ describe('pet recommendation reward preview', () => {
     })
   })
 
-  it('passes recommended reward preview into action controls', () => {
+  it('keeps reward preview numbers out of the focused care dock', () => {
     const template = readComponentTemplate('app.vue')
 
-    expect(getComponentPropExpression(template, 'PetActions', 'recommended-care-reward-preview')).toBe(
-      'pet.recommendedCareRewardPreview.value',
-    )
+    expect(getComponentPropExpression(template, 'PetCareDock', 'recommended-care-reward-preview')).toBeUndefined()
+    expect(template).not.toContain('pet.recommendedCareRewardPreview.value')
   })
 
   it('renders localized reward preview copy in the recommendation card', () => {

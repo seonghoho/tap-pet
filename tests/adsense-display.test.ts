@@ -87,18 +87,15 @@ describe('adsense display configuration', () => {
     expect(appSource).not.toContain("key: 'adsense'")
   })
 
-  it('places the display ad only when AdSense is enabled and configured', () => {
+  it('keeps display-ad wiring out of the focused application surface', () => {
     const appTemplate = readComponentTemplate('app.vue')
     const appSource = readSource('app.vue')
 
     expect(appTemplate).not.toContain('<MonetizationMock')
-    expect(appTemplate).toContain('<AdSenseDisplay')
-    expect(appTemplate.indexOf('<GuidePanel')).toBeLessThan(appTemplate.indexOf('<AdSenseDisplay'))
-    expect(appTemplate).toContain('v-if="currentPet && adsenseEnabled"')
-    expect(appTemplate).toContain(':client="adsenseClient"')
-    expect(appTemplate).toContain(':slot="adsenseSidebarSlot"')
-    expect(appTemplate).toContain(':enabled="adsenseEnabled"')
-    expect(appSource).not.toContain('shouldShowAdPlacement')
+    expect(appTemplate).not.toContain('<AdSenseDisplay')
+    expect(appTemplate).not.toContain('<GuidePanel')
+    expect(appSource).not.toContain('adsenseEnabled')
+    expect(appSource).not.toContain('useRuntimeConfig')
   })
 
   it('publishes an ads.txt file for the AdSense publisher ID', () => {

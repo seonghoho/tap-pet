@@ -128,12 +128,11 @@ describe('care feedback growth target', () => {
     vi.useRealTimers()
   })
 
-  it('passes level progress into action feedback', () => {
+  it('keeps level progress out of the focused care dock', () => {
     const template = readComponentTemplate('app.vue')
 
-    expect(getComponentPropExpression(template, 'PetActions', 'level-progress')).toBe(
-      'pet.levelProgress.value',
-    )
+    expect(getComponentPropExpression(template, 'PetCareDock', 'level-progress')).toBeUndefined()
+    expect(template).not.toContain('pet.levelProgress.value')
   })
 
   it('renders a growth target section inside the care feedback card', () => {
