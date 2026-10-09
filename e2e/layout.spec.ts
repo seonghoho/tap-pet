@@ -88,7 +88,7 @@ for (const width of [320, 375]) {
 }
 
 test.describe('visual baselines', () => {
-  // Countdown text changes every second, so it is masked.
+  // Countdown text and the rotating voice line change between runs, so they are masked.
   const screenshot = { animations: 'disabled' as const, maxDiffPixelRatio: 0.02 }
 
   test('setup screen', async ({ page }) => {
@@ -108,7 +108,7 @@ test.describe('visual baselines', () => {
     await expect(page).toHaveScreenshot('pet.png', {
       ...screenshot,
       fullPage: true,
-      mask: [page.locator('.action-meta')],
+      mask: [page.locator('.action-meta'), page.locator('.pet-status__voice')],
     })
   })
 

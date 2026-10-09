@@ -28,6 +28,7 @@ export const PET_ART_PALETTES: Record<PetSpecies, PetArtPalette> = {
   hamster: { body: '#ffd7a3', belly: '#fffaf1', mark: '#f2b56e', inner: '#ffc4c4', tile: '#ffedd6' },
 }
 
+const OPEN_EYE_STATUSES: ReadonlySet<PetStatus> = new Set(['fine', 'happy', 'hungry'])
 const NEEDS_CARE: ReadonlySet<PetStatus> = new Set(['hungry', 'sleepy', 'dirty', 'bored'])
 
 export function petNeedsCare(status: PetStatus): boolean {
@@ -226,8 +227,11 @@ function renderFace(ctx: Ctx): string {
   return [
     renderBlush(left - 9, blushY, blushRx, ctx),
     renderBlush(right + 9, blushY, blushRx, ctx),
+    // Open dot eyes get a class so the room can make them blink; drawn expressions stay put.
+    OPEN_EYE_STATUSES.has(ctx.status) ? '<g class="pet-eyes">' : '<g>',
     renderEye(left, layout.eyeY, 'left', ctx),
     renderEye(right, layout.eyeY, 'right', ctx),
+    '</g>',
     renderNose(layout, ctx),
     layout.nose === 'beak' ? '' : renderMouth(layout, ctx),
   ].join('')

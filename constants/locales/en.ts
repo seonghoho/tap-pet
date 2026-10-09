@@ -108,6 +108,67 @@ export const en = {
       excited: 'excited',
     },
   },
+  voice: {
+    petLabel: 'Pet {name}',
+    fine: [
+      'All good here. Go do your thing.',
+      'I’ll just sit quietly next to you.',
+      'Dozing in the tab corner… I mean, not dozing.',
+      'Busy day? You’ve got this.',
+    ],
+    happy: [
+      'Full and cozy. Just keep the tab open.',
+      'Feeling all warm and fuzzy.',
+      'Did you see my tail wag just now?',
+      'This tab is the coziest place.',
+    ],
+    hungry: [
+      'My tummy is rumbling…',
+      'Is that… food I smell?',
+      'Too hungry to move.',
+      'Just one snack… okay, dinner.',
+    ],
+    sleepy: [
+      'Eyes keep closing. Just a little nap?',
+      'Yawn… five more minutes.',
+      'Nod… nod…',
+      'The cushion is calling me.',
+    ],
+    dirty: [
+      'Got a bit grubby out there.',
+      'Itchy, itchy. Bath time?',
+      'Where did this smudge come from…',
+      'I want to be fluffy again.',
+    ],
+    bored: [
+      'Anyone want to play…?',
+      'So bored I’m counting ceiling dots.',
+      'Roll me a ball, please.',
+      'Playing alone is no fun.',
+    ],
+    excited: [
+      'Best day ever!',
+      'I could bounce off the walls!',
+      'Happiest tab in the world.',
+      'Thank you! Really really!',
+    ],
+    morning: [
+      'Good morning! Here with you again today.',
+      'Morning! Big stretch—',
+      'Let’s have a good day.',
+    ],
+    night: [
+      'It’s night already. You did great today.',
+      'You can wind down now.',
+      'Working late… I’ll keep you company.',
+    ],
+    petted: [
+      'Hehe, that tickles.',
+      'Again, again!',
+      'Mmm, nice.',
+      'Best pats ever.',
+    ],
+  },
   stats: {
     fullness: 'Fullness',
     energy: 'Energy',
@@ -136,9 +197,21 @@ export const en = {
     levelRequirement: 'Level {level}',
     allUnlocked: 'All early rewards are available.',
     rewards: {
-      'title-focus-signal': {
-        name: 'Focus title signal',
-        detail: 'Status title copy now reads as a calmer work signal.',
+      'room-frame': {
+        name: 'Little frame',
+        detail: 'A photo of you two goes up on the wall.',
+      },
+      'room-lamp': {
+        name: 'Floor lamp',
+        detail: 'A cozy light switches on in the corner.',
+      },
+      'room-plant': {
+        name: 'Big plant',
+        detail: 'Green leaves fill up the room.',
+      },
+      'room-lights': {
+        name: 'String lights',
+        detail: 'Twinkly lights hang across the ceiling.',
       },
       'favicon-bright-accent': {
         name: 'Bright favicon accent',

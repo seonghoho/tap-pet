@@ -48,3 +48,4 @@
 | `backup_exported` | – | 백업 코드 복사 성공 |
 | `backup_imported` | `ok` | 백업 코드 불러오기 시도 |
 | `pin_tip_dismissed` | – | "이 탭을 고정해두세요" 안내 닫기 |
+| `pet_patted` | – | 페이지를 연 뒤 처음 펫을 쓰다듬음 (방문당 1회) |

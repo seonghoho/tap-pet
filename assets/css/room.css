@@ -784,3 +784,178 @@
     transition: none;
   }
 }
+
+/* ---------- room items (level rewards) ---------- */
+
+.pet-habitat__item {
+  pointer-events: none;
+  position: absolute;
+}
+
+.pet-habitat__item--lights {
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+
+.pet-habitat__item--lights circle {
+  animation: room-twinkle 2.4s ease-in-out infinite;
+}
+
+.pet-habitat__item--lights circle:nth-child(even) {
+  animation-delay: 1.2s;
+}
+
+.pet-habitat__item--frame {
+  left: 38%;
+  top: 14%;
+  width: 48px;
+}
+
+.pet-habitat__item--lamp {
+  bottom: 52%;
+  height: 160%;
+  left: 24%;
+}
+
+.pet-habitat--sleepy .pet-habitat__item--lamp,
+.pet-habitat__item--lamp {
+  filter: drop-shadow(0 0 14px rgba(255, 210, 120, 0.55));
+}
+
+.pet-habitat__item--plant {
+  bottom: 48%;
+  height: 105%;
+  right: 24%;
+}
+
+@keyframes room-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* ---------- idle life: blink and breathe ---------- */
+
+.pet-avatar .pet-eyes {
+  animation: pet-blink 5.2s infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pet-habitat__pet .pet-avatar svg {
+  animation: pet-breathe 3.4s ease-in-out infinite;
+  transform-origin: 50% 88%;
+}
+
+@keyframes pet-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  95% {
+    transform: scaleY(0.12);
+  }
+}
+
+@keyframes pet-breathe {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+
+  50% {
+    transform: scale(1.025, 0.975);
+  }
+}
+
+/* ---------- petting ---------- */
+
+button.pet-habitat__pet {
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+}
+
+button.pet-habitat__pet:focus-visible {
+  outline-offset: -8px;
+}
+
+.pet-habitat--petting .pet-habitat__pet .pet-avatar svg {
+  animation: pet-squish 600ms cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+@keyframes pet-squish {
+  0% {
+    transform: scale(1, 1);
+  }
+
+  30% {
+    transform: scale(1.12, 0.86);
+  }
+
+  60% {
+    transform: scale(0.95, 1.06);
+  }
+
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+.pet-habitat__hearts {
+  left: var(--pet-x);
+  pointer-events: none;
+  position: absolute;
+  top: calc(var(--pet-y) - 64px);
+  transform: translateX(-50%);
+  width: 90px;
+  z-index: 4;
+}
+
+.pet-habitat__hearts svg {
+  animation: pet-heart-up 900ms ease-out forwards;
+  position: absolute;
+  width: 20px;
+}
+
+.pet-habitat__hearts svg:nth-child(1) {
+  left: 10px;
+}
+
+.pet-habitat__hearts svg:nth-child(2) {
+  animation-delay: 120ms;
+  left: 36px;
+  top: -12px;
+  width: 24px;
+}
+
+.pet-habitat__hearts svg:nth-child(3) {
+  animation-delay: 240ms;
+  left: 64px;
+}
+
+@keyframes pet-heart-up {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.6);
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-22px) scale(1);
+  }
+}

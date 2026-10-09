@@ -190,12 +190,12 @@ describe('pet level unlock UI', () => {
     })
 
     expect(setup.availableLevelUnlocks.value.map((unlock) => unlock.id)).toEqual([
-      'title-focus-signal',
+      'room-frame',
       'favicon-bright-accent',
     ])
     expect(setup.nextLevelUnlock.value?.id).toBe('habitat-reaction-spark')
     expect(setup.getLevelUnlockName(setup.availableLevelUnlocks.value[0])).toBe(
-      I18N_MESSAGES.ko.levelUnlocks.rewards['title-focus-signal'].name,
+      I18N_MESSAGES.ko.levelUnlocks.rewards['room-frame'].name,
     )
     expect(setup.getLevelUnlockRequirement(setup.nextLevelUnlock.value!)).toBe(
       I18N_MESSAGES.ko.levelUnlocks.levelRequirement.replace('{level}', '4'),
@@ -232,13 +232,13 @@ describe('pet level unlock UI', () => {
 
     expect(setup.shouldShowFeedbackLevelUnlocks.value).toBe(true)
     expect(setup.feedbackLevelUnlocks.value.map((unlock) => unlock.id)).toEqual([
-      'title-focus-signal',
+      'room-frame',
     ])
     expect(setup.getLevelUnlockName(setup.feedbackLevelUnlocks.value[0])).toBe(
-      I18N_MESSAGES.ko.levelUnlocks.rewards['title-focus-signal'].name,
+      I18N_MESSAGES.ko.levelUnlocks.rewards['room-frame'].name,
     )
     expect(setup.getLevelUnlockDetail(setup.feedbackLevelUnlocks.value[0])).toBe(
-      I18N_MESSAGES.ko.levelUnlocks.rewards['title-focus-signal'].detail,
+      I18N_MESSAGES.ko.levelUnlocks.rewards['room-frame'].detail,
     )
   })
 
@@ -253,7 +253,7 @@ describe('pet level unlock UI', () => {
       expect(levelUnlocks.unlockedLabel.length).toBeGreaterThan(0)
       expect(levelUnlocks.levelRequirement).toContain('{level}')
       expect(levelUnlocks.allUnlocked.length).toBeGreaterThan(0)
-      expect(levelUnlocks.rewards['title-focus-signal'].name.length).toBeGreaterThan(0)
+      expect(levelUnlocks.rewards['room-frame'].name.length).toBeGreaterThan(0)
       expect(levelUnlocks.rewards['favicon-bright-accent'].detail.length).toBeGreaterThan(0)
       expect(levelUnlocks.rewards['habitat-reaction-spark'].name.length).toBeGreaterThan(0)
     }

@@ -134,11 +134,14 @@ export type PetDailyGoalRewardFeedback = {
 }
 
 export type PetLevelUnlockId =
-  | 'title-focus-signal'
+  | 'room-frame'
   | 'favicon-bright-accent'
   | 'habitat-reaction-spark'
+  | 'room-lamp'
+  | 'room-plant'
+  | 'room-lights'
 
-export type PetLevelUnlockCategory = 'title' | 'favicon' | 'habitat'
+export type PetLevelUnlockCategory = 'room' | 'favicon' | 'habitat'
 
 export type PetLevelUnlock = {
   id: PetLevelUnlockId
