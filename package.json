@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "build:extension": "node extension/build.mjs"
   },
   "dependencies": {
     "@sentry/vue": "^11.6.0",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
+    "@types/chrome": "^0.3.4",
     "@types/node": "^25.6.0",
     "typescript": "^5.8.3",
     "vitest": "^3.1.4",
