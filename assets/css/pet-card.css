@@ -1,0 +1,131 @@
+/* Pet card: heading, voice line, stats. */
+
+/* ---------- pet card ---------- */
+
+.pet-status {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.pet-status__visual {
+  min-width: 0;
+}
+
+.pet-status__content {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.pet-status__heading h2 {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pet-status__mood {
+  background: var(--app-surface-strong);
+  border-radius: 999px;
+  color: var(--app-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  padding: 3px 10px;
+}
+
+.pet-status__voice {
+  background: var(--app-bg);
+  border-radius: 4px 16px 16px 16px;
+  color: var(--app-text);
+  font-size: 1rem;
+  justify-self: start;
+  margin-top: 8px;
+  max-width: 100%;
+  padding: 10px 14px;
+}
+
+.pet-avatar {
+  display: block;
+  height: 240px;
+  line-height: 0;
+  max-width: 100%;
+  width: 240px;
+}
+
+.pet-avatar svg {
+  display: block;
+  height: 100%;
+  overflow: visible;
+  width: 100%;
+}
+
+.pet-avatar--compact {
+  height: 72px;
+  width: 72px;
+}
+
+.stat-list {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.stat-row {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.stat-row__label {
+  align-items: baseline;
+  display: flex;
+  font-size: 0.8125rem;
+  gap: 6px;
+  justify-content: space-between;
+}
+
+.stat-row__label span {
+  color: var(--app-muted);
+}
+
+.stat-row__label strong {
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.stat-track {
+  background: var(--app-surface-strong);
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.stat-fill {
+  background: linear-gradient(90deg, var(--app-stat-fill-start), var(--app-stat-fill-end));
+  border-radius: inherit;
+  height: 100%;
+  transition: width 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.stat-row--fullness .stat-fill {
+  background: #f4a861;
+}
+
+.stat-row--energy .stat-fill {
+  background: #8fb3e6;
+}
+
+.stat-row--cleanliness .stat-fill {
+  background: #7ccbb8;
+}
+
+.stat-row--low .stat-fill {
+  background: var(--app-accent);
+}
+
+.stat-row--low .stat-row__label strong {
+  color: var(--app-accent);
+}

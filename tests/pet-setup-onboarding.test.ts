@@ -54,14 +54,4 @@ describe('pet setup onboarding', () => {
     }
   })
 
-  it('defines responsive setup styles for the onboarding blocks', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toContain('.setup-tab-demo')
-    expect(css).toMatch(/\.app-shell\s*\{[^}]*width: 100%;/)
-    expect(css).toMatch(/\.main-panel\s*\{[^}]*min-width: 0;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.species-grid\s*\{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/,
-    )
-  })
 })

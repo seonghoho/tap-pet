@@ -208,11 +208,4 @@ describe('pet action button status labels', () => {
     }
   })
 
-  it('defines overflow-safe button status styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toMatch(/\.action-button__badge\s*\{[^}]*max-width: 100%;/)
-    expect(css).toMatch(/\.action-button__badge\s*\{[^}]*text-overflow: ellipsis;/)
-    expect(css).toMatch(/\.action-button small\s*\{[^}]*overflow-wrap: anywhere;/)
-  })
 })

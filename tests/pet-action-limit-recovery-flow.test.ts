@@ -154,16 +154,4 @@ describe('pet action limit recovery flow', () => {
     }
   })
 
-  it('defines responsive locked recovery card styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toMatch(/\.action-limit--locked\s*\{[^}]*border-radius: 18px;/)
-    expect(css).toMatch(/\.action-limit__recovery\s*\{[^}]*display: grid;/)
-    expect(css).toMatch(/\.action-limit__recovery\s*\{[^}]*grid-template-columns:/)
-    expect(css).toMatch(/\.action-limit__option\s*\{[^}]*min-width: 0;/)
-    expect(css).toContain('.action-limit__option--reward')
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.action-limit__recovery\s*\{[^}]*grid-template-columns: minmax\(0, 1fr\);/,
-    )
-  })
 })

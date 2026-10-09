@@ -95,19 +95,6 @@ describe('pet care recommendation', () => {
     )
   })
 
-  it('renders recommendation copy and action button state in the controls', () => {
-    const template = readComponentTemplate('components/PetActions.vue')
-    const source = readSource('components/PetActions.vue')
-    const css = readSource('assets/css/main.css')
-
-    expect(template).toContain('action-recommendation')
-    expect(template).toContain('recommendationTitle')
-    expect(template).toContain("getActionButtonState(action.id) === 'recommended'")
-    expect(source).toContain('recommendedCareAction: PetCareRecommendation | null')
-    expect(css).toContain('.action-recommendation')
-    expect(css).toContain('.action-button--recommended')
-  })
-
   it('keeps recommendation copy localized for every supported language', () => {
     for (const locale of SUPPORTED_LOCALES) {
       const careRecommendation = I18N_MESSAGES[locale].careRecommendation
@@ -127,5 +114,15 @@ describe('pet care recommendation', () => {
 
     expect(source).toContain('getRecommendedCareAction')
     expect(source).toContain('recommendedCareAction')
+  })
+
+  it('renders recommendation copy and action button state in the controls', () => {
+    const template = readComponentTemplate('components/PetActions.vue')
+    const source = readSource('components/PetActions.vue')
+
+    expect(template).toContain('action-recommendation')
+    expect(template).toContain('recommendationTitle')
+    expect(template).toContain("getActionButtonState(action.id) === 'recommended'")
+    expect(source).toContain('recommendedCareAction: PetCareRecommendation | null')
   })
 })

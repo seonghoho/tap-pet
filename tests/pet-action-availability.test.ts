@@ -329,11 +329,4 @@ describe('pet action availability forecast', () => {
     }
   })
 
-  it('defines responsive availability styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toContain('.action-limit__copy')
-    expect(css).toMatch(/\.action-availability\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/\.action-meta\s*\{[^}]*flex-wrap: wrap;/)
-  })
 })

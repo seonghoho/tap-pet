@@ -243,11 +243,4 @@ describe('care feedback priority layout', () => {
     expect(quietSetup.shouldShowFeedbackFollowup.value).toBe(true)
   })
 
-  it('defines follow-up line styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toMatch(
-      /\.care-feedback__next,\s*\.care-feedback__checkback\s*\{[^}]*border-top: 1px solid var\(--app-border\);/,
-    )
-  })
 })

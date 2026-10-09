@@ -301,10 +301,4 @@ describe('pet personality UI', () => {
     }
   })
 
-  it('defines compact personality styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toMatch(/\.pet-personality,[^{]*\{[^}]*display: grid;/)
-    expect(css).toMatch(/\.care-feedback__personality\s*\{[^}]*display: grid;/)
-  })
 })

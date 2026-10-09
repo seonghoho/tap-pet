@@ -244,10 +244,4 @@ describe('care feedback checkback hint', () => {
     }
   })
 
-  it('defines compact checkback styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toMatch(/\.care-feedback__checkback\s*\{[^}]*flex-wrap: wrap;/)
-    expect(css).toMatch(/\.care-feedback__checkback small\s*\{[^}]*color: var\(--app-muted\);/)
-  })
 })

@@ -1,0 +1,169 @@
+/* Onboarding: species picker, naming step, tab preview. */
+
+/* ---------- setup ---------- */
+
+.setup-panel {
+  display: grid;
+  gap: 24px;
+  padding: 8px 4px;
+}
+
+.setup-panel__heading h2 {
+  font-size: 1.75rem;
+}
+
+.species-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.species-option {
+  align-items: center;
+  background: color-mix(in srgb, var(--app-bg) 60%, var(--app-surface-strong));
+  border: 1.5px solid transparent;
+  border-radius: 20px;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  padding: 16px 12px 18px;
+  text-align: center;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.species-option:hover {
+  border-color: var(--app-text);
+  transform: translateY(-2px);
+}
+
+.species-option:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.species-option .pet-avatar {
+  height: 104px;
+  width: 104px;
+}
+
+.species-option span {
+  display: grid;
+  gap: 2px;
+}
+
+.species-option strong {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.species-option small {
+  color: var(--app-muted);
+  line-height: 1.4;
+}
+
+.setup-tab-demo {
+  align-items: center;
+  background: var(--app-surface-strong);
+  border-radius: 20px;
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.setup-tab-demo__copy {
+  display: grid;
+  gap: 2px;
+}
+
+.setup-tab-demo__copy strong {
+  font-size: 0.9375rem;
+}
+
+.setup-tab-demo__copy small {
+  color: var(--app-muted);
+}
+
+.setup-tab-demo__choice {
+  display: grid;
+  gap: 8px;
+}
+
+.setup-tab-demo__choice > span {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.setup-tab-demo__choice .segmented-control {
+  background: var(--app-bg);
+}
+
+.setup-tab-demo__tabs {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+
+.setup-tab-demo__tab {
+  align-items: center;
+  background: var(--app-surface);
+  border-radius: 10px 10px 4px 4px;
+  display: inline-flex;
+  font-size: 0.8125rem;
+  gap: 8px;
+  height: 36px;
+  min-width: 0;
+  padding: 0 14px 0 10px;
+  white-space: nowrap;
+}
+
+.setup-tab-demo__tab > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.setup-tab-demo__tab img {
+  height: 18px;
+  width: 18px;
+}
+
+.setup-tab-demo__tab--alert {
+  font-weight: 600;
+}
+
+.setup-save-note {
+  color: var(--app-muted);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+.setup-naming {
+  justify-items: center;
+  padding: 24px 4px 12px;
+  text-align: center;
+}
+
+.setup-naming .pet-avatar {
+  height: 160px;
+  width: 160px;
+}
+
+.setup-naming__field {
+  display: grid;
+  gap: 8px;
+  max-width: 320px;
+  width: 100%;
+}
+
+.setup-naming__input {
+  font-size: 1.125rem;
+  font-weight: 700;
+  min-height: 52px;
+  text-align: center;
+}
+
+.setup-naming__field small {
+  color: var(--app-muted);
+}

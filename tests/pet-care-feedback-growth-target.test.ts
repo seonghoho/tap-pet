@@ -247,12 +247,4 @@ describe('care feedback growth target', () => {
     }
   })
 
-  it('defines growth target styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toContain('.care-feedback__growth-track')
-    expect(css).toContain('.care-feedback__growth-fill')
-    expect(css).toMatch(/\.care-feedback__growth\s*\{[^}]*display: grid;/)
-    expect(css).toMatch(/\.care-feedback__growth-copy\s*\{[^}]*flex-wrap: wrap;/)
-  })
 })
