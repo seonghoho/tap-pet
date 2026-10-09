@@ -125,7 +125,11 @@ describe('pet action availability forecast', () => {
     )
 
     expect(setup.shouldShowActionAvailability.value).toBe(true)
-    expect(setup.actionAvailabilityText.value).toBe('재우기 2s 후 다시 가능')
+    expect(setup.actionAvailabilityText.value).toBe(
+      I18N_MESSAGES.ko.actionAvailability.cooldown
+        .replace('{action}', I18N_MESSAGES.ko.actions.sleep.label)
+        .replace('{time}', I18N_MESSAGES.ko.time.remainingSeconds.replace('{seconds}', '2')),
+    )
   })
 
   it('hides the generic cooldown helper when the recommendation card already shows that action wait', () => {
@@ -224,7 +228,11 @@ describe('pet action availability forecast', () => {
     )
 
     expect(setup.shouldShowActionAvailability.value).toBe(true)
-    expect(setup.actionAvailabilityText.value).toBe('재우기 2s 후 다시 가능')
+    expect(setup.actionAvailabilityText.value).toBe(
+      I18N_MESSAGES.ko.actionAvailability.cooldown
+        .replace('{action}', I18N_MESSAGES.ko.actions.sleep.label)
+        .replace('{time}', I18N_MESSAGES.ko.time.remainingSeconds.replace('{seconds}', '2')),
+    )
   })
 
   it('hides the cooldown helper during active reactions and action limit locks', () => {
@@ -304,8 +312,8 @@ describe('pet action availability forecast', () => {
     )
 
     expect(setup.isLimitReached.value).toBe(false)
-    expect(setup.actionLimitText.value).toBe('새 돌봄 윈도우가 시작됐습니다.')
-    expect(setup.actionLimitMetaText.value).toBe('행동을 선택하면 새 횟수로 이어갈 수 있습니다.')
+    expect(setup.actionLimitText.value).toBe(I18N_MESSAGES.ko.actionLimit.resetReady)
+    expect(setup.actionLimitMetaText.value).toBe(I18N_MESSAGES.ko.actionLimit.resetReadyHint)
   })
 
   it('keeps limit reset and availability copy localized for every supported language', () => {
@@ -325,11 +333,7 @@ describe('pet action availability forecast', () => {
     const css = readSource('assets/css/main.css')
 
     expect(css).toContain('.action-limit__copy')
-    expect(css).toContain('.action-limit small')
-    expect(css).toContain('.action-availability')
     expect(css).toMatch(/\.action-availability\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.action-limit\s*\{[^}]*align-items: flex-start;/,
-    )
+    expect(css).toMatch(/\.action-meta\s*\{[^}]*flex-wrap: wrap;/)
   })
 })

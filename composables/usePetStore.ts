@@ -19,14 +19,22 @@ import type {
   PetSpecies,
   PetStats,
   PetState,
+  PetStatus,
   ThemeId,
 } from '~/types/pet'
-import { applyCareAction, getCareActionRewardPreview, getRecommendedCareAction } from '~/utils/petCare'
+import {
+  applyCareAction,
+  getCareActionRewardPreview,
+  getRecommendedCareAction,
+  isPetRestingFromCare,
+} from '~/utils/petCare'
 import {
   consumeActionLimitUse,
   getActionLimitInfo,
   grantRewardedActionUses,
 } from '~/utils/petActionLimit'
+import { decodePetBackup, encodePetBackup } from '~/utils/petBackup'
+import { accumulateLiveDecay, applyOfflineDecay } from '~/utils/petDecay'
 import { createInitialPetState } from '~/utils/petFactory'
 import {
   claimDailyGoalReward as claimDailyGoalRewardResult,
@@ -40,8 +48,9 @@ import {
   recordPersonalityCareAction,
 } from '~/utils/petPersonality'
 import { createPetReturnReport } from '~/utils/petReturnReport'
+import { getActiveStreak, hasCaredToday, recordStreakCare } from '~/utils/petStreak'
 import { getPetStatus } from '~/utils/petStatus'
-import { isDisguiseTitleId, isPetSpecies, isThemeId } from '~/utils/petValidation'
+import { clampStat, isDisguiseTitleId, isPetSpecies, isThemeId } from '~/utils/petValidation'
 
 type SidePanelMode = 'status' | 'settings'
 type ActionScheduler = (callback: () => void) => void
@@ -52,8 +61,11 @@ type PersonalityRevealFeedback = NonNullable<PetCareFeedback['personalityReveal'
 
 const CLOCK_UPDATE_INTERVAL_MS = 1000 * 60
 
+const EMPTY_DECAY_CARRY: PetStats = { fullness: 0, energy: 0, cleanliness: 0 }
+
 let clockIntervalId: number | null = null
 let clockSubscriberCount = 0
+let clockTickHandler: (() => void) | null = null
 
 export function usePetStore(options: PetStoreOptions = {}) {
   const storage = useLocalPetStorage()
@@ -89,7 +101,11 @@ export function usePetStore(options: PetStoreOptions = {}) {
     () => null,
   )
 
-  usePetClock(now)
+  // Runtime-only: the fractional decay not yet applied, and when we last measured it.
+  const decayCarry = useState<PetStats>('tab-pet:decay-carry', () => ({ ...EMPTY_DECAY_CARRY }))
+  const lastDecayAt = useState<number | null>('tab-pet:last-decay-at', () => null)
+
+  usePetClock(now, () => applyLiveDecay())
 
   const activeSettings = computed(() => petState.value?.settings ?? draftSettings.value)
   const draftDisguiseTitleId = computed(() => activeSettings.value.disguiseTitleId)
@@ -108,10 +124,12 @@ export function usePetStore(options: PetStoreOptions = {}) {
   const recommendedCareAction = computed(() => {
     if (!petState.value || !petStatus.value) return null
 
-    return getRecommendedCareAction({
+    const recommendation = getRecommendedCareAction({
       stats: petState.value.stats,
       status: petStatus.value,
     })
+
+    return isPetRestingFromCare(recommendation, petState.value.stats) ? null : recommendation
   })
   const recommendedCareRewardPreview = computed(() => {
     const recommendation = recommendedCareAction.value
@@ -122,6 +140,17 @@ export function usePetStore(options: PetStoreOptions = {}) {
       growth: petState.value.growth,
       action: recommendation.action,
     })
+  })
+  const streakInfo = computed(() => {
+    if (!petState.value) return null
+
+    const streak = petState.value.streak
+
+    return {
+      current: getActiveStreak(streak, now.value),
+      best: streak.best,
+      caredToday: hasCaredToday(streak, now.value),
+    }
   })
   const levelProgress = computed(() =>
     petState.value ? getLevelProgress(petState.value.growth) : null,
@@ -167,14 +196,12 @@ export function usePetStore(options: PetStoreOptions = {}) {
         state: restored.state,
         previousLastUpdatedAt: restored.previousLastUpdatedAt,
         now: restoredAt,
-        recommendedCareAction: getRecommendedCareAction({
-          stats: restored.state.stats,
-          status: restoredStatus,
-        }),
+        recommendedCareAction: getRestAwareRecommendation(restored.state.stats, restoredStatus),
       })
     } else {
       returnReport.value = null
     }
+    startLiveDecay(restoredAt)
     hasRestored.value = true
     isReady.value = true
   }
@@ -190,8 +217,10 @@ export function usePetStore(options: PetStoreOptions = {}) {
     returnReport.value = null
     dailyGoalRewardFeedbackState.value = null
     actionLimitRewardFeedbackState.value = null
+    const createdAt = Date.now()
+    startLiveDecay(createdAt)
     commitState(
-      createInitialPetState(species, Date.now(), {
+      createInitialPetState(species, createdAt, {
         settings: {
           ...draftSettings.value,
         },
@@ -273,6 +302,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
         growth: result.growth,
         dailyGoal: resolvedDailyGoal,
         personality: nextPersonality,
+        streak: recordStreakCare(previousState.streak, resolvedAt),
         lastPlayedAt: action === 'play' ? resolvedAt : previousState.lastPlayedAt,
       })
       if (latestActionRunId.value === actionRunId) {
@@ -351,13 +381,18 @@ export function usePetStore(options: PetStoreOptions = {}) {
     updatePetSettings({ themeId })
   }
 
+  // No rewarded-ad SDK yet: this is a free once-a-day recharge. When an SDK is added,
+  // call this only from its "reward granted" callback.
   function grantRewardedAdActions(): void {
     if (!petState.value) return
 
     const grantedAt = Date.now()
+    const recharged = grantRewardedActionUses(petState.value.actionLimit, grantedAt)
+    if (!recharged) return
+
     commitState({
       ...petState.value,
-      actionLimit: grantRewardedActionUses(petState.value.actionLimit, grantedAt),
+      actionLimit: recharged,
     })
     actionLimitRewardFeedbackState.value = {
       addedUses: ACTION_LIMIT_AD_REWARD_USES,
@@ -393,6 +428,33 @@ export function usePetStore(options: PetStoreOptions = {}) {
     dailyGoalRewardFeedbackState.value = result.feedback
   }
 
+  function exportPetBackup(): string | null {
+    return petState.value ? encodePetBackup(petState.value) : null
+  }
+
+  // Replaces the current pet with one from a backup code. Returns false for an invalid code.
+  function importPetBackup(code: string): boolean {
+    const importedAt = Date.now()
+    const imported = decodePetBackup(code, importedAt)
+    if (!imported) return false
+
+    actionGeneration.value += 1
+    latestActionRunId.value += 1
+    activeReaction.value = null
+    lastCareFeedback.value = null
+    pendingPersonalityReveal.value = null
+    returnReport.value = null
+    dailyGoalRewardFeedbackState.value = null
+    actionLimitRewardFeedbackState.value = null
+    startLiveDecay(importedAt)
+    commitState({
+      ...imported,
+      stats: applyOfflineDecay(imported.stats, imported.lastUpdatedAt, importedAt),
+    })
+
+    return true
+  }
+
   function resetPet(): void {
     actionGeneration.value += 1
     latestActionRunId.value += 1
@@ -411,7 +473,39 @@ export function usePetStore(options: PetStoreOptions = {}) {
     dailyGoalRewardFeedbackState.value = null
     actionLimitRewardFeedbackState.value = null
     sidePanelMode.value = 'status'
+    lastDecayAt.value = null
+    decayCarry.value = { ...EMPTY_DECAY_CARRY }
     storage.clearPetState()
+  }
+
+  function startLiveDecay(at: number): void {
+    lastDecayAt.value = at
+    decayCarry.value = { ...EMPTY_DECAY_CARRY }
+  }
+
+  // Offline time is applied on restore; this keeps stats moving while the tab stays open.
+  function applyLiveDecay(at = Date.now()): void {
+    if (!petState.value || lastDecayAt.value === null) return
+
+    const elapsed = at - lastDecayAt.value
+    if (elapsed <= 0) return
+
+    lastDecayAt.value = at
+    const result = accumulateLiveDecay(decayCarry.value, elapsed)
+    decayCarry.value = result.carry
+
+    const { delta } = result
+    if (delta.fullness === 0 && delta.energy === 0 && delta.cleanliness === 0) return
+
+    const stats = petState.value.stats
+    commitState({
+      ...petState.value,
+      stats: {
+        fullness: clampStat(stats.fullness + delta.fullness),
+        energy: clampStat(stats.energy + delta.energy),
+        cleanliness: clampStat(stats.cleanliness + delta.cleanliness),
+      },
+    })
   }
 
   function commitState(nextState: PetState): void {
@@ -455,11 +549,13 @@ export function usePetStore(options: PetStoreOptions = {}) {
 
   return {
     petState: readonly(petState),
+    activeSettings,
     draftDisguiseTitleId: readonly(draftDisguiseTitleId),
     draftThemeId: readonly(draftThemeId),
     isReady: readonly(isReady),
     petStatus,
     dailyGoal,
+    streakInfo,
     recommendedCareAction,
     recommendedCareRewardPreview,
     levelProgress,
@@ -475,6 +571,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     storageError: storage.storageError,
     restorePet,
     initializePet,
+    applyLiveDecay,
     performAction,
     updatePetName,
     updatePetSettings,
@@ -484,14 +581,17 @@ export function usePetStore(options: PetStoreOptions = {}) {
     setTheme,
     grantRewardedAdActions,
     claimDailyGoalReward,
+    exportPetBackup,
+    importPetBackup,
     resetPet,
   }
 }
 
-function usePetClock(now: Ref<number>): void {
+function usePetClock(now: Ref<number>, onTick: () => void): void {
   if (!import.meta.client || !getCurrentInstance()) return
 
   onMounted(() => {
+    clockTickHandler = onTick
     now.value = Date.now()
     clockSubscriberCount += 1
 
@@ -499,6 +599,7 @@ function usePetClock(now: Ref<number>): void {
 
     clockIntervalId = window.setInterval(() => {
       now.value = Date.now()
+      clockTickHandler?.()
     }, CLOCK_UPDATE_INTERVAL_MS)
   })
 
@@ -508,7 +609,14 @@ function usePetClock(now: Ref<number>): void {
 
     window.clearInterval(clockIntervalId)
     clockIntervalId = null
+    clockTickHandler = null
   })
+}
+
+function getRestAwareRecommendation(stats: PetStats, status: PetStatus) {
+  const recommendation = getRecommendedCareAction({ stats, status })
+
+  return isPetRestingFromCare(recommendation, stats) ? null : recommendation
 }
 
 function isSidePanelMode(mode: unknown): mode is SidePanelMode {
@@ -548,6 +656,10 @@ function getValidSettingsPatch(settings: Partial<PetSettings>): Partial<PetSetti
 
   if (isThemeId(settings.themeId)) {
     nextSettings.themeId = settings.themeId
+  }
+
+  if (typeof settings.careNotifications === 'boolean') {
+    nextSettings.careNotifications = settings.careNotifications
   }
 
   return nextSettings

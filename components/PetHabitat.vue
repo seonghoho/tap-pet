@@ -5,7 +5,7 @@ import {
   STATUS_HABITAT_BOUNDS,
   STATUS_HABITAT_MOTION,
 } from '~/constants/habitat'
-import type { PetAction, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
+import type { PetAction, PetCareFeedback, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
 import { getAvailableLevelUnlocks } from '~/utils/petLevelUnlocks'
 import { getThemeById } from '~/utils/theme'
 
@@ -23,7 +23,24 @@ const props = defineProps<{
   avatarLabel: string
   level: number
   activeReaction?: PetAction | null
+  careFeedback?: PetCareFeedback | null
 }>()
+
+const { messages } = useLocale()
+// The one or two numbers that matter, floated above the pet right after care.
+const floatingGains = computed(() => {
+  const feedback = props.careFeedback
+  if (!feedback) return []
+
+  const statGains = (['fullness', 'energy', 'cleanliness'] as const)
+    .filter((key) => feedback.statChanges[key] > 0)
+    .map((key) => `${messages.value.stats[key]} +${feedback.statChanges[key]}`)
+  const affinity = feedback.gainedAffinityExp > 0
+    ? [`${messages.value.stats.affinity} +${feedback.gainedAffinityExp}`]
+    : []
+
+  return [...statGains, ...affinity].slice(0, 2)
+})
 
 const theme = computed(() => getThemeById(props.themeId))
 const isReducedMotion = ref(false)
@@ -149,7 +166,7 @@ function randomWithin(min: number, max: number): number {
     </span>
 
     <span
-      v-if="activeReaction === 'play' && species === 'dog'"
+      v-if="activeReaction === 'play' && species !== 'cat'"
       class="pet-habitat__reaction pet-habitat__reaction--play-dog"
       aria-hidden="true"
     >
@@ -202,6 +219,15 @@ function randomWithin(min: number, max: number): number {
       <span class="pet-habitat__spark pet-habitat__spark--two" />
       <span class="pet-habitat__spark pet-habitat__spark--three" />
     </span>
+
+    <div
+      v-if="floatingGains.length"
+      :key="careFeedback?.createdAt"
+      class="pet-habitat__float"
+      aria-hidden="true"
+    >
+      <span v-for="gain in floatingGains" :key="gain">{{ gain }}</span>
+    </div>
 
     <div
       class="pet-habitat__pet"

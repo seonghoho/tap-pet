@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type {
+  PetSpecies,
   PetDailyGoalRewardFeedback,
   PetDailyGoalState,
   PetLevelUnlock,
@@ -14,12 +15,16 @@ import { getPetPersonalityProgress } from '~/utils/petPersonality'
 
 const props = defineProps<{
   mode: 'status' | 'settings'
+  species?: PetSpecies
   name: string
   level: number
   levelProgress: ProgressInfo
   affinityProgress: AffinityProgressInfo
   dailyGoal: PetDailyGoalState
   dailyGoalRewardFeedback: PetDailyGoalRewardFeedback | null
+  streak?: { current: number, best: number, caredToday: boolean } | null
+  backupCode?: string | null
+  importBackup?: (code: string) => boolean
   personality: PetPersonalityState
   settings: PetSettings
 }>()
@@ -85,12 +90,14 @@ const progressGoalRows = computed(() => [
     label: messages.value.sidePanelProgress.levelGoalLabel,
     text: levelGoalText.value,
     detail: formatGoalProgress(props.levelProgress.current, props.levelProgress.required),
+    percent: props.levelProgress.percent,
   },
   {
     id: 'affinity' as const,
     label: messages.value.sidePanelProgress.affinityGoalLabel,
     text: affinityGoalText.value,
     detail: affinityGoalDetail.value,
+    percent: props.affinityProgress.percent,
   },
 ])
 const personalityProgress = computed(() => getPetPersonalityProgress(props.personality))
@@ -175,63 +182,13 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
     </div>
 
     <div v-if="mode === 'status'" class="pet-side-panel__body">
-      <div class="section-heading">
-        <p class="eyebrow">{{ messages.settings.statusTab }}</p>
-        <h2>{{ name }}</h2>
-        <p>
-          {{ messages.stats.level }} {{ level }} ·
-          {{ messages.stats.affinity }} {{ affinityProgress.level }}
-        </p>
-      </div>
-
-      <section
-        class="first-care-goal"
-        :class="{ 'first-care-goal--repeat': hasStartedFirstCareLoop }"
-        aria-labelledby="first-care-goal-title"
-      >
-        <div class="first-care-goal__copy">
-          <span>{{ firstCareGoalCopy.eyebrow }}</span>
-          <strong id="first-care-goal-title">{{ firstCareGoalCopy.title }}</strong>
-          <small>{{ firstCareGoalCopy.description }}</small>
-        </div>
-
-        <ol class="first-care-goal__list" role="list">
-          <li
-            v-for="step in firstCareGoalCopy.steps"
-            :key="step.id"
-            class="first-care-goal__step"
-          >
-            <span>{{ step.label }}</span>
-          </li>
-        </ol>
-      </section>
 
       <PetDailyGoal
         :daily-goal="dailyGoal"
         :reward-feedback="dailyGoalRewardFeedback"
+        :streak="streak"
         @claim="emit('claimDailyGoal')"
       />
-
-      <section class="premium-tab-pack premium-tab-pack--compact" aria-labelledby="premium-tab-pack-preview-title">
-        <div class="premium-tab-pack__header">
-          <span>{{ messages.premium.lockedLabel }}</span>
-          <strong id="premium-tab-pack-preview-title">{{ messages.premium.heading }}</strong>
-          <small>{{ messages.premium.description }}</small>
-        </div>
-
-        <div class="premium-lock-group">
-          <div class="premium-lock-row premium-lock-row--static">
-            <span>{{ messages.premium.workTitlePack }}</span>
-            <small>{{ messages.premium.workTitlePackDetail }}</small>
-            <em>{{ messages.premium.lockedLabel }}</em>
-          </div>
-          <div class="premium-lock-row premium-lock-row--static">
-            <span>{{ messages.premium.quietSignalPack }}</span>
-            <small>{{ messages.premium.quietSignalPackDetail }}</small>
-            <em>{{ messages.premium.lockedLabel }}</em>
-          </div>
-        </div>
-      </section>
 
       <template v-if="hasStartedFirstCareLoop">
         <section class="pet-personality" aria-labelledby="pet-personality-title">
@@ -267,6 +224,9 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
             >
               <span>{{ goal.label }}</span>
               <strong>{{ goal.text }}</strong>
+              <div class="stat-track" aria-hidden="true">
+                <div class="stat-fill" :style="{ width: `${goal.percent}%` }" />
+              </div>
               <small>{{ goal.detail }}</small>
             </div>
           </div>
@@ -304,27 +264,28 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
           </p>
         </section>
 
-        <div class="progress-list">
-          <div class="stat-row">
-            <div class="stat-row__label">
-              <span>{{ messages.stats.level }} {{ level }}</span>
-              <strong>{{ levelProgress.current }} / {{ levelProgress.required }} {{ messages.stats.exp }}</strong>
-            </div>
-            <div class="stat-track" aria-hidden="true">
-              <div class="stat-fill" :style="{ width: `${levelProgress.percent}%` }" />
-            </div>
+        <section
+          v-if="level >= 3"
+          class="premium-tab-pack premium-tab-pack--compact" aria-labelledby="premium-tab-pack-preview-title">
+          <div class="premium-tab-pack__header">
+            <span>{{ messages.premium.lockedLabel }}</span>
+            <strong id="premium-tab-pack-preview-title">{{ messages.premium.heading }}</strong>
+            <small>{{ messages.premium.description }}</small>
           </div>
 
-          <div class="stat-row">
-            <div class="stat-row__label">
-              <span>{{ messages.stats.affinity }} {{ affinityProgress.level }}</span>
-              <strong>{{ affinityProgress.current }} / {{ affinityProgress.required }}</strong>
+          <div class="premium-lock-group">
+            <div class="premium-lock-row premium-lock-row--static">
+              <span>{{ messages.premium.workTitlePack }}</span>
+              <small>{{ messages.premium.workTitlePackDetail }}</small>
+              <em>{{ messages.premium.lockedLabel }}</em>
             </div>
-            <div class="stat-track" aria-hidden="true">
-              <div class="stat-fill" :style="{ width: `${affinityProgress.percent}%` }" />
+            <div class="premium-lock-row premium-lock-row--static">
+              <span>{{ messages.premium.quietSignalPack }}</span>
+              <small>{{ messages.premium.quietSignalPackDetail }}</small>
+              <em>{{ messages.premium.lockedLabel }}</em>
             </div>
           </div>
-        </div>
+        </section>
       </template>
 
       <section v-else class="level-unlocks level-unlocks--compact" aria-labelledby="level-unlocks-title">
@@ -342,6 +303,14 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
             <small>{{ getLevelUnlockDetail(nextLevelUnlock) }}</small>
         </div>
       </section>
+
+      <ShareCardButton
+        v-if="species"
+        :species="species"
+        :name="name"
+        :level="level"
+        :streak-days="streak?.current ?? 0"
+      />
     </div>
 
     <PetSettingsPanel
@@ -349,6 +318,8 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
       class="pet-side-panel__body"
       :name="name"
       :settings="settings"
+      :backup-code="backupCode"
+      :import-backup="importBackup"
       @update-name="emit('updateName', $event)"
       @update-settings="emit('updateSettings', $event)"
       @reset="emit('reset')"

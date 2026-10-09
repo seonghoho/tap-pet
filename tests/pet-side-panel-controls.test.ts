@@ -104,6 +104,10 @@ function createActionMessages() {
       limitReached: 'Care limit reached',
       ariaLabel: '{action}: {state}',
     },
+    time: {
+      remaining: '{minutes}m {seconds}s',
+      remainingSeconds: '{seconds}s',
+    },
     actionButtonState: {
       ready: 'Ready',
       recommended: 'Recommended',
@@ -142,7 +146,8 @@ describe('pet side panel progress summary', () => {
   it('keeps duplicated status props out of the side panel mount', () => {
     const template = readComponentTemplate('app.vue')
 
-    expect(getComponentPropExpression(template, 'PetSidePanel', 'species')).toBeUndefined()
+    // species is passed only for the share card art, not to render status.
+    expect(getComponentPropExpression(template, 'PetSidePanel', 'species')).toBe('currentPet.species')
     expect(getComponentPropExpression(template, 'PetSidePanel', 'status')).toBeUndefined()
     expect(getComponentPropExpression(template, 'PetSidePanel', 'stats')).toBeUndefined()
     expect(getComponentPropExpression(template, 'PetSidePanel', 'status-theme-id')).toBeUndefined()
@@ -203,6 +208,7 @@ describe('pet settings panel controls', () => {
 
   it('clears a custom disguise title when selecting a preset title', () => {
     vi.stubGlobal('useLocale', () => ({ locale: 'en', messages: {} }))
+    vi.stubGlobal('useClipboard', () => ({ copyText: vi.fn() }))
     const component = loadScriptSetupComponent<PetSettingsPanelSetup>('components/PetSettingsPanel.vue')
     const emitted: unknown[][] = []
     const setup = component.setup(
@@ -231,6 +237,7 @@ describe('pet settings panel controls', () => {
 
   it('emits custom disguise title changes as the user types', () => {
     vi.stubGlobal('useLocale', () => ({ locale: 'en', messages: {} }))
+    vi.stubGlobal('useClipboard', () => ({ copyText: vi.fn() }))
     const component = loadScriptSetupComponent<PetSettingsPanelSetup>('components/PetSettingsPanel.vue')
     const emitted: unknown[][] = []
     const setup = component.setup(
@@ -258,6 +265,7 @@ describe('pet settings panel controls', () => {
 
   it('resets an empty draft name without emitting', () => {
     vi.stubGlobal('useLocale', () => ({ locale: 'en', messages: {} }))
+    vi.stubGlobal('useClipboard', () => ({ copyText: vi.fn() }))
     const component = loadScriptSetupComponent<PetSettingsPanelSetup>('components/PetSettingsPanel.vue')
     const emitted: unknown[][] = []
     const setup = component.setup(
@@ -282,6 +290,7 @@ describe('pet settings panel controls', () => {
 
   it('trims a non-empty draft name before emitting', () => {
     vi.stubGlobal('useLocale', () => ({ locale: 'en', messages: {} }))
+    vi.stubGlobal('useClipboard', () => ({ copyText: vi.fn() }))
     const component = loadScriptSetupComponent<PetSettingsPanelSetup>('components/PetSettingsPanel.vue')
     const emitted: unknown[][] = []
     const setup = component.setup(
@@ -306,6 +315,7 @@ describe('pet settings panel controls', () => {
 
   it('requires confirmation before emitting reset', () => {
     vi.stubGlobal('useLocale', () => ({ locale: 'en', messages: {} }))
+    vi.stubGlobal('useClipboard', () => ({ copyText: vi.fn() }))
     const component = loadScriptSetupComponent<PetSettingsPanelSetup>('components/PetSettingsPanel.vue')
     const emitted: unknown[][] = []
     const setup = component.setup(

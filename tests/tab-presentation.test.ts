@@ -126,7 +126,7 @@ describe('getFaviconSvg', () => {
     expect(unlockedSvg).not.toBe(lockedSvg)
     expect(lockedSvg).not.toContain('data-unlock="favicon-bright-accent"')
     expect(unlockedSvg).toContain('data-unlock="favicon-bright-accent"')
-    expect(unlockedSvg).toContain('fill="#facc15"')
+    expect(unlockedSvg).toContain('fill="#ffd25e"')
   })
 })
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
   PREMIUM_QUIET_SIGNAL_PACKS,
   PREMIUM_THEME_PACKS,
@@ -19,6 +19,8 @@ import type {
 const props = defineProps<{
   name: string
   settings: PetSettings
+  backupCode?: string | null
+  importBackup?: (code: string) => boolean
 }>()
 
 const emit = defineEmits<{
@@ -32,6 +34,12 @@ const { locale, messages } = useLocale()
 const draftName = ref(props.name)
 const draftCustomTitle = ref(props.settings.customDisguiseTitle)
 const isResetConfirming = ref(false)
+const notificationNotice = ref('')
+const backupDraft = ref('')
+const backupNotice = ref('')
+const isBackupConfirming = ref(false)
+const { copyText } = useClipboard()
+const canImportBackup = computed(() => backupDraft.value.trim().length > 0)
 
 const titleModeOptions: Array<{
   id: TitleMode
@@ -126,6 +134,57 @@ function getPremiumDetail(item: PremiumMockItem): string {
   return item.detail[locale.value]
 }
 
+async function setCareNotifications(event: Event): Promise<void> {
+  const input = event.target as HTMLInputElement | null
+  const enabled = Boolean(input?.checked)
+  notificationNotice.value = ''
+
+  if (!enabled) {
+    emit('updateSettings', { careNotifications: false })
+    return
+  }
+
+  if (!isNotificationSupported()) {
+    if (input) input.checked = false
+    notificationNotice.value = messages.value.notifications.unsupported
+    return
+  }
+
+  const permission = Notification.permission === 'granted'
+    ? 'granted'
+    : await Notification.requestPermission()
+
+  if (permission !== 'granted') {
+    if (input) input.checked = false
+    notificationNotice.value = messages.value.notifications.denied
+    return
+  }
+
+  emit('updateSettings', { careNotifications: true })
+}
+
+async function copyBackupCode(): Promise<void> {
+  if (!props.backupCode) return
+
+  const copied = await copyText(props.backupCode)
+  backupNotice.value = copied ? messages.value.backup.copied : ''
+  if (copied) trackEvent('backup_exported', {})
+}
+
+function requestBackupImport(): void {
+  if (!canImportBackup.value) return
+
+  backupNotice.value = ''
+  isBackupConfirming.value = true
+}
+
+function confirmBackupImport(): void {
+  isBackupConfirming.value = false
+  const imported = props.importBackup?.(backupDraft.value) ?? false
+  backupNotice.value = imported ? messages.value.backup.imported : messages.value.backup.invalid
+  if (imported) backupDraft.value = ''
+}
+
 function requestReset(): void {
   isResetConfirming.value = true
 }
@@ -218,12 +277,52 @@ function confirmReset(): void {
       >
     </label>
 
-    <section class="premium-tab-pack" aria-labelledby="premium-tab-pack-heading">
-      <div class="premium-tab-pack__header">
+
+    <label class="settings-checkbox">
+      <input
+        type="checkbox"
+        :checked="settings.titleAnimationEnabled"
+        @change="setTitleAnimation"
+      >
+      <span>{{ messages.settings.titleAnimation }}</span>
+    </label>
+
+    <div class="settings-toggle-group">
+      <label class="settings-checkbox">
+        <input
+          type="checkbox"
+          :checked="settings.careNotifications === true"
+          @change="setCareNotifications"
+        >
+        <span>{{ messages.notifications.toggle }}</span>
+      </label>
+      <small>{{ messages.notifications.hint }}</small>
+      <small v-if="notificationNotice" class="settings-notice" role="status">{{ notificationNotice }}</small>
+    </div>
+
+    <fieldset class="settings-fieldset">
+      <legend>{{ messages.settings.themeMode }}</legend>
+      <div class="segmented-control">
+        <button
+          v-for="theme in PET_THEMES"
+          :key="theme.id"
+          class="segmented-button"
+          :class="{ 'segmented-button--active': settings.themeId === theme.id }"
+          type="button"
+          :aria-pressed="settings.themeId === theme.id"
+          @click="setTheme(theme.id)"
+        >
+          {{ messages.themes[theme.id].name }}
+        </button>
+      </div>
+    </fieldset>
+
+    <details class="premium-tab-pack" aria-labelledby="premium-tab-pack-heading">
+      <summary class="premium-tab-pack__header">
         <span>{{ messages.premium.lockedLabel }}</span>
         <strong id="premium-tab-pack-heading">{{ messages.premium.heading }}</strong>
         <small>{{ messages.premium.description }}</small>
-      </div>
+      </summary>
 
       <div class="premium-lock-group">
         <strong>{{ messages.premium.workTitlePack }}</strong>
@@ -271,33 +370,46 @@ function confirmReset(): void {
       </div>
 
       <p>{{ messages.premium.unavailable }}</p>
-    </section>
+    </details>
 
-    <label class="settings-checkbox">
-      <input
-        type="checkbox"
-        :checked="settings.titleAnimationEnabled"
-        @change="setTitleAnimation"
-      >
-      <span>{{ messages.settings.titleAnimation }}</span>
-    </label>
-
-    <fieldset class="settings-fieldset">
-      <legend>{{ messages.settings.themeMode }}</legend>
-      <div class="segmented-control">
-        <button
-          v-for="theme in PET_THEMES"
-          :key="theme.id"
-          class="segmented-button"
-          :class="{ 'segmented-button--active': settings.themeId === theme.id }"
-          type="button"
-          :aria-pressed="settings.themeId === theme.id"
-          @click="setTheme(theme.id)"
-        >
-          {{ messages.themes[theme.id].name }}
-        </button>
+    <section class="settings-backup" aria-labelledby="settings-backup-title">
+      <div>
+        <strong id="settings-backup-title">{{ messages.backup.heading }}</strong>
+        <p>{{ messages.backup.description }}</p>
       </div>
-    </fieldset>
+      <button class="ghost-button" type="button" :disabled="!backupCode" @click="copyBackupCode">
+        {{ messages.backup.copy }}
+      </button>
+      <textarea
+        v-model="backupDraft"
+        class="settings-input settings-backup__input"
+        rows="2"
+        :placeholder="messages.backup.placeholder"
+        :aria-label="messages.backup.placeholder"
+        spellcheck="false"
+      />
+      <template v-if="isBackupConfirming">
+        <p class="settings-danger-zone__confirm">{{ messages.backup.confirm }}</p>
+        <div class="settings-danger-zone__actions">
+          <button class="ghost-button" type="button" @click="isBackupConfirming = false">
+            {{ messages.settings.resetCancel }}
+          </button>
+          <button class="primary-button settings-backup__confirm" type="button" @click="confirmBackupImport">
+            {{ messages.backup.import }}
+          </button>
+        </div>
+      </template>
+      <button
+        v-else
+        class="ghost-button"
+        type="button"
+        :disabled="!canImportBackup"
+        @click="requestBackupImport"
+      >
+        {{ messages.backup.import }}
+      </button>
+      <small v-if="backupNotice" class="settings-notice" role="status">{{ backupNotice }}</small>
+    </section>
 
     <div class="settings-danger-zone" role="group" :aria-label="messages.settings.resetHeading">
       <div>

@@ -62,19 +62,18 @@ describe('pet care feedback summary', () => {
     vi.useRealTimers()
   })
 
-  it('renders a key result summary and next-action prompt inside care feedback', () => {
+  it('renders a done header and next-action prompt inside care feedback', () => {
     const template = readComponentTemplate('components/PetActions.vue')
     const source = readSource('components/PetActions.vue')
 
-    expect(template).toContain('care-feedback__summary')
-    expect(template).toContain('careFeedbackSummary')
+    expect(template).toContain('careFeedbackDoneText')
     expect(template).toContain('care-feedback__next')
     expect(template).toContain('v-if="shouldShowFeedbackNextAction"')
     expect(template).toContain('feedbackNextActionTitle')
     expect(template).toContain('feedbackNextActionDetail')
-    expect(template).toContain('messages.careFeedback.summaryLabel')
     expect(template).toContain('messages.careFeedback.nextLabel')
     expect(source).toContain('messages.value.careFeedback.statSummary')
+    expect(source).toContain('messages.value.careFeedback.done[feedback.action]')
     expect(source).toContain('messages.value.careFeedback.nextTitle')
   })
 
@@ -190,7 +189,7 @@ describe('pet care feedback summary', () => {
     const template = readComponentTemplate('components/PetActions.vue')
     const source = readSource('components/PetActions.vue')
 
-    expect(template).toContain('v-if="shouldShowRecommendation"')
+    expect(template).toContain('v-else-if="shouldShowRecommendation"')
     expect(source).toContain('!props.careFeedback')
   })
 
@@ -209,15 +208,10 @@ describe('pet care feedback summary', () => {
     }
   })
 
-  it('defines responsive result summary styles', () => {
+  it('defines result header and next-action styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.care-feedback__summary')
-    expect(css).toContain('.care-feedback__next')
-    expect(css).toMatch(/\.care-feedback__summary strong\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/\.care-feedback__next strong\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.care-feedback__summary\s*\{[^}]*grid-template-columns: 1fr;/,
-    )
+    expect(css).toMatch(/\.care-feedback__header\s*\{[^}]*justify-content: space-between;/)
+    expect(css).toMatch(/\.care-feedback__next,\s*\.care-feedback__checkback\s*\{[^}]*flex-wrap: wrap;/)
   })
 })

@@ -25,7 +25,7 @@ describe('pet habitat action reactions', () => {
 
     expect(template).toContain("activeReaction === 'feed'")
     expect(template).toContain('pet-habitat__reaction--feed')
-    expect(template).toContain("activeReaction === 'play' && species === 'dog'")
+    expect(template).toContain("activeReaction === 'play' && species !== 'cat'")
     expect(template).toContain('pet-habitat__reaction--play-dog')
     expect(template).toContain("activeReaction === 'play' && species === 'cat'")
     expect(template).toContain('pet-habitat__reaction--play-cat')

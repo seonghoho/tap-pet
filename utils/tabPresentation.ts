@@ -10,11 +10,7 @@ import { DEFAULT_LOCALE } from '~/constants/i18n'
 import type { AppLocale } from '~/types/i18n'
 import type { DisguiseTitleId, PetSettings, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
 import { getAvailableLevelUnlocks } from '~/utils/petLevelUnlocks'
-import {
-  getPetPixelPalette,
-  renderPetPixelSpriteSvg,
-} from '~/utils/petPixelSprite'
-import { getThemeById } from '~/utils/theme'
+import { petNeedsCare, renderPetArtSvg } from '~/utils/petArt'
 
 export type TabPresentation = {
   title: string
@@ -38,15 +34,20 @@ export function getTabTitle(input: {
   locale: AppLocale
   isDocumentVisible: boolean
 }): string {
+  const shouldSignal = input.settings.titleVisibility === 'always' || !input.isDocumentVisible
+
   if (input.settings.titleMode === 'disguise') {
-    return getDisguiseTitleValue(
+    const disguiseTitle = getDisguiseTitleValue(
       input.settings.disguiseTitleId,
       input.locale,
       input.settings.customDisguiseTitle,
     )
+
+    // Borrow the unread-count pattern every work app uses, so the signal never looks like a pet.
+    return shouldSignal && petNeedsCare(input.status) ? `(1) ${disguiseTitle}` : disguiseTitle
   }
 
-  if (input.settings.titleVisibility === 'inactive-only' && input.isDocumentVisible) {
+  if (!shouldSignal) {
     return APP_DEFAULT_TITLE
   }
 
@@ -83,31 +84,21 @@ export function getTabPresentation(input: {
 export function getFaviconSvg(
   species: PetSpecies,
   status: PetStatus,
-  themeId: ThemeId,
+  _themeId: ThemeId,
   options: {
     level?: number
   } = {},
 ): string {
-  const theme = getThemeById(themeId)
-  const baseColor = theme.statusColors[status]
-  const contrast = theme.colors.petContrast
-  const bgColor = theme.colors.surface
   const hasBrightAccent = getAvailableLevelUnlocks(options.level ?? 1).some(
     (unlock) => unlock.id === 'favicon-bright-accent',
   )
 
-  return renderPetPixelSpriteSvg({
+  return renderPetArtSvg({
     species,
     status,
-    backgroundColor: bgColor,
+    variant: 'icon',
+    idPrefix: 'tab-pet-favicon',
     accentBoost: hasBrightAccent,
-    palette: getPetPixelPalette({
-      body: baseColor,
-      contrast,
-      accent: theme.statusColors.excited,
-      dirt: theme.colors.warning,
-      bubble: theme.statusColors.sleepy,
-    }),
   })
 }
 

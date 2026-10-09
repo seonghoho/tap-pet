@@ -194,10 +194,14 @@ describe('pet level unlock UI', () => {
       'favicon-bright-accent',
     ])
     expect(setup.nextLevelUnlock.value?.id).toBe('habitat-reaction-spark')
-    expect(setup.getLevelUnlockName(setup.availableLevelUnlocks.value[0])).toBe('집중 제목 신호')
-    expect(setup.getLevelUnlockRequirement(setup.nextLevelUnlock.value!)).toBe('레벨 4')
+    expect(setup.getLevelUnlockName(setup.availableLevelUnlocks.value[0])).toBe(
+      I18N_MESSAGES.ko.levelUnlocks.rewards['title-focus-signal'].name,
+    )
+    expect(setup.getLevelUnlockRequirement(setup.nextLevelUnlock.value!)).toBe(
+      I18N_MESSAGES.ko.levelUnlocks.levelRequirement.replace('{level}', '4'),
+    )
     expect(setup.getLevelUnlockDetail(setup.nextLevelUnlock.value!)).toBe(
-      '돌봄 직후 방 안 반응이 조금 더 선명해져요.',
+      I18N_MESSAGES.ko.levelUnlocks.rewards['habitat-reaction-spark'].detail,
     )
   })
 
@@ -230,9 +234,11 @@ describe('pet level unlock UI', () => {
     expect(setup.feedbackLevelUnlocks.value.map((unlock) => unlock.id)).toEqual([
       'title-focus-signal',
     ])
-    expect(setup.getLevelUnlockName(setup.feedbackLevelUnlocks.value[0])).toBe('집중 제목 신호')
+    expect(setup.getLevelUnlockName(setup.feedbackLevelUnlocks.value[0])).toBe(
+      I18N_MESSAGES.ko.levelUnlocks.rewards['title-focus-signal'].name,
+    )
     expect(setup.getLevelUnlockDetail(setup.feedbackLevelUnlocks.value[0])).toBe(
-      '탭 제목 상태 문구가 더 차분한 업무 신호로 보입니다.',
+      I18N_MESSAGES.ko.levelUnlocks.rewards['title-focus-signal'].detail,
     )
   })
 
@@ -253,16 +259,12 @@ describe('pet level unlock UI', () => {
     }
   })
 
-  it('defines compact responsive level unlock styles', () => {
+  it('defines compact level unlock styles', () => {
     const css = readSource('assets/css/main.css')
 
     expect(css).toContain('.level-unlocks')
-    expect(css).toContain('.level-unlock')
-    expect(css).toContain('.care-feedback__unlock')
-    expect(css).toMatch(/\.level-unlock strong\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/\.care-feedback__unlock strong\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.care-feedback__unlock\s*\{[^}]*grid-template-columns: 1fr;/,
-    )
+    expect(css).toContain('.level-unlock--next')
+    expect(css).toContain('.care-feedback__unlock-list')
+    expect(css).toMatch(/\.care-feedback__unlock,\s*\.care-feedback__personality\s*\{[^}]*display: grid;/)
   })
 })

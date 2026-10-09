@@ -50,12 +50,15 @@ export type PetSettings = {
   customDisguiseTitle: string
   titleAnimationEnabled: boolean
   themeId: ThemeId
+  careNotifications?: boolean
 }
 
 export type PetActionLimit = {
   windowStartedAt: number
   used: number
   bonusUses: number
+  // Local date key of the day the one-a-day recharge was used.
+  rechargedOn?: string
 }
 
 export type PetActionLimitInfo = {
@@ -64,6 +67,7 @@ export type PetActionLimitInfo = {
   remaining: number
   resetAt: number
   windowMs: number
+  canRecharge: boolean
 }
 
 export type PetActionLimitRewardFeedback = {
@@ -151,8 +155,15 @@ export type PetState = {
   actionLimit: PetActionLimit
   dailyGoal: PetDailyGoalState
   personality: PetPersonalityState
+  streak: PetStreak
   lastUpdatedAt: number
   lastPlayedAt: number
+}
+
+export type PetStreak = {
+  current: number
+  best: number
+  lastCareDateKey: string | null
 }
 
 export type StoredPetState = PetState & {

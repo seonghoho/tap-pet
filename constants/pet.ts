@@ -31,12 +31,13 @@ export const DEFAULT_GROWTH: PetGrowth = {
 }
 
 export const DEFAULT_SETTINGS: PetSettings = {
-  titleMode: 'status',
+  titleMode: 'disguise',
   titleVisibility: 'inactive-only',
   disguiseTitleId: 'project-dashboard',
   customDisguiseTitle: '',
   titleAnimationEnabled: false,
   themeId: 'system',
+  careNotifications: false,
 }
 
 export const NEED_THRESHOLDS = {
@@ -94,9 +95,9 @@ export const ACTION_COOLDOWN_MS: Record<PetAction, number> = {
   wash: 4000,
 }
 
-export const ACTION_REACTION_HOLD_MS = 4000
+export const ACTION_REACTION_HOLD_MS = 1200
 export const ACTION_LIMIT_WINDOW_MS = 1000 * 60 * 30
-export const ACTION_LIMIT_BASE_USES = 5
+export const ACTION_LIMIT_BASE_USES = 10
 export const ACTION_LIMIT_AD_REWARD_USES = 5
 export const ACTION_LIMIT_REWARD_FEEDBACK_TTL_MS = 1000 * 12
 export const PET_PERSONALITY_ASSIGNMENT_ACTION_COUNT = 3
@@ -108,6 +109,8 @@ export const PET_RETURN_REPORT_MEDIUM_MAX_MS = 1000 * 60 * 60 * 8
 export const PET_RETURN_REPORT_LONG_MAX_MS = 1000 * 60 * 60 * 24
 
 export const OVERCARE_THRESHOLD = 90
+// When every stat is at least this high and nothing is urgent, stop suggesting care.
+export const CARE_REST_THRESHOLD = 75
 export const OVERCARE_REWARD_MULTIPLIER = 0.35
 
 export const LEVEL_EXP_BASE = 100
@@ -124,3 +127,6 @@ export const DECAY_PER_HOUR: PetStats = {
 }
 
 export const MAX_OFFLINE_DECAY_HOURS = 24
+
+// Browser notifications: never more than one per this window.
+export const CARE_NOTIFICATION_COOLDOWN_MS = 1000 * 60 * 60 * 2

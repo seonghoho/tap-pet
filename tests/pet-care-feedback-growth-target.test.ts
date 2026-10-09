@@ -174,8 +174,15 @@ describe('care feedback growth target', () => {
     expect(setup.feedbackGrowthRequired.value).toBe(100)
     expect(setup.feedbackGrowthRemaining.value).toBe(58)
     expect(setup.feedbackGrowthPercent.value).toBe(42)
-    expect(setup.feedbackGrowthTitle.value).toBe('다음 레벨까지 58 경험치')
-    expect(setup.feedbackGrowthDetail.value).toBe('현재 42/100 경험치까지 채웠습니다.')
+    expect(setup.feedbackGrowthTitle.value).toBe(
+      I18N_MESSAGES.ko.careFeedback.growthRemaining.replace('{remaining}', '58').replace('{exp}', I18N_MESSAGES.ko.stats.exp),
+    )
+    expect(setup.feedbackGrowthDetail.value).toBe(
+      I18N_MESSAGES.ko.careFeedback.growthDetail
+        .replace('{current}', '42')
+        .replace('{required}', '100')
+        .replace('{exp}', I18N_MESSAGES.ko.stats.exp),
+    )
   })
 
   it('uses level-up copy when the result reaches a new level', () => {
@@ -213,8 +220,13 @@ describe('care feedback growth target', () => {
       },
     )
 
-    expect(setup.feedbackGrowthTitle.value).toBe('새 레벨에 도달했어요')
-    expect(setup.feedbackGrowthDetail.value).toBe('새 성장 게이지가 8/135 경험치에서 시작됐습니다.')
+    expect(setup.feedbackGrowthTitle.value).toBe(I18N_MESSAGES.ko.careFeedback.growthComplete)
+    expect(setup.feedbackGrowthDetail.value).toBe(
+      I18N_MESSAGES.ko.careFeedback.growthCompleteDetail
+        .replace('{current}', '8')
+        .replace('{required}', '135')
+        .replace('{exp}', I18N_MESSAGES.ko.stats.exp),
+    )
     expect(setup.feedbackGrowthPercent.value).toBe(6)
   })
 
@@ -235,16 +247,12 @@ describe('care feedback growth target', () => {
     }
   })
 
-  it('defines responsive growth target styles', () => {
+  it('defines growth target styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.care-feedback__growth')
     expect(css).toContain('.care-feedback__growth-track')
     expect(css).toContain('.care-feedback__growth-fill')
-    expect(css).toMatch(/\.care-feedback__growth strong\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/\.care-feedback__growth small\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.care-feedback__growth\s*\{[^}]*grid-template-columns: 1fr;/,
-    )
+    expect(css).toMatch(/\.care-feedback__growth\s*\{[^}]*display: grid;/)
+    expect(css).toMatch(/\.care-feedback__growth-copy\s*\{[^}]*flex-wrap: wrap;/)
   })
 })

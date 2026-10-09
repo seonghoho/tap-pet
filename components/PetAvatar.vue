@@ -1,18 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useId } from 'vue'
 import type { PetSpecies, PetStatus, ThemeId } from '~/types/pet'
-import type { PetPixelColor } from '~/utils/petPixelSprite'
-import {
-  getPetPixelPalette,
-  getPetPixelSpriteCells,
-} from '~/utils/petPixelSprite'
-import { getThemeById } from '~/utils/theme'
+import { renderPetArtSvg } from '~/utils/petArt'
 
 const props = withDefaults(
   defineProps<{
     species: PetSpecies
     status: PetStatus
-    themeId: ThemeId
+    themeId?: ThemeId
     ariaLabel?: string
     compact?: boolean
   }>(),
@@ -21,47 +16,22 @@ const props = withDefaults(
   },
 )
 
-const theme = computed(() => getThemeById(props.themeId))
-const baseColor = computed(() => theme.value.statusColors[props.status])
-const contrastColor = computed(() => theme.value.colors.petContrast)
-const pixelPalette = computed(() =>
-  getPetPixelPalette({
-    body: baseColor.value,
-    contrast: contrastColor.value,
-    accent: theme.value.statusColors.excited,
-    dirt: theme.value.colors.warning,
-    bubble: theme.value.statusColors.sleepy,
-  }),
-)
-const pixelCells = computed(() =>
-  getPetPixelSpriteCells({
+const uid = useId()
+const svg = computed(() =>
+  renderPetArtSvg({
     species: props.species,
     status: props.status,
+    idPrefix: `pet-${uid}`,
   }),
 )
-
-function getCellFill(color: PetPixelColor): string {
-  return pixelPalette.value[color]
-}
 </script>
 
 <template>
-  <svg
+  <span
     class="pet-avatar"
     :class="{ 'pet-avatar--compact': compact }"
-    viewBox="0 0 24 24"
-    shape-rendering="crispEdges"
     role="img"
-    :aria-label="ariaLabel ?? `${species} is ${status}`"
-  >
-    <rect
-      v-for="(cell, index) in pixelCells"
-      :key="`${cell.role}-${index}-${cell.x}-${cell.y}`"
-      :x="cell.x"
-      :y="cell.y"
-      :width="cell.width"
-      :height="cell.height"
-      :fill="getCellFill(cell.color)"
-    />
-  </svg>
+    :aria-label="ariaLabel ?? `${species} ${status}`"
+    v-html="svg"
+  />
 </template>

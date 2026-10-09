@@ -167,10 +167,8 @@ describe('care feedback retention hint', () => {
     const setup = setupPetActions()
 
     expect(setup.shouldShowFeedbackCheckback?.value).toBe(true)
-    expect(setup.careFeedbackRetentionTitle?.value).toBe('지금 다시 확인')
-    expect(setup.careFeedbackCheckbackText?.value).toBe(
-      '다음 추천을 돌보면 결과 카드와 성장 변화를 바로 확인할 수 있어요.',
-    )
+    expect(setup.careFeedbackRetentionTitle?.value).toBe(I18N_MESSAGES.ko.careFeedback.retentionNowTitle)
+    expect(setup.careFeedbackCheckbackText?.value).toBe(I18N_MESSAGES.ko.careFeedback.retentionNowDetail)
   })
 
   it('shows the nearest cooldown as the next check time', () => {
@@ -184,9 +182,13 @@ describe('care feedback retention hint', () => {
       recommendedCareAction: null,
     })
 
-    expect(setup.careFeedbackRetentionTitle?.value).toBe('2s 후 다시 확인')
+    expect(setup.careFeedbackRetentionTitle?.value).toBe(
+      I18N_MESSAGES.ko.careFeedback.retentionInTitle.replace('{time}', I18N_MESSAGES.ko.time.remainingSeconds.replace('{seconds}', '2')),
+    )
     expect(setup.careFeedbackCheckbackText?.value).toBe(
-      '재우기: 2s 후 반복 돌봄 결과를 확인할 수 있어요.',
+      I18N_MESSAGES.ko.careFeedback.retentionCooldownDetail
+        .replace('{action}', I18N_MESSAGES.ko.actions.sleep.label)
+        .replace('{time}', I18N_MESSAGES.ko.time.remainingSeconds.replace('{seconds}', '2')),
     )
   })
 
@@ -200,9 +202,13 @@ describe('care feedback retention hint', () => {
       },
     })
 
-    expect(setup.careFeedbackRetentionTitle?.value).toBe('6s 후 다시 확인')
+    expect(setup.careFeedbackRetentionTitle?.value).toBe(
+      I18N_MESSAGES.ko.careFeedback.retentionInTitle.replace('{time}', I18N_MESSAGES.ko.time.remainingSeconds.replace('{seconds}', '6')),
+    )
     expect(setup.careFeedbackCheckbackText?.value).toBe(
-      '재우기: 6s 후 반복 돌봄 결과를 확인할 수 있어요.',
+      I18N_MESSAGES.ko.careFeedback.retentionCooldownDetail
+        .replace('{action}', I18N_MESSAGES.ko.actions.sleep.label)
+        .replace('{time}', I18N_MESSAGES.ko.time.remainingSeconds.replace('{seconds}', '6')),
     )
   })
 
@@ -217,19 +223,22 @@ describe('care feedback retention hint', () => {
       },
     })
 
-    expect(setup.careFeedbackRetentionTitle?.value).toBe('31m 00s 후 다시 확인')
-    expect(setup.careFeedbackCheckbackText?.value).toBe(
-      '돌봄 횟수가 돌아오면 상태 변화와 다음 추천을 다시 확인할 수 있어요.',
+    expect(setup.careFeedbackRetentionTitle?.value).toBe(
+      I18N_MESSAGES.ko.careFeedback.retentionInTitle.replace(
+        '{time}',
+        I18N_MESSAGES.ko.time.remaining.replace('{minutes}', '31').replace('{seconds}', '00'),
+      ),
     )
+    expect(setup.careFeedbackCheckbackText?.value).toBe(I18N_MESSAGES.ko.careFeedback.retentionLimitDetail)
   })
 
-  it('renders retention title and detail inside the feedback follow-up', () => {
+  it('renders retention title and detail inside the feedback checkback', () => {
     const template = readComponentTemplate('components/PetActions.vue')
     const checkbackBlock = extractElementBlock(template, 'care-feedback__checkback')
 
     expect(checkbackBlock).toContain('careFeedbackRetentionTitle')
     expect(checkbackBlock).toContain('careFeedbackCheckbackText')
-    expect(checkbackBlock).toMatch(/<strong>\s*\{\{\s*careFeedbackRetentionTitle\s*\}\}\s*<\/strong>/)
+    expect(checkbackBlock).toMatch(/<span>\s*\{\{\s*careFeedbackRetentionTitle\s*\}\}\s*<\/span>/)
     expect(checkbackBlock).toMatch(/<small>\s*\{\{\s*careFeedbackCheckbackText\s*\}\}\s*<\/small>/)
   })
 
@@ -250,14 +259,10 @@ describe('care feedback retention hint', () => {
     }
   })
 
-  it('defines compact responsive retention hint styles', () => {
+  it('defines compact retention hint styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toMatch(/\.care-feedback__checkback div\s*\{[^}]*display: grid;/)
-    expect(css).toMatch(/\.care-feedback__checkback strong\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/\.care-feedback__checkback small\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.care-feedback__checkback\s*\{[^}]*grid-template-columns: 1fr;/,
-    )
+    expect(css).toMatch(/\.care-feedback__checkback span\s*\{[^}]*font-weight: 700;/)
+    expect(css).toMatch(/\.care-feedback__checkback small\s*\{[^}]*color: var\(--app-muted\);/)
   })
 })

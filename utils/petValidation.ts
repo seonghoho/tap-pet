@@ -25,6 +25,7 @@ import { normalizeActionLimit } from '~/utils/petActionLimit'
 import { createDailyGoal, normalizeDailyGoalState } from '~/utils/petDailyGoal'
 import { normalizeGrowth } from '~/utils/petGrowth'
 import { createPetPersonalityState, normalizePetPersonalityState } from '~/utils/petPersonality'
+import { normalizePetStreak } from '~/utils/petStreak'
 
 const PET_SPECIES = ['cat', 'dog', 'hedgehog', 'rabbit', 'penguin', 'hamster'] as const
 
@@ -70,6 +71,7 @@ export function normalizeSettings(value: unknown): PetSettings {
       typeof settings.customDisguiseTitle === 'string' ? settings.customDisguiseTitle : '',
     titleAnimationEnabled: settings.titleAnimationEnabled === true,
     themeId: isThemeId(settings.themeId) ? settings.themeId : DEFAULT_SETTINGS.themeId,
+    careNotifications: settings.careNotifications === true,
   }
 }
 
@@ -106,6 +108,7 @@ export function toStoredPetState(state: PetState, version: number): StoredPetSta
     actionLimit: normalizeStoredActionLimit(state.actionLimit, state.lastUpdatedAt),
     dailyGoal: normalizeStoredDailyGoal(state.dailyGoal, state.lastUpdatedAt),
     personality: normalizeStoredPersonality(state.personality, state.lastUpdatedAt),
+    streak: normalizePetStreak(state.streak),
     version,
   }
 }
@@ -142,6 +145,7 @@ function parseStoredPetStateV2(value: Record<string, unknown>, now: number): Pet
     actionLimit: normalizeStoredActionLimit(value.actionLimit, now),
     dailyGoal: createDailyGoal(now),
     personality: createPetPersonalityState(),
+    streak: normalizePetStreak(value.streak),
     lastUpdatedAt,
     lastPlayedAt: normalizeTimestamp(value.lastPlayedAt, now),
   }
@@ -163,6 +167,7 @@ function parseStoredPetStateV1(value: Record<string, unknown>, now: number): Pet
     actionLimit: normalizeStoredActionLimit(value.actionLimit, now),
     dailyGoal: createDailyGoal(now),
     personality: createPetPersonalityState(),
+    streak: normalizePetStreak(value.streak),
     lastUpdatedAt,
     lastPlayedAt: normalizeTimestamp(value.lastPlayedAt, lastUpdatedAt),
   }

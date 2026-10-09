@@ -159,16 +159,14 @@ describe('care feedback checkback hint', () => {
     vi.useRealTimers()
   })
 
-  it('renders the next check hint inside the feedback follow-up section', () => {
+  it('renders the next check hint inside the feedback checkback line', () => {
     const template = readComponentTemplate('components/PetActions.vue')
     const source = readSource('components/PetActions.vue')
-    const followupBlock = extractElementBlock(template, 'care-feedback__follow-up')
+    const checkbackBlock = extractElementBlock(template, 'care-feedback__checkback')
 
-    expect(followupBlock).toContain('class="care-feedback__checkback"')
-    expect(followupBlock).toContain('v-if="shouldShowFeedbackCheckback"')
-    expect(followupBlock).toContain('messages.careFeedback.checkbackLabel')
-    expect(followupBlock).toContain('careFeedbackRetentionTitle')
-    expect(followupBlock).toContain('careFeedbackCheckbackText')
+    expect(template).toContain('<p v-else class="care-feedback__checkback">')
+    expect(checkbackBlock).toContain('careFeedbackRetentionTitle')
+    expect(checkbackBlock).toContain('careFeedbackCheckbackText')
     expect(source).toContain('messages.value.careFeedback.retentionNowDetail')
     expect(source).toContain('messages.value.careFeedback.retentionCooldownDetail')
     expect(source).toContain('messages.value.careFeedback.retentionLimitDetail')
@@ -183,7 +181,7 @@ describe('care feedback checkback hint', () => {
     expect(setup.shouldShowFeedbackCheckback?.value).toBe(true)
     expect(setup.shouldShowFeedbackFollowup?.value).toBe(true)
     expect(setup.careFeedbackCheckbackText?.value).toBe(
-      '탭을 열어두면 상태 변화가 제목과 파비콘 신호로 먼저 나타납니다.',
+      I18N_MESSAGES.ko.careFeedback.retentionLaterDetail,
     )
   })
 
@@ -191,7 +189,7 @@ describe('care feedback checkback hint', () => {
     const setup = setupPetActions()
 
     expect(setup.careFeedbackCheckbackText?.value).toBe(
-      '다음 추천을 돌보면 결과 카드와 성장 변화를 바로 확인할 수 있어요.',
+      I18N_MESSAGES.ko.careFeedback.retentionNowDetail,
     )
   })
 
@@ -207,7 +205,7 @@ describe('care feedback checkback hint', () => {
     })
 
     expect(setup.careFeedbackCheckbackText?.value).toBe(
-      '돌봄 횟수가 돌아오면 상태 변화와 다음 추천을 다시 확인할 수 있어요.',
+      I18N_MESSAGES.ko.careFeedback.retentionLimitDetail,
     )
   })
 
@@ -223,7 +221,9 @@ describe('care feedback checkback hint', () => {
     })
 
     expect(setup.careFeedbackCheckbackText?.value).toBe(
-      '재우기: 2s 후 반복 돌봄 결과를 확인할 수 있어요.',
+      I18N_MESSAGES.ko.careFeedback.retentionCooldownDetail
+        .replace('{action}', I18N_MESSAGES.ko.actions.sleep.label)
+        .replace('{time}', I18N_MESSAGES.ko.time.remainingSeconds.replace('{seconds}', '2')),
     )
   })
 
@@ -247,11 +247,7 @@ describe('care feedback checkback hint', () => {
   it('defines compact checkback styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.care-feedback__checkback')
-    expect(css).toMatch(/\.care-feedback__checkback\s*\{[^}]*grid-template-columns: minmax\(0, 0\.42fr\) minmax\(0, 1fr\);/)
-    expect(css).toMatch(/\.care-feedback__checkback small\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.care-feedback__checkback\s*\{[^}]*grid-template-columns: 1fr;/,
-    )
+    expect(css).toMatch(/\.care-feedback__checkback\s*\{[^}]*flex-wrap: wrap;/)
+    expect(css).toMatch(/\.care-feedback__checkback small\s*\{[^}]*color: var\(--app-muted\);/)
   })
 })

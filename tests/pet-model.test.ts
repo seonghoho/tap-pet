@@ -67,8 +67,9 @@ describe('pet actions', () => {
       })
   })
 
-  it('holds care reaction animations for four seconds', () => {
-    expect(ACTION_REACTION_HOLD_MS).toBe(4000)
+  it('keeps the care reaction short enough to feel instant', () => {
+    expect(ACTION_REACTION_HOLD_MS).toBeGreaterThanOrEqual(800)
+    expect(ACTION_REACTION_HOLD_MS).toBeLessThanOrEqual(1500)
   })
 })
 
@@ -404,11 +405,12 @@ describe('pet store', () => {
     expect(store.petState.value?.personality.earlyActionCounts.feed).toBe(1)
   })
 
-  it('limits care actions to five uses per thirty minute window', () => {
+  it('limits care actions per thirty minute window', () => {
     const store = usePetStore()
 
     store.initializePet('cat')
-    const actions = ['feed', 'play', 'sleep', 'wash', 'feed'] as const
+    const cycle = ['feed', 'play', 'sleep', 'wash'] as const
+    const actions = Array.from({ length: ACTION_LIMIT_BASE_USES }, (_, index) => cycle[index % cycle.length])
 
     actions.forEach((action, index) => {
       vi.setSystemTime(1000 + index * 6000)
@@ -432,23 +434,25 @@ describe('pet store', () => {
     const store = usePetStore()
 
     store.initializePet('dog')
+    const cycle = ['feed', 'play', 'sleep', 'wash'] as const
+    const uses = ACTION_LIMIT_BASE_USES
 
-    ;(['feed', 'play', 'sleep', 'wash', 'feed'] as const).forEach((action, index) => {
+    for (let index = 0; index < uses; index += 1) {
       vi.setSystemTime(1000 + index * 6000)
-      store.performAction(action)
-    })
+      store.performAction(cycle[index % cycle.length])
+    }
 
     expect(store.actionLimitInfo.value.remaining).toBe(0)
 
-    vi.setSystemTime(1000 + 6000 * 5)
+    vi.setSystemTime(1000 + 6000 * uses)
     store.grantRewardedAdActions()
     expect(store.actionLimitInfo.value.remaining).toBe(ACTION_LIMIT_AD_REWARD_USES)
     expect(store.actionLimitRewardFeedback.value).toEqual({
       addedUses: ACTION_LIMIT_AD_REWARD_USES,
-      createdAt: 1000 + 6000 * 5,
+      createdAt: 1000 + 6000 * uses,
     })
 
-    vi.setSystemTime(1000 + 6000 * 6)
+    vi.setSystemTime(1000 + 6000 * (uses + 1))
     store.performAction('play')
 
     expect(store.actionLimitInfo.value.remaining).toBe(ACTION_LIMIT_AD_REWARD_USES - 1)

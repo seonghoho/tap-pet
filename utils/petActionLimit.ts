@@ -4,6 +4,7 @@ import {
   ACTION_LIMIT_WINDOW_MS,
 } from '~/constants/pet'
 import type { PetActionLimit, PetActionLimitInfo } from '~/types/pet'
+import { getLocalDateKey } from '~/utils/petDailyGoal'
 
 export function createPetActionLimit(now = Date.now()): PetActionLimit {
   return {
@@ -19,11 +20,13 @@ export function normalizeActionLimit(value: unknown, now = Date.now()): PetActio
   const windowStartedAt = normalizeTimestamp(value.windowStartedAt, now)
   const used = normalizeCount(value.used)
   const bonusUses = normalizeCount(value.bonusUses)
+  const rechargedOn = typeof value.rechargedOn === 'string' ? value.rechargedOn : undefined
 
   return resetExpiredActionLimit({
     windowStartedAt,
     used,
     bonusUses,
+    ...(rechargedOn ? { rechargedOn } : {}),
   }, now)
 }
 
@@ -37,6 +40,7 @@ export function getActionLimitInfo(limit: PetActionLimit, now = Date.now()): Pet
     remaining: Math.max(0, limitCount - currentLimit.used),
     resetAt: currentLimit.windowStartedAt + ACTION_LIMIT_WINDOW_MS,
     windowMs: ACTION_LIMIT_WINDOW_MS,
+    canRecharge: canRechargeActionLimit(currentLimit, now),
   }
 }
 
@@ -52,19 +56,28 @@ export function consumeActionLimitUse(limit: PetActionLimit, now = Date.now()): 
   }
 }
 
-export function grantRewardedActionUses(limit: PetActionLimit, now = Date.now()): PetActionLimit {
+export function canRechargeActionLimit(limit: PetActionLimit, now = Date.now()): boolean {
+  return limit.rechargedOn !== getLocalDateKey(now)
+}
+
+// One recharge per local day. Returns null when today's recharge is already used.
+export function grantRewardedActionUses(limit: PetActionLimit, now = Date.now()): PetActionLimit | null {
   const currentLimit = resetExpiredActionLimit(limit, now)
+  if (!canRechargeActionLimit(currentLimit, now)) return null
 
   return {
     ...currentLimit,
     bonusUses: currentLimit.bonusUses + ACTION_LIMIT_AD_REWARD_USES,
+    rechargedOn: getLocalDateKey(now),
   }
 }
 
 function resetExpiredActionLimit(limit: PetActionLimit, now: number): PetActionLimit {
   if (now < limit.windowStartedAt + ACTION_LIMIT_WINDOW_MS) return limit
 
-  return createPetActionLimit(now)
+  const fresh = createPetActionLimit(now)
+
+  return limit.rechargedOn ? { ...fresh, rechargedOn: limit.rechargedOn } : fresh
 }
 
 function normalizeCount(value: unknown): number {

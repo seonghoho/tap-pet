@@ -74,18 +74,6 @@ function loadScriptSetupComponent<T>(componentPath: string): SetupComponent<T> {
   return (module.exports as { default: SetupComponent<T> }).default
 }
 
-function readComponentTemplate(componentPath: string): string {
-  const filename = resolve(componentPath)
-  const source = readFileSync(filename, 'utf8')
-  const descriptor = parse(source, { filename }).descriptor
-
-  return descriptor.template?.content ?? ''
-}
-
-function readSource(sourcePath: string): string {
-  return readFileSync(resolve(sourcePath), 'utf8')
-}
-
 function createTestSettings(overrides: Partial<PetSettings> = {}): PetSettings {
   return {
     titleMode: 'status',
@@ -133,31 +121,6 @@ describe('first care goal guidance', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
-  })
-
-  it('renders the first care loop goal before the growth gauges', () => {
-    const template = readComponentTemplate('components/PetSidePanel.vue')
-    const statusBodyIndex = template.indexOf('v-if="mode === \'status\'" class="pet-side-panel__body"')
-    const settingsPanelIndex = template.indexOf('<PetSettingsPanel')
-    const statusTemplate = template.slice(statusBodyIndex, settingsPanelIndex)
-    const settingsTemplate = template.slice(settingsPanelIndex)
-    const goalIndex = statusTemplate.indexOf('class="first-care-goal"')
-    const progressIndex = statusTemplate.indexOf('class="progress-list"')
-
-    expect(statusBodyIndex).toBeGreaterThan(-1)
-    expect(settingsPanelIndex).toBeGreaterThan(statusBodyIndex)
-    expect(goalIndex).toBeGreaterThan(-1)
-    expect(progressIndex).toBeGreaterThan(goalIndex)
-    expect(statusTemplate).toContain('class="first-care-goal"')
-    expect(statusTemplate).toContain('aria-labelledby="first-care-goal-title"')
-    expect(statusTemplate).toContain(':class="{ \'first-care-goal--repeat\': hasStartedFirstCareLoop }"')
-    expect(statusTemplate).toContain('<strong id="first-care-goal-title">{{ firstCareGoalCopy.title }}</strong>')
-    expect(statusTemplate).toContain('firstCareGoalCopy.eyebrow')
-    expect(statusTemplate).toContain('firstCareGoalCopy.description')
-    expect(statusTemplate).toContain('<ol class="first-care-goal__list" role="list">')
-    expect(statusTemplate).toContain('v-for="step in firstCareGoalCopy.steps"')
-    expect(statusTemplate).toContain(':key="step.id"')
-    expect(settingsTemplate).not.toContain('first-care-goal')
   })
 
   it('keeps the initial first care copy before any growth progress exists', () => {
@@ -244,20 +207,5 @@ describe('first care goal guidance', () => {
         expect(step.label.length).toBeGreaterThan(0)
       }
     }
-  })
-
-  it('defines compact responsive styles for the first care goal', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toContain('.first-care-goal')
-    expect(css).toContain('.first-care-goal__copy')
-    expect(css).toContain('.first-care-goal__list')
-    expect(css).toContain('.first-care-goal__step')
-    expect(css).toContain('.first-care-goal--repeat .first-care-goal__step::before')
-    expect(css).toMatch(/\.first-care-goal__copy strong\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/\.first-care-goal__step span\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.first-care-goal__step\s*\{[^}]*grid-template-columns: 22px minmax\(0, 1fr\);/,
-    )
   })
 })

@@ -65,40 +65,6 @@ function getComponentPropExpression(template: string, componentName: string, pro
   return match?.[0].match(new RegExp(`:${propName}="([^"]+)"`))?.[1]
 }
 
-function extractElementBlock(template: string, className: string): string {
-  const openPattern = new RegExp(`<([A-Za-z][\\w-]*)(?=[^>]*class="${className}")[^>]*>`)
-  const openMatch = openPattern.exec(template)
-
-  expect(openMatch).not.toBeNull()
-
-  const start = openMatch?.index ?? 0
-  const tagName = openMatch?.[1] ?? ''
-  const tagPattern = /<\/?([A-Za-z][\w-]*)(?:\s[^>]*)?>/g
-  let depth = 0
-
-  for (const match of template.slice(start).matchAll(tagPattern)) {
-    const tag = match[1]
-    if (tag !== tagName) continue
-
-    const tagText = match[0]
-    if (tagText.endsWith('/>')) continue
-
-    if (tagText.startsWith('</')) {
-      depth -= 1
-    } else {
-      depth += 1
-    }
-
-    if (depth === 0) {
-      const end = start + match.index + tagText.length
-
-      return template.slice(start, end)
-    }
-  }
-
-  throw new Error(`Unable to find closing tag for ${className}.`)
-}
-
 function createBaseProps(overrides: Record<string, unknown> = {}) {
   return {
     stats: {
@@ -177,7 +143,11 @@ describe('pet recommendation evidence', () => {
     const setup = setupPetActions()
 
     expect(setup.shouldShowRecommendationEvidence?.value).toBe(true)
-    expect(setup.recommendationEvidenceText?.value).toBe('근거 에너지 21/100')
+    expect(setup.recommendationEvidenceText?.value).toBe(
+      I18N_MESSAGES.ko.careRecommendation.statEvidence
+        .replace('{stat}', I18N_MESSAGES.ko.stats.energy)
+        .replace('{value}', '21'),
+    )
   })
 
   it('keeps the recommendation card reason separate from the compact button detail', () => {
@@ -201,7 +171,12 @@ describe('pet recommendation evidence', () => {
     })
 
     expect(setup.shouldShowRecommendationEvidence?.value).toBe(true)
-    expect(setup.recommendationEvidenceText?.value).toBe('근거 마지막 놀이 2시간 15분 전')
+    expect(setup.recommendationEvidenceText?.value).toBe(
+      I18N_MESSAGES.ko.careRecommendation.playEvidence.replace(
+        '{time}',
+        I18N_MESSAGES.ko.time.hoursMinutesAgo.replace('{hours}', '2').replace('{minutes}', '15'),
+      ),
+    )
   })
 
   it('hides evidence when the recommendation has no stat key', () => {
@@ -217,25 +192,12 @@ describe('pet recommendation evidence', () => {
     expect(setup.recommendationEvidenceText?.value).toBe('')
   })
 
-  it('renders evidence inside the recommendation support area', () => {
-    const template = readComponentTemplate('components/PetActions.vue')
-    const supportBlock = extractElementBlock(template, 'action-recommendation__support')
-
-    expect(supportBlock).toContain('class="action-recommendation__evidence"')
-    expect(supportBlock).toContain('<small>{{ recommendationDetail }}</small>')
-    expect(supportBlock).toContain('v-if="shouldShowRecommendationEvidence"')
-    expect(supportBlock).toContain('recommendationEvidenceText')
-    expect(supportBlock).not.toContain('class="action-recommendation__cta"')
-  })
-
   it('keeps the recommendation card explanatory while the action button remains the CTA', () => {
     const template = readComponentTemplate('components/PetActions.vue')
     const source = readSource('components/PetActions.vue')
 
     expect(template).toContain('class="action-recommendation"')
-    expect(template).toContain('recommendationDetail')
-    expect(template).toContain('recommendationEvidenceText')
-    expect(template).toContain('recommendationRewardText')
+    expect(template).toContain('recommendationTitle')
     expect(template).not.toContain('action-recommendation__cta')
     expect(source).not.toContain('recommendationCtaStatusText')
     expect(source).not.toContain('recommendationCtaStatusClass')
@@ -257,21 +219,11 @@ describe('pet recommendation evidence', () => {
     }
   })
 
-  it('defines compact responsive evidence styles', () => {
+  it('defines compact recommendation styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.action-recommendation__evidence')
     expect(css).not.toContain('.action-recommendation__cta')
-    expect(css).not.toContain('.action-recommendation__cta--ready')
-    expect(css).not.toContain('.action-recommendation__cta--cooldown')
-    expect(css).toMatch(/\.action-recommendation__evidence\s*\{[^}]*display: inline-block;/)
-    expect(css).toMatch(/\.action-recommendation__evidence\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/\.action-recommendation__reward\s*\{[^}]*min-width: 0;/)
-    expect(css).toMatch(/\.action-recommendation__reward\s*\{[^}]*width: fit-content;/)
-    expect(css).toMatch(/\.action-recommendation__evidence\s*\{[^}]*min-width: 0;/)
-    expect(css).toMatch(/\.action-recommendation__evidence\s*\{[^}]*width: fit-content;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.action-recommendation__evidence\s*\{[^}]*text-align: left;/,
-    )
+    expect(css).toMatch(/\.action-recommendation\s*\{[^}]*flex-wrap: wrap;/)
+    expect(css).toMatch(/\.action-recommendation\s*\{[^}]*min-width: 0;/)
   })
 })

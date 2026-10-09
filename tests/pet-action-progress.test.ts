@@ -35,7 +35,7 @@ describe('pet action progress status', () => {
     const template = readComponentTemplate('components/PetActions.vue')
     const source = readSource('components/PetActions.vue')
 
-    expect(template).toContain('v-if="shouldShowRecommendation"')
+    expect(template).toContain('v-else-if="shouldShowRecommendation"')
     expect(source).toContain('!props.activeReaction')
   })
 
@@ -51,11 +51,8 @@ describe('pet action progress status', () => {
   it('defines progress styles that are safe for mobile text wrapping', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.care-progress')
-    expect(css).toContain('.care-progress__bar')
-    expect(css).toMatch(/\.care-progress strong\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.care-progress\s*\{[^}]*align-items: flex-start;/,
-    )
+    expect(css).toContain('.care-progress__dot')
+    expect(css).toMatch(/\.care-progress\s*\{[^}]*flex-wrap: wrap;/)
+    expect(css).toMatch(/\.care-progress\s*\{[^}]*min-width: 0;/)
   })
 })

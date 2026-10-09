@@ -2,6 +2,7 @@ import {
   ACTION_EFFECTS,
   BASE_ACTION_EXP,
   BASE_AFFINITY_EXP,
+  CARE_REST_THRESHOLD,
   OVERCARE_REWARD_MULTIPLIER,
   OVERCARE_THRESHOLD,
 } from '~/constants/pet'
@@ -150,6 +151,17 @@ export function getRecommendedCareAction(input: {
     status: input.status,
     statKey: lowestStat.key,
   }
+}
+
+// True when the pet is fine and every stat has headroom, so the UI can let the user go.
+export function isPetRestingFromCare(recommendation: PetCareRecommendation, stats: PetStats): boolean {
+  if (recommendation.reason !== 'lowest-stat') return false
+
+  return (
+    stats.fullness >= CARE_REST_THRESHOLD &&
+    stats.energy >= CARE_REST_THRESHOLD &&
+    stats.cleanliness >= CARE_REST_THRESHOLD
+  )
 }
 
 export function isOvercareAction(stats: PetStats, action: PetAction): boolean {

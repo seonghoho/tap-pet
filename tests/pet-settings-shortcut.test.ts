@@ -44,15 +44,10 @@ describe('pet settings shortcut', () => {
     }
   })
 
-  it('defines responsive shortcut styles', () => {
+  it('defines compact shortcut styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.tab-settings-shortcut')
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.tab-settings-shortcut\s*\{[^}]*flex: 1;/,
-    )
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.tab-settings-shortcut\s*\{[^}]*min-width: 0;/,
-    )
+    expect(css).toMatch(/\.tab-settings-shortcut\s*\{[^}]*white-space: nowrap;/)
+    expect(css).toContain('.tab-settings-shortcut:hover')
   })
 })

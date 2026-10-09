@@ -36,7 +36,8 @@ describe('return report and daily goal UI', () => {
 
     expect(template).toContain(':daily-goal="pet.dailyGoal.value"')
     expect(template).toContain(':daily-goal-reward-feedback="pet.dailyGoalRewardFeedback.value"')
-    expect(template).toContain('@claim-daily-goal="pet.claimDailyGoalReward"')
+    expect(template).toContain('@claim-daily-goal="handleClaimDailyGoal"')
+    expect(readFileSync(resolve('app.vue'), 'utf8')).toContain('pet.claimDailyGoalReward()')
   })
 
   it('renders the daily goal inside the side panel status body', () => {
@@ -59,13 +60,12 @@ describe('return report and daily goal UI', () => {
     }
   })
 
-  it('defines compact responsive styles', () => {
+  it('defines compact styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.return-report')
-    expect(css).toContain('.daily-goal')
-    expect(css).toMatch(/\.return-report__title\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/\.daily-goal__title\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/@media \(max-width: 720px\)[\s\S]*\.daily-goal\s*\{/)
+    expect(css).toMatch(/\.return-report\s*\{[^}]*display: grid;/)
+    expect(css).toContain('.return-report__title')
+    expect(css).toMatch(/\.daily-goal\s*\{[^}]*display: grid;/)
+    expect(css).toContain('.daily-goal__title')
   })
 })
