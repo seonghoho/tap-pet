@@ -39,6 +39,11 @@ const backupDraft = ref('')
 const backupNotice = ref('')
 const isBackupConfirming = ref(false)
 const { copyText } = useClipboard()
+const analyticsConsent = useAnalyticsConsent()
+
+function setAnalyticsSharing(event: Event): void {
+  analyticsConsent.setOptedOut(!(event.target as HTMLInputElement | null)?.checked)
+}
 const canImportBackup = computed(() => backupDraft.value.trim().length > 0)
 
 const titleModeOptions: Array<{
@@ -298,6 +303,21 @@ function confirmReset(): void {
       </label>
       <small>{{ messages.notifications.hint }}</small>
       <small v-if="notificationNotice" class="settings-notice" role="status">{{ notificationNotice }}</small>
+    </div>
+
+    <div class="settings-toggle-group">
+      <label class="settings-checkbox">
+        <input
+          type="checkbox"
+          :checked="!analyticsConsent.optedOut.value"
+          @change="setAnalyticsSharing"
+        >
+        <span>{{ messages.privacy.analytics }}</span>
+      </label>
+      <small>
+        {{ messages.privacy.analyticsHint }}
+        <a href="/privacy.html" target="_blank" rel="noopener">{{ messages.privacy.link }}</a>
+      </small>
     </div>
 
     <fieldset class="settings-fieldset">

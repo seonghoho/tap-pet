@@ -179,8 +179,7 @@ small {
 
 .main-panel,
 .pet-side-panel,
-.guide-panel,
-.ad-panel {
+.guide-panel {
   background: var(--app-surface);
   border: 1px solid var(--app-border);
   border-radius: 24px;
@@ -216,6 +215,13 @@ small {
   justify-content: space-between;
   margin: 28px auto 0;
   max-width: 1120px;
+}
+
+.app-footer__link,
+.settings-toggle-group a {
+  color: inherit;
+  margin-left: 6px;
+  text-underline-offset: 2px;
 }
 
 .locale-switcher {
@@ -2442,25 +2448,6 @@ small {
   gap: 4px;
   margin: 0;
   padding-left: 18px;
-}
-
-/* ---------- ad slot ---------- */
-
-.ad-panel {
-  display: grid;
-  gap: 8px;
-  padding: 14px;
-}
-
-.ad-panel__label {
-  color: var(--app-muted);
-  font-size: 0.6875rem;
-}
-
-.ad-panel__placeholder {
-  background: var(--app-bg);
-  border-radius: 12px;
-  min-height: 120px;
 }
 
 /* ---------- responsive ---------- */

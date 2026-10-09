@@ -467,6 +467,11 @@ export const I18N_MESSAGES = {
       footer: 'Tab Pet · a tiny friend in your tab',
       text: 'Meet my tab friend {name}',
     },
+    privacy: {
+      analytics: 'Share anonymous usage stats',
+      analyticsHint: 'Only which features get used, anonymously. Never your pet\'s name or backup code.',
+      link: 'Privacy',
+    },
     guide: {
       heading: 'How it works',
       description: 'Takes 30 seconds.',
@@ -993,6 +998,11 @@ export const I18N_MESSAGES = {
       footer: 'Tab Pet · 탭 한 칸에 사는 작은 친구',
       text: '탭에 사는 내 친구 {name}, 소개할게요',
     },
+    privacy: {
+      analytics: '익명 사용 통계 보내기',
+      analyticsHint: '어떤 기능을 많이 쓰는지만 익명으로 모아요. 이름이나 백업 코드는 보내지 않아요.',
+      link: '개인정보처리방침',
+    },
     guide: {
       heading: '탭펫은 이렇게 써요',
       description: '30초면 다 알 수 있어요.',
@@ -1518,6 +1528,11 @@ export const I18N_MESSAGES = {
       fresh: '今日はじめて会いました',
       footer: 'Tab Pet · タブにすむ小さな友だち',
       text: 'タブにすむ友だち {name} を紹介します',
+    },
+    privacy: {
+      analytics: '匿名の利用統計を送る',
+      analyticsHint: 'どの機能がよく使われるかだけを匿名で集めます。名前やバックアップコードは送りません。',
+      link: 'プライバシー',
     },
     guide: {
       heading: '使い方',
