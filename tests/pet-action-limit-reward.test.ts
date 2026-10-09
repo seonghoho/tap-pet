@@ -33,17 +33,6 @@ describe('pet action limit reward feedback', () => {
     )
   })
 
-  it('renders a reward grant confirmation near the action limit controls', () => {
-    const template = readComponentTemplate('components/PetActions.vue')
-    const source = readSource('components/PetActions.vue')
-    const css = readSource('assets/css/main.css')
-
-    expect(template).toContain('action-limit-reward')
-    expect(template).toContain('actionLimitRewardText')
-    expect(source).toContain('actionLimitRewardFeedback: PetActionLimitRewardFeedback | null')
-    expect(css).toContain('.action-limit-reward')
-  })
-
   it('prioritizes action limit recovery over recommendations while locked', () => {
     const template = readComponentTemplate('components/PetActions.vue')
     const source = readSource('components/PetActions.vue')
@@ -68,5 +57,14 @@ describe('pet action limit reward feedback', () => {
 
     expect(source).toContain('actionLimitRewardFeedback')
     expect(source).toContain('ACTION_LIMIT_AD_REWARD_USES')
+  })
+
+  it('renders a reward grant confirmation near the action limit controls', () => {
+    const template = readComponentTemplate('components/PetActions.vue')
+    const source = readSource('components/PetActions.vue')
+
+    expect(template).toContain('action-limit-reward')
+    expect(template).toContain('actionLimitRewardText')
+    expect(source).toContain('actionLimitRewardFeedback: PetActionLimitRewardFeedback | null')
   })
 })

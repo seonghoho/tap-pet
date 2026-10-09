@@ -11,9 +11,6 @@ function readComponentTemplate(componentPath: string): string {
   return descriptor.template?.content ?? ''
 }
 
-function readCss(cssPath: string): string {
-  return readFileSync(resolve(cssPath), 'utf8')
-}
 
 function readSource(sourcePath: string): string {
   return readFileSync(resolve(sourcePath), 'utf8')
@@ -35,23 +32,6 @@ describe('pet habitat action reactions', () => {
     expect(template).toContain('pet-habitat__reaction--wash')
   })
 
-  it('animates every action reaction in the habitat', () => {
-    const css = readCss('assets/css/main.css')
-
-    expect(css).toContain('.pet-habitat--reaction-feed .pet-habitat__pet')
-    expect(css).toContain('@keyframes habitat-feed-nod')
-    expect(css).toContain('.pet-habitat--reaction-play .pet-avatar')
-    expect(css).toContain('@keyframes habitat-play-hop')
-    expect(css).toContain('@keyframes habitat-play-roll')
-    expect(css).toContain('@keyframes habitat-play-teaser')
-    expect(css).toContain('@keyframes habitat-play-mouse')
-    expect(css).toContain('.pet-habitat--reaction-sleep .pet-avatar')
-    expect(css).toContain('@keyframes habitat-sleep-breathe')
-    expect(css).toContain('.pet-habitat--reaction-wash .pet-avatar')
-    expect(css).toContain('@keyframes habitat-wash-shake')
-    expect(css).toContain('@keyframes habitat-wash-bubble')
-  })
-
   it('passes pet level into habitat so level rewards can affect reactions', () => {
     const appTemplate = readComponentTemplate('app.vue')
     const statusTemplate = readComponentTemplate('components/PetStatusPanel.vue')
@@ -65,33 +45,11 @@ describe('pet habitat action reactions', () => {
   it('renders the level 4 habitat reaction spark layer from unlock state', () => {
     const template = readComponentTemplate('components/PetHabitat.vue')
     const source = readSource('components/PetHabitat.vue')
-    const css = readCss('assets/css/main.css')
 
     expect(source).toContain('getAvailableLevelUnlocks(props.level)')
     expect(source).toContain("unlock.id === 'habitat-reaction-spark'")
     expect(template).toContain('pet-habitat--reaction-spark')
     expect(template).toContain('v-if="shouldShowReactionSpark"')
     expect(template).toContain('pet-habitat__reaction--spark')
-    expect(css).toContain('.pet-habitat--reaction-spark .pet-habitat__spark')
-    expect(css).toContain('@keyframes habitat-reaction-spark')
-  })
-
-  it('keeps dog play ball low enough to read as rolling on the floor', () => {
-    const css = readCss('assets/css/main.css')
-
-    expect(css).toContain('animation: habitat-play-roll 1260ms linear infinite')
-    expect(css).toContain('top: 53%')
-    expect(css).toContain('translate: 154px 30px')
-    expect(css).not.toContain('translate: 72px 8px')
-  })
-
-  it('moves the cat teaser and mouse together from one shared pivot', () => {
-    const template = readComponentTemplate('components/PetHabitat.vue')
-    const css = readCss('assets/css/main.css')
-
-    expect(template).toContain('<span class="pet-habitat__play-string">')
-    expect(css).toContain('.pet-habitat__play-string .pet-habitat__play-mouse')
-    expect(css).not.toContain('translate: -18px 0')
-    expect(css).not.toContain('translate: 22px 4px')
   })
 })

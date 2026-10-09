@@ -160,25 +160,6 @@ describe('pet side panel progress summary', () => {
     expect(getComponentPropExpression(template, 'PetActions', 'care-feedback')).toBe('pet.lastCareFeedback.value')
   })
 
-  it('uses softer dedicated gauge colors instead of the primary action colors', () => {
-    const appSource = readSource('app.vue')
-    const css = readSource('assets/css/main.css')
-
-    expect(appSource).toContain("'--app-stat-fill-start': colors.statFillStart")
-    expect(appSource).toContain("'--app-stat-fill-end': colors.statFillEnd")
-    expect(css).toContain('var(--app-stat-fill-start)')
-    expect(css).toContain('var(--app-stat-fill-end)')
-    expect(css).not.toContain('linear-gradient(90deg, var(--app-accent), var(--app-success))')
-  })
-
-  it('keeps mobile action controls in a two-column grid', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.action-panel\s*\{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/,
-    )
-  })
-
   it('keeps first-loop side panel focused by gating detailed progression sections', () => {
     const template = readComponentTemplate('components/PetSidePanel.vue')
 

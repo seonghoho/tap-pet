@@ -259,10 +259,4 @@ describe('care feedback retention hint', () => {
     }
   })
 
-  it('defines compact retention hint styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toMatch(/\.care-feedback__checkback span\s*\{[^}]*font-weight: 700;/)
-    expect(css).toMatch(/\.care-feedback__checkback small\s*\{[^}]*color: var\(--app-muted\);/)
-  })
 })

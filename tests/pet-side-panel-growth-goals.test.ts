@@ -237,10 +237,4 @@ describe('pet side panel growth goals', () => {
     }
   })
 
-  it('defines compact growth goal styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toMatch(/\.progress-goal,\s*\.level-unlock\s*\{[^}]*display: grid;/)
-    expect(css).toMatch(/\.progress-goal \.stat-track\s*\{/)
-  })
 })

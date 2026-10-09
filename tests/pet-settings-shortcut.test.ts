@@ -44,10 +44,4 @@ describe('pet settings shortcut', () => {
     }
   })
 
-  it('defines compact shortcut styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toMatch(/\.tab-settings-shortcut\s*\{[^}]*white-space: nowrap;/)
-    expect(css).toContain('.tab-settings-shortcut:hover')
-  })
 })

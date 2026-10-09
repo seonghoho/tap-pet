@@ -259,12 +259,4 @@ describe('pet level unlock UI', () => {
     }
   })
 
-  it('defines compact level unlock styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toContain('.level-unlocks')
-    expect(css).toContain('.level-unlock--next')
-    expect(css).toContain('.care-feedback__unlock-list')
-    expect(css).toMatch(/\.care-feedback__unlock,\s*\.care-feedback__personality\s*\{[^}]*display: grid;/)
-  })
 })

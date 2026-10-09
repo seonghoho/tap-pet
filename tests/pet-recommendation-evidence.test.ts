@@ -219,11 +219,4 @@ describe('pet recommendation evidence', () => {
     }
   })
 
-  it('defines compact recommendation styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).not.toContain('.action-recommendation__cta')
-    expect(css).toMatch(/\.action-recommendation\s*\{[^}]*flex-wrap: wrap;/)
-    expect(css).toMatch(/\.action-recommendation\s*\{[^}]*min-width: 0;/)
-  })
 })

@@ -1,0 +1,257 @@
+/* Settings tab and guide panel. */
+
+/* ---------- settings ---------- */
+
+.pet-settings-panel {
+  display: grid;
+  gap: 22px;
+}
+
+.settings-field,
+.settings-fieldset {
+  border: 0;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.settings-field > span,
+.settings-fieldset legend {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.settings-field > span {
+  margin-bottom: 0;
+}
+
+.settings-input,
+.text-input {
+  background: var(--app-bg);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  min-height: 44px;
+  min-width: 0;
+  padding: 0 14px;
+  width: 100%;
+}
+
+.settings-input:focus {
+  border-color: var(--app-text);
+  outline: none;
+}
+
+.choice-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.choice-button {
+  background: var(--app-bg);
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  min-height: 34px;
+  padding: 0 12px;
+}
+
+.choice-button--active {
+  border-color: var(--app-text);
+  font-weight: 700;
+}
+
+.settings-checkbox {
+  align-items: center;
+  display: flex;
+  font-size: 0.875rem;
+  gap: 10px;
+}
+
+.settings-checkbox input {
+  accent-color: var(--app-accent);
+  height: 18px;
+  width: 18px;
+}
+
+.pet-settings-panel .premium-tab-pack {
+  background: var(--app-bg);
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+
+.pet-settings-panel .premium-tab-pack summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.pet-settings-panel .premium-tab-pack summary::-webkit-details-marker {
+  display: none;
+}
+
+.pet-settings-panel .premium-tab-pack > p {
+  color: var(--app-muted);
+  font-size: 0.75rem;
+  margin-top: 10px;
+}
+
+.settings-toggle-group {
+  display: grid;
+  gap: 4px;
+}
+
+.settings-toggle-group small {
+  color: var(--app-muted);
+  padding-left: 28px;
+}
+
+.settings-notice {
+  color: var(--app-accent) !important;
+}
+
+.settings-backup {
+  border-top: 1px solid var(--app-border);
+  display: grid;
+  gap: 10px;
+  padding-top: 18px;
+}
+
+.settings-backup strong {
+  font-size: 0.9375rem;
+}
+
+.settings-backup p {
+  color: var(--app-muted);
+  font-size: 0.8125rem;
+}
+
+.settings-backup__input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+  padding: 10px 14px;
+  resize: vertical;
+}
+
+.settings-backup__confirm {
+  min-height: 40px;
+  width: auto;
+}
+
+.ghost-button:disabled {
+  opacity: 0.45;
+}
+
+.settings-danger-zone {
+  border-top: 1px solid var(--app-border);
+  display: grid;
+  gap: 10px;
+  padding-top: 18px;
+}
+
+.settings-danger-zone strong {
+  font-size: 0.9375rem;
+}
+
+.settings-danger-zone p {
+  color: var(--app-muted);
+  font-size: 0.8125rem;
+}
+
+.settings-danger-zone__confirm {
+  color: var(--app-text) !important;
+}
+
+.settings-danger-zone__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.danger-button,
+.ghost-button,
+.small-button {
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  min-height: 40px;
+  padding: 0 14px;
+}
+
+.danger-button {
+  color: #d9473a;
+  justify-self: start;
+  padding-left: 0;
+}
+
+.danger-button--solid {
+  background: #d9473a;
+  color: #ffffff;
+  padding-left: 14px;
+}
+
+.ghost-button,
+.small-button {
+  background: var(--app-bg);
+}
+
+/* ---------- guide ---------- */
+
+.guide-panel {
+  overflow: hidden;
+}
+
+.guide-panel__toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 16px 20px;
+  text-align: left;
+  width: 100%;
+}
+
+.guide-panel__toggle > span:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.guide-panel__toggle strong {
+  font-size: 0.9375rem;
+}
+
+.guide-panel__toggle small {
+  color: var(--app-muted);
+}
+
+.guide-panel__chevron {
+  color: var(--app-muted);
+  font-size: 1.25rem;
+}
+
+.guide-panel__content {
+  display: grid;
+  gap: 16px;
+  font-size: 0.875rem;
+  padding: 0 20px 20px;
+}
+
+.guide-section h3 {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.guide-section ul {
+  color: var(--app-muted);
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 18px;
+}

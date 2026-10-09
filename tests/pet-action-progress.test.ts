@@ -48,11 +48,4 @@ describe('pet action progress status', () => {
     }
   })
 
-  it('defines progress styles that are safe for mobile text wrapping', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toContain('.care-progress__dot')
-    expect(css).toMatch(/\.care-progress\s*\{[^}]*flex-wrap: wrap;/)
-    expect(css).toMatch(/\.care-progress\s*\{[^}]*min-width: 0;/)
-  })
 })

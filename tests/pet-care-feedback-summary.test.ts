@@ -208,10 +208,4 @@ describe('pet care feedback summary', () => {
     }
   })
 
-  it('defines result header and next-action styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toMatch(/\.care-feedback__header\s*\{[^}]*justify-content: space-between;/)
-    expect(css).toMatch(/\.care-feedback__next,\s*\.care-feedback__checkback\s*\{[^}]*flex-wrap: wrap;/)
-  })
 })

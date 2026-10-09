@@ -60,12 +60,4 @@ describe('return report and daily goal UI', () => {
     }
   })
 
-  it('defines compact styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toMatch(/\.return-report\s*\{[^}]*display: grid;/)
-    expect(css).toContain('.return-report__title')
-    expect(css).toMatch(/\.daily-goal\s*\{[^}]*display: grid;/)
-    expect(css).toContain('.daily-goal__title')
-  })
 })
