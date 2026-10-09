@@ -33,7 +33,8 @@ import {
   getActionLimitInfo,
   grantRewardedActionUses,
 } from '~/utils/petActionLimit'
-import { accumulateLiveDecay } from '~/utils/petDecay'
+import { decodePetBackup, encodePetBackup } from '~/utils/petBackup'
+import { accumulateLiveDecay, applyOfflineDecay } from '~/utils/petDecay'
 import { createInitialPetState } from '~/utils/petFactory'
 import {
   claimDailyGoalReward as claimDailyGoalRewardResult,
@@ -47,6 +48,7 @@ import {
   recordPersonalityCareAction,
 } from '~/utils/petPersonality'
 import { createPetReturnReport } from '~/utils/petReturnReport'
+import { getActiveStreak, hasCaredToday, recordStreakCare } from '~/utils/petStreak'
 import { getPetStatus } from '~/utils/petStatus'
 import { clampStat, isDisguiseTitleId, isPetSpecies, isThemeId } from '~/utils/petValidation'
 
@@ -138,6 +140,17 @@ export function usePetStore(options: PetStoreOptions = {}) {
       growth: petState.value.growth,
       action: recommendation.action,
     })
+  })
+  const streakInfo = computed(() => {
+    if (!petState.value) return null
+
+    const streak = petState.value.streak
+
+    return {
+      current: getActiveStreak(streak, now.value),
+      best: streak.best,
+      caredToday: hasCaredToday(streak, now.value),
+    }
   })
   const levelProgress = computed(() =>
     petState.value ? getLevelProgress(petState.value.growth) : null,
@@ -289,6 +302,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
         growth: result.growth,
         dailyGoal: resolvedDailyGoal,
         personality: nextPersonality,
+        streak: recordStreakCare(previousState.streak, resolvedAt),
         lastPlayedAt: action === 'play' ? resolvedAt : previousState.lastPlayedAt,
       })
       if (latestActionRunId.value === actionRunId) {
@@ -414,6 +428,33 @@ export function usePetStore(options: PetStoreOptions = {}) {
     dailyGoalRewardFeedbackState.value = result.feedback
   }
 
+  function exportPetBackup(): string | null {
+    return petState.value ? encodePetBackup(petState.value) : null
+  }
+
+  // Replaces the current pet with one from a backup code. Returns false for an invalid code.
+  function importPetBackup(code: string): boolean {
+    const importedAt = Date.now()
+    const imported = decodePetBackup(code, importedAt)
+    if (!imported) return false
+
+    actionGeneration.value += 1
+    latestActionRunId.value += 1
+    activeReaction.value = null
+    lastCareFeedback.value = null
+    pendingPersonalityReveal.value = null
+    returnReport.value = null
+    dailyGoalRewardFeedbackState.value = null
+    actionLimitRewardFeedbackState.value = null
+    startLiveDecay(importedAt)
+    commitState({
+      ...imported,
+      stats: applyOfflineDecay(imported.stats, imported.lastUpdatedAt, importedAt),
+    })
+
+    return true
+  }
+
   function resetPet(): void {
     actionGeneration.value += 1
     latestActionRunId.value += 1
@@ -514,6 +555,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     isReady: readonly(isReady),
     petStatus,
     dailyGoal,
+    streakInfo,
     recommendedCareAction,
     recommendedCareRewardPreview,
     levelProgress,
@@ -539,6 +581,8 @@ export function usePetStore(options: PetStoreOptions = {}) {
     setTheme,
     grantRewardedAdActions,
     claimDailyGoalReward,
+    exportPetBackup,
+    importPetBackup,
     resetPet,
   }
 }
@@ -612,6 +656,10 @@ function getValidSettingsPatch(settings: Partial<PetSettings>): Partial<PetSetti
 
   if (isThemeId(settings.themeId)) {
     nextSettings.themeId = settings.themeId
+  }
+
+  if (typeof settings.careNotifications === 'boolean') {
+    nextSettings.careNotifications = settings.careNotifications
   }
 
   return nextSettings

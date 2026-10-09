@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type {
+  PetSpecies,
   PetDailyGoalRewardFeedback,
   PetDailyGoalState,
   PetLevelUnlock,
@@ -14,12 +15,16 @@ import { getPetPersonalityProgress } from '~/utils/petPersonality'
 
 const props = defineProps<{
   mode: 'status' | 'settings'
+  species?: PetSpecies
   name: string
   level: number
   levelProgress: ProgressInfo
   affinityProgress: AffinityProgressInfo
   dailyGoal: PetDailyGoalState
   dailyGoalRewardFeedback: PetDailyGoalRewardFeedback | null
+  streak?: { current: number, best: number, caredToday: boolean } | null
+  backupCode?: string | null
+  importBackup?: (code: string) => boolean
   personality: PetPersonalityState
   settings: PetSettings
 }>()
@@ -181,6 +186,7 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
       <PetDailyGoal
         :daily-goal="dailyGoal"
         :reward-feedback="dailyGoalRewardFeedback"
+        :streak="streak"
         @claim="emit('claimDailyGoal')"
       />
 
@@ -258,7 +264,9 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
           </p>
         </section>
 
-        <section class="premium-tab-pack premium-tab-pack--compact" aria-labelledby="premium-tab-pack-preview-title">
+        <section
+          v-if="level >= 3"
+          class="premium-tab-pack premium-tab-pack--compact" aria-labelledby="premium-tab-pack-preview-title">
           <div class="premium-tab-pack__header">
             <span>{{ messages.premium.lockedLabel }}</span>
             <strong id="premium-tab-pack-preview-title">{{ messages.premium.heading }}</strong>
@@ -295,6 +303,14 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
             <small>{{ getLevelUnlockDetail(nextLevelUnlock) }}</small>
         </div>
       </section>
+
+      <ShareCardButton
+        v-if="species"
+        :species="species"
+        :name="name"
+        :level="level"
+        :streak-days="streak?.current ?? 0"
+      />
     </div>
 
     <PetSettingsPanel
@@ -302,6 +318,8 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
       class="pet-side-panel__body"
       :name="name"
       :settings="settings"
+      :backup-code="backupCode"
+      :import-backup="importBackup"
       @update-name="emit('updateName', $event)"
       @update-settings="emit('updateSettings', $event)"
       @reset="emit('reset')"

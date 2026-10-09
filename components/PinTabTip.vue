@@ -16,6 +16,7 @@ onMounted(() => {
 
 function dismiss(): void {
   isVisible.value = false
+  trackEvent('pin_tip_dismissed', {})
 
   try {
     localStorage.setItem(PIN_TIP_STORAGE_KEY, '1')

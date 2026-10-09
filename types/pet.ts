@@ -50,6 +50,7 @@ export type PetSettings = {
   customDisguiseTitle: string
   titleAnimationEnabled: boolean
   themeId: ThemeId
+  careNotifications?: boolean
 }
 
 export type PetActionLimit = {
@@ -154,8 +155,15 @@ export type PetState = {
   actionLimit: PetActionLimit
   dailyGoal: PetDailyGoalState
   personality: PetPersonalityState
+  streak: PetStreak
   lastUpdatedAt: number
   lastPlayedAt: number
+}
+
+export type PetStreak = {
+  current: number
+  best: number
+  lastCareDateKey: string | null
 }
 
 export type StoredPetState = PetState & {

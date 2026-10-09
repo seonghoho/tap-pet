@@ -37,6 +37,7 @@ export const DEFAULT_SETTINGS: PetSettings = {
   customDisguiseTitle: '',
   titleAnimationEnabled: false,
   themeId: 'system',
+  careNotifications: false,
 }
 
 export const NEED_THRESHOLDS = {
@@ -126,3 +127,6 @@ export const DECAY_PER_HOUR: PetStats = {
 }
 
 export const MAX_OFFLINE_DECAY_HOURS = 24
+
+// Browser notifications: never more than one per this window.
+export const CARE_NOTIFICATION_COOLDOWN_MS = 1000 * 60 * 60 * 2

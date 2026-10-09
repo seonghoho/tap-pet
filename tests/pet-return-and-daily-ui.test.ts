@@ -36,7 +36,8 @@ describe('return report and daily goal UI', () => {
 
     expect(template).toContain(':daily-goal="pet.dailyGoal.value"')
     expect(template).toContain(':daily-goal-reward-feedback="pet.dailyGoalRewardFeedback.value"')
-    expect(template).toContain('@claim-daily-goal="pet.claimDailyGoalReward"')
+    expect(template).toContain('@claim-daily-goal="handleClaimDailyGoal"')
+    expect(readFileSync(resolve('app.vue'), 'utf8')).toContain('pet.claimDailyGoalReward()')
   })
 
   it('renders the daily goal inside the side panel status body', () => {
