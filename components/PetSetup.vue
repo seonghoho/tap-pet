@@ -1,13 +1,29 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { PetSpecies } from '~/types/pet'
+import type { PetSettings, PetSpecies, TitleMode } from '~/types/pet'
 import { renderPetArtSvg } from '~/utils/petArt'
-import { svgToDataUrl } from '~/utils/tabPresentation'
+import { getDisguiseTitleValue, svgToDataUrl } from '~/utils/tabPresentation'
 
+const props = withDefaults(defineProps<{
+  titleMode?: TitleMode
+}>(), {
+  titleMode: 'status',
+})
 const emit = defineEmits<{
   select: [species: PetSpecies]
+  updateSettings: [settings: Partial<PetSettings>]
 }>()
-const { messages } = useLocale()
+const { locale, messages } = useLocale()
+const titleModeOptions: TitleMode[] = ['status', 'disguise']
+const demoTitles = computed(() => {
+  if (props.titleMode === 'disguise') {
+    const disguise = getDisguiseTitleValue('project-dashboard', locale.value)
+
+    return { normal: disguise, alert: `(1) ${disguise}` }
+  }
+
+  return { normal: messages.value.setup.tabPreview.normal, alert: messages.value.setup.tabPreview.alert }
+})
 
 const options: Array<{
   species: PetSpecies
@@ -75,14 +91,30 @@ const demoIcons = computed(() => ({
         <strong>{{ messages.setup.tabPreview.label }}</strong>
         <small>{{ messages.setup.tabPreview.hint }}</small>
       </div>
+      <div class="setup-tab-demo__choice" role="group" :aria-label="messages.setup.titleChoice.label">
+        <span>{{ messages.setup.titleChoice.label }}</span>
+        <div class="segmented-control">
+          <button
+            v-for="mode in titleModeOptions"
+            :key="mode"
+            class="segmented-button"
+            :class="{ 'segmented-button--active': titleMode === mode }"
+            type="button"
+            :aria-pressed="titleMode === mode"
+            @click="emit('updateSettings', { titleMode: mode })"
+          >
+            {{ messages.setup.titleChoice[mode] }}
+          </button>
+        </div>
+      </div>
       <div class="setup-tab-demo__tabs" aria-hidden="true">
         <span class="setup-tab-demo__tab">
           <img :src="demoIcons.normal" alt="">
-          {{ messages.setup.tabPreview.normal }}
+          <span>{{ demoTitles.normal }}</span>
         </span>
         <span class="setup-tab-demo__tab setup-tab-demo__tab--alert">
           <img :src="demoIcons.alert" alt="">
-          {{ messages.setup.tabPreview.alert }}
+          <span>{{ demoTitles.alert }}</span>
         </span>
       </div>
     </div>

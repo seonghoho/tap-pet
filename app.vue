@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useHead } from '#app'
-import { DEFAULT_SETTINGS } from '~/constants/pet'
 import type { AppLocale } from '~/types/i18n'
 import type { PetAction, PetSettings, PetSpecies, PetStatus } from '~/types/pet'
 import { renderPetArtSvg } from '~/utils/petArt'
@@ -36,11 +35,7 @@ onBeforeUnmount(() => {
 
 const currentPet = computed(() => pet.petState.value)
 const effectiveStatus = computed<PetStatus>(() => pet.petStatus.value ?? 'happy')
-const effectiveSettings = computed<PetSettings>(() => currentPet.value?.settings ?? {
-  ...DEFAULT_SETTINGS,
-  disguiseTitleId: pet.draftDisguiseTitleId.value,
-  themeId: pet.draftThemeId.value,
-})
+const effectiveSettings = computed<PetSettings>(() => currentPet.value?.settings ?? pet.activeSettings.value)
 const resolvedThemeId = computed(() => resolveThemeId(effectiveSettings.value.themeId, prefersDark.value))
 const activeTheme = computed(() => getThemeById(resolvedThemeId.value))
 const adsenseClient = computed(() => String(runtimeConfig.public.adsenseClient || ''))
@@ -124,6 +119,7 @@ function openTabSettings(): void {
 
 function handleVisibilityChange(): void {
   isDocumentVisible.value = document.visibilityState === 'visible'
+  if (isDocumentVisible.value) pet.applyLiveDecay()
 }
 
 function handleColorSchemeChange(event: MediaQueryListEvent): void {
@@ -169,7 +165,9 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
         <PetSetup
           v-else-if="!currentPet"
           id="pet-panel-title"
+          :title-mode="effectiveSettings.titleMode"
           @select="handleSpeciesSelect"
+          @update-settings="pet.updatePetSettings"
         />
 
         <template v-else>

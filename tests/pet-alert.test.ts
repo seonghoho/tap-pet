@@ -53,7 +53,7 @@ describe('tab title policy', () => {
     ).toBe('배고파요')
   })
 
-  it('uses disguise title before status title in disguise mode', () => {
+  it('adds an unread-style count to the disguise title when the pet needs care', () => {
     expect(
       getTabTitle({
         status: 'hungry',
@@ -68,7 +68,22 @@ describe('tab title policy', () => {
         },
         isDocumentVisible: false,
       }),
-    ).toBe('회의 자료')
+    ).toBe('(1) 회의 자료')
+  })
+
+  it('keeps the plain disguise title while the pet is fine or the tab is in view', () => {
+    const settings = {
+      titleMode: 'disguise' as const,
+      titleVisibility: 'inactive-only' as const,
+      disguiseTitleId: 'inbox' as const,
+      customDisguiseTitle: '',
+      titleAnimationEnabled: false,
+      themeId: 'system' as const,
+    }
+
+    expect(getTabTitle({ status: 'happy', locale: 'ko', settings, isDocumentVisible: false })).toBe('받은 편지함')
+    expect(getTabTitle({ status: 'hungry', locale: 'ko', settings, isDocumentVisible: true })).toBe('받은 편지함')
+    expect(getTabTitle({ status: 'hungry', locale: 'ko', settings, isDocumentVisible: false })).toBe('(1) 받은 편지함')
   })
 
   it('uses app title while visible for inactive-only status mode', () => {
@@ -123,7 +138,8 @@ describe('tab title policy', () => {
       isDocumentVisible: false,
     })
 
-    expect(presentation.title).toBe('받은 편지함')
+    expect(presentation.title).toBe('(1) 받은 편지함')
     expect(presentation.faviconSvg).toContain('<svg')
+    expect(presentation.faviconSvg).toContain('data-status="dirty"')
   })
 })

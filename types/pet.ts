@@ -56,6 +56,8 @@ export type PetActionLimit = {
   windowStartedAt: number
   used: number
   bonusUses: number
+  // Local date key of the day the one-a-day recharge was used.
+  rechargedOn?: string
 }
 
 export type PetActionLimitInfo = {
@@ -64,6 +66,7 @@ export type PetActionLimitInfo = {
   remaining: number
   resetAt: number
   windowMs: number
+  canRecharge: boolean
 }
 
 export type PetActionLimitRewardFeedback = {

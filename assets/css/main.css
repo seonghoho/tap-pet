@@ -360,6 +360,20 @@ small {
   color: var(--app-muted);
 }
 
+.setup-tab-demo__choice {
+  display: grid;
+  gap: 8px;
+}
+
+.setup-tab-demo__choice > span {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.setup-tab-demo__choice .segmented-control {
+  background: var(--app-bg);
+}
+
 .setup-tab-demo__tabs {
   display: flex;
   gap: 6px;
@@ -377,6 +391,12 @@ small {
   min-width: 0;
   padding: 0 14px 0 10px;
   white-space: nowrap;
+}
+
+.setup-tab-demo__tab > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .setup-tab-demo__tab img {
@@ -1506,6 +1526,10 @@ small {
 .action-limit__option--reward {
   background: var(--app-text);
   color: var(--app-bg);
+}
+
+.action-limit__option--reward:disabled {
+  opacity: 0.45;
 }
 
 .action-limit__option--reward small {

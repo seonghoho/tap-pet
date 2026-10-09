@@ -10,7 +10,7 @@ import { DEFAULT_LOCALE } from '~/constants/i18n'
 import type { AppLocale } from '~/types/i18n'
 import type { DisguiseTitleId, PetSettings, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
 import { getAvailableLevelUnlocks } from '~/utils/petLevelUnlocks'
-import { renderPetArtSvg } from '~/utils/petArt'
+import { petNeedsCare, renderPetArtSvg } from '~/utils/petArt'
 
 export type TabPresentation = {
   title: string
@@ -34,15 +34,20 @@ export function getTabTitle(input: {
   locale: AppLocale
   isDocumentVisible: boolean
 }): string {
+  const shouldSignal = input.settings.titleVisibility === 'always' || !input.isDocumentVisible
+
   if (input.settings.titleMode === 'disguise') {
-    return getDisguiseTitleValue(
+    const disguiseTitle = getDisguiseTitleValue(
       input.settings.disguiseTitleId,
       input.locale,
       input.settings.customDisguiseTitle,
     )
+
+    // Borrow the unread-count pattern every work app uses, so the signal never looks like a pet.
+    return shouldSignal && petNeedsCare(input.status) ? `(1) ${disguiseTitle}` : disguiseTitle
   }
 
-  if (input.settings.titleVisibility === 'inactive-only' && input.isDocumentVisible) {
+  if (!shouldSignal) {
     return APP_DEFAULT_TITLE
   }
 

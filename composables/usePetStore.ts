@@ -27,6 +27,7 @@ import {
   getActionLimitInfo,
   grantRewardedActionUses,
 } from '~/utils/petActionLimit'
+import { accumulateLiveDecay } from '~/utils/petDecay'
 import { createInitialPetState } from '~/utils/petFactory'
 import {
   claimDailyGoalReward as claimDailyGoalRewardResult,
@@ -41,7 +42,7 @@ import {
 } from '~/utils/petPersonality'
 import { createPetReturnReport } from '~/utils/petReturnReport'
 import { getPetStatus } from '~/utils/petStatus'
-import { isDisguiseTitleId, isPetSpecies, isThemeId } from '~/utils/petValidation'
+import { clampStat, isDisguiseTitleId, isPetSpecies, isThemeId } from '~/utils/petValidation'
 
 type SidePanelMode = 'status' | 'settings'
 type ActionScheduler = (callback: () => void) => void
@@ -52,8 +53,11 @@ type PersonalityRevealFeedback = NonNullable<PetCareFeedback['personalityReveal'
 
 const CLOCK_UPDATE_INTERVAL_MS = 1000 * 60
 
+const EMPTY_DECAY_CARRY: PetStats = { fullness: 0, energy: 0, cleanliness: 0 }
+
 let clockIntervalId: number | null = null
 let clockSubscriberCount = 0
+let clockTickHandler: (() => void) | null = null
 
 export function usePetStore(options: PetStoreOptions = {}) {
   const storage = useLocalPetStorage()
@@ -89,7 +93,11 @@ export function usePetStore(options: PetStoreOptions = {}) {
     () => null,
   )
 
-  usePetClock(now)
+  // Runtime-only: the fractional decay not yet applied, and when we last measured it.
+  const decayCarry = useState<PetStats>('tab-pet:decay-carry', () => ({ ...EMPTY_DECAY_CARRY }))
+  const lastDecayAt = useState<number | null>('tab-pet:last-decay-at', () => null)
+
+  usePetClock(now, () => applyLiveDecay())
 
   const activeSettings = computed(() => petState.value?.settings ?? draftSettings.value)
   const draftDisguiseTitleId = computed(() => activeSettings.value.disguiseTitleId)
@@ -175,6 +183,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     } else {
       returnReport.value = null
     }
+    startLiveDecay(restoredAt)
     hasRestored.value = true
     isReady.value = true
   }
@@ -190,8 +199,10 @@ export function usePetStore(options: PetStoreOptions = {}) {
     returnReport.value = null
     dailyGoalRewardFeedbackState.value = null
     actionLimitRewardFeedbackState.value = null
+    const createdAt = Date.now()
+    startLiveDecay(createdAt)
     commitState(
-      createInitialPetState(species, Date.now(), {
+      createInitialPetState(species, createdAt, {
         settings: {
           ...draftSettings.value,
         },
@@ -351,13 +362,18 @@ export function usePetStore(options: PetStoreOptions = {}) {
     updatePetSettings({ themeId })
   }
 
+  // No rewarded-ad SDK yet: this is a free once-a-day recharge. When an SDK is added,
+  // call this only from its "reward granted" callback.
   function grantRewardedAdActions(): void {
     if (!petState.value) return
 
     const grantedAt = Date.now()
+    const recharged = grantRewardedActionUses(petState.value.actionLimit, grantedAt)
+    if (!recharged) return
+
     commitState({
       ...petState.value,
-      actionLimit: grantRewardedActionUses(petState.value.actionLimit, grantedAt),
+      actionLimit: recharged,
     })
     actionLimitRewardFeedbackState.value = {
       addedUses: ACTION_LIMIT_AD_REWARD_USES,
@@ -411,7 +427,39 @@ export function usePetStore(options: PetStoreOptions = {}) {
     dailyGoalRewardFeedbackState.value = null
     actionLimitRewardFeedbackState.value = null
     sidePanelMode.value = 'status'
+    lastDecayAt.value = null
+    decayCarry.value = { ...EMPTY_DECAY_CARRY }
     storage.clearPetState()
+  }
+
+  function startLiveDecay(at: number): void {
+    lastDecayAt.value = at
+    decayCarry.value = { ...EMPTY_DECAY_CARRY }
+  }
+
+  // Offline time is applied on restore; this keeps stats moving while the tab stays open.
+  function applyLiveDecay(at = Date.now()): void {
+    if (!petState.value || lastDecayAt.value === null) return
+
+    const elapsed = at - lastDecayAt.value
+    if (elapsed <= 0) return
+
+    lastDecayAt.value = at
+    const result = accumulateLiveDecay(decayCarry.value, elapsed)
+    decayCarry.value = result.carry
+
+    const { delta } = result
+    if (delta.fullness === 0 && delta.energy === 0 && delta.cleanliness === 0) return
+
+    const stats = petState.value.stats
+    commitState({
+      ...petState.value,
+      stats: {
+        fullness: clampStat(stats.fullness + delta.fullness),
+        energy: clampStat(stats.energy + delta.energy),
+        cleanliness: clampStat(stats.cleanliness + delta.cleanliness),
+      },
+    })
   }
 
   function commitState(nextState: PetState): void {
@@ -455,6 +503,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
 
   return {
     petState: readonly(petState),
+    activeSettings,
     draftDisguiseTitleId: readonly(draftDisguiseTitleId),
     draftThemeId: readonly(draftThemeId),
     isReady: readonly(isReady),
@@ -475,6 +524,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     storageError: storage.storageError,
     restorePet,
     initializePet,
+    applyLiveDecay,
     performAction,
     updatePetName,
     updatePetSettings,
@@ -488,10 +538,11 @@ export function usePetStore(options: PetStoreOptions = {}) {
   }
 }
 
-function usePetClock(now: Ref<number>): void {
+function usePetClock(now: Ref<number>, onTick: () => void): void {
   if (!import.meta.client || !getCurrentInstance()) return
 
   onMounted(() => {
+    clockTickHandler = onTick
     now.value = Date.now()
     clockSubscriberCount += 1
 
@@ -499,6 +550,7 @@ function usePetClock(now: Ref<number>): void {
 
     clockIntervalId = window.setInterval(() => {
       now.value = Date.now()
+      clockTickHandler?.()
     }, CLOCK_UPDATE_INTERVAL_MS)
   })
 
@@ -508,6 +560,7 @@ function usePetClock(now: Ref<number>): void {
 
     window.clearInterval(clockIntervalId)
     clockIntervalId = null
+    clockTickHandler = null
   })
 }
 

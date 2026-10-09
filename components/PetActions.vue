@@ -549,10 +549,11 @@ function getLevelUnlockDetail(unlock: PetLevelUnlock): string {
         <button
           class="action-limit__option action-limit__option--reward"
           type="button"
+          :disabled="!actionLimitInfo.canRecharge"
           @click="emit('rewardAd')"
         >
           <strong>{{ messages.actionLimit.rewardOption }}</strong>
-          <small>{{ actionLimitRecoveryRewardText }}</small>
+          <small>{{ actionLimitInfo.canRecharge ? actionLimitRecoveryRewardText : messages.actionLimit.rechargeUsed }}</small>
         </button>
       </div>
     </div>
