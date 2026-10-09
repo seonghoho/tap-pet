@@ -18,6 +18,7 @@ export type AnalyticsEvents = {
   backup_exported: Record<string, never>
   backup_imported: { ok: boolean }
   pin_tip_dismissed: Record<string, never>
+  pet_patted: Record<string, never>
 }
 
 export type AnalyticsEventName = keyof AnalyticsEvents

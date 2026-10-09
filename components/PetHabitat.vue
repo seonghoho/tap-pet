@@ -24,9 +24,27 @@ const props = defineProps<{
   level: number
   activeReaction?: PetAction | null
   careFeedback?: PetCareFeedback | null
+  petName?: string
+}>()
+
+const emit = defineEmits<{
+  pet: []
 }>()
 
 const { messages } = useLocale()
+const unlockedIds = computed(() => new Set(getAvailableLevelUnlocks(props.level).map((unlock) => unlock.id)))
+const isPetting = ref(false)
+let pettingTimer: ReturnType<typeof setTimeout> | null = null
+
+// Petting is pure affection: no stats, no limits, just a squish and some hearts.
+function petThePet(): void {
+  isPetting.value = true
+  if (pettingTimer) clearTimeout(pettingTimer)
+  pettingTimer = setTimeout(() => {
+    isPetting.value = false
+  }, 900)
+  emit('pet')
+}
 // The one or two numbers that matter, floated above the pet right after care.
 const floatingGains = computed(() => {
   const feedback = props.careFeedback
@@ -81,6 +99,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  if (pettingTimer) clearTimeout(pettingTimer)
   stopMotion()
   motionQuery?.removeEventListener('change', handleMotionPreferenceChange)
 })
@@ -140,6 +159,7 @@ function randomWithin(min: number, max: number): number {
       {
         'pet-habitat--bounce': shouldBounce,
         'pet-habitat--reaction-spark': shouldShowReactionSpark,
+        'pet-habitat--petting': isPetting,
       },
     ]"
     :data-reaction="activeReaction ?? undefined"
@@ -148,11 +168,56 @@ function randomWithin(min: number, max: number): number {
     <div class="pet-habitat__back-wall" aria-hidden="true">
       <span class="pet-habitat__shelf" />
       <span class="pet-habitat__window" />
+      <svg
+        v-if="unlockedIds.has('room-lights')"
+        class="pet-habitat__item pet-habitat__item--lights"
+        viewBox="0 0 600 46"
+      >
+        <path d="M0 6Q75 34 150 10T300 10T450 10T600 6" fill="none" stroke="#4a3934" stroke-width="2.5" />
+        <g stroke="#4a3934" stroke-width="2">
+          <circle cx="40" cy="20" r="7" fill="#ffd25e" />
+          <circle cx="110" cy="24" r="7" fill="#ff9aa6" />
+          <circle cx="190" cy="22" r="7" fill="#9fd3c7" />
+          <circle cx="260" cy="14" r="7" fill="#ffd25e" />
+          <circle cx="340" cy="22" r="7" fill="#ff9aa6" />
+          <circle cx="410" cy="16" r="7" fill="#9fd3c7" />
+          <circle cx="490" cy="22" r="7" fill="#ffd25e" />
+          <circle cx="560" cy="14" r="7" fill="#ff9aa6" />
+        </g>
+      </svg>
+      <svg
+        v-if="unlockedIds.has('room-frame')"
+        class="pet-habitat__item pet-habitat__item--frame"
+        viewBox="0 0 48 40"
+      >
+        <rect x="2" y="2" width="44" height="36" rx="4" fill="#e8c49a" stroke="#4a3934" stroke-width="2.5" />
+        <rect x="8" y="8" width="32" height="24" rx="2" fill="#fff6e8" />
+        <path d="M24 26C17 21 16 16 19.5 14C21.5 13 23.2 14 24 15.5C24.8 14 26.5 13 28.5 14C32 16 31 21 24 26Z" fill="#ff9aa6" />
+      </svg>
     </div>
 
     <div class="pet-habitat__floor" aria-hidden="true">
       <span class="pet-habitat__bowl" />
       <span class="pet-habitat__cushion" />
+      <svg
+        v-if="unlockedIds.has('room-lamp')"
+        class="pet-habitat__item pet-habitat__item--lamp"
+        viewBox="0 0 44 110"
+      >
+        <path d="M8 32L14 6H30L36 32Z" fill="#ffd98a" stroke="#4a3934" stroke-width="2.5" stroke-linejoin="round" />
+        <path d="M22 32V100" stroke="#4a3934" stroke-width="3" />
+        <ellipse cx="22" cy="102" rx="13" ry="5" fill="#c9a07c" stroke="#4a3934" stroke-width="2.5" />
+      </svg>
+      <svg
+        v-if="unlockedIds.has('room-plant')"
+        class="pet-habitat__item pet-habitat__item--plant"
+        viewBox="0 0 64 84"
+      >
+        <path d="M32 50C14 46 6 30 12 18C24 22 30 34 32 50Z" fill="#8cc59a" stroke="#4a3934" stroke-width="2.5" stroke-linejoin="round" />
+        <path d="M32 50C50 46 58 30 52 18C40 22 34 34 32 50Z" fill="#9fd3a8" stroke="#4a3934" stroke-width="2.5" stroke-linejoin="round" />
+        <path d="M32 50C26 32 28 14 34 4C40 16 38 34 32 50Z" fill="#7bb88b" stroke="#4a3934" stroke-width="2.5" stroke-linejoin="round" />
+        <path d="M14 50H50L45 80H19Z" fill="#f0a586" stroke="#4a3934" stroke-width="2.5" stroke-linejoin="round" />
+      </svg>
     </div>
 
     <span
@@ -229,9 +294,18 @@ function randomWithin(min: number, max: number): number {
       <span v-for="gain in floatingGains" :key="gain">{{ gain }}</span>
     </div>
 
-    <div
+    <span v-if="isPetting" class="pet-habitat__hearts" aria-hidden="true">
+      <svg v-for="index in 3" :key="index" viewBox="-9 -9 18 16">
+        <path d="M0 6C-7 1-8-5-4-7C-2-8 0-6.5 0-5C0-6.5 2-8 4-7C8-5 7 1 0 6Z" fill="#ff9aa6" stroke="#4a3934" stroke-width="1.6" />
+      </svg>
+    </span>
+
+    <button
       class="pet-habitat__pet"
       :class="{ 'pet-habitat__pet--left': position.direction === 'left' }"
+      type="button"
+      :aria-label="messages.voice.petLabel.replace('{name}', petName ?? messages.species[species].label)"
+      @click="petThePet"
     >
       <PetAvatar
         :species="species"
@@ -241,6 +315,6 @@ function randomWithin(min: number, max: number): number {
         compact
       />
       <span class="pet-habitat__shadow" aria-hidden="true" />
-    </div>
+    </button>
   </div>
 </template>

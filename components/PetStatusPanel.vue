@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { pickVoiceLine } from '~/utils/petVoice'
 import type { PetAction, PetCareFeedback, PetSpecies, PetStats, PetStatus, ThemeId } from '~/types/pet'
 
 const props = defineProps<{
@@ -14,6 +15,40 @@ const props = defineProps<{
 }>()
 
 const { messages } = useLocale()
+const voiceSeed = ref(Math.floor(Math.random() * 1000))
+const petCount = ref(0)
+const pettedLine = ref('')
+let pettedTimer: ReturnType<typeof setTimeout> | null = null
+
+const voiceLine = computed(() =>
+  pettedLine.value ||
+  pickVoiceLine({
+    pools: messages.value.voice,
+    status: props.status,
+    hour: new Date().getHours(),
+    seed: voiceSeed.value,
+  }),
+)
+
+watch(() => props.status, () => {
+  voiceSeed.value += 1
+})
+
+function handlePet(): void {
+  const lines = messages.value.voice.petted
+  pettedLine.value = lines[petCount.value % lines.length]
+  petCount.value += 1
+  if (petCount.value === 1) trackEvent('pet_patted', {})
+  if (pettedTimer) clearTimeout(pettedTimer)
+  pettedTimer = setTimeout(() => {
+    pettedLine.value = ''
+    voiceSeed.value += 1
+  }, 2500)
+}
+
+onBeforeUnmount(() => {
+  if (pettedTimer) clearTimeout(pettedTimer)
+})
 
 const statRows = computed(() => [
   {
@@ -44,6 +79,8 @@ const statRows = computed(() => [
         :level="level"
         :active-reaction="activeReaction"
         :care-feedback="careFeedback"
+        :pet-name="name"
+        @pet="handlePet"
         :avatar-label="`${messages.species[species].label} ${messages.status.aria[status]}`"
       />
     </div>
@@ -55,7 +92,7 @@ const statRows = computed(() => [
           {{ name ?? messages.species[species].label }}
           <span class="pet-status__mood">{{ messages.status.labels[status] }}</span>
         </h2>
-        <p class="pet-status__voice">{{ messages.status.messages[status] }}</p>
+        <p class="pet-status__voice" aria-live="polite">{{ voiceLine }}</p>
       </div>
 
       <div class="stat-list">
