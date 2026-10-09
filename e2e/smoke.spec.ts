@@ -130,28 +130,22 @@ test('returning after absence shows a return report', async ({ page }) => {
 
   await page.goto('/')
 
-  await expect(page.locator('.return-report').getByText('다시 만난 탭 펫', { exact: true })).toBeVisible()
+  const report = page.locator('.return-report')
+  await expect(report).toBeVisible()
+  await expect(report).toContainText('몇 시간 자리 비운 사이')
+  await expect(report).toContainText('몽이')
 })
 
 test('completing recommended care completes the daily goal and claims reward', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: /고양이/ }).first().click()
+  await page.getByRole('button', { name: '같이 살기 시작' }).click()
 
   await expect(page.getByText('오늘의 목표')).toBeVisible()
 
-  const recommendedCard = page.locator('.action-recommendation')
-  const recommendedText = await recommendedCard.textContent()
-  const actionName = recommendedText?.includes('놀이')
-    ? /놀이/
-    : recommendedText?.includes('잠')
-      ? /잠/
-      : recommendedText?.includes('목욕')
-        ? /목욕/
-        : /먹이|밥/
-
-  await page.getByRole('button', { name: actionName }).first().click()
-  await expect(page.getByText('오늘 목표를 완료했어요.')).toBeVisible({ timeout: 6000 })
+  await page.locator('.action-button--recommended').click()
+  await expect(page.getByText('오늘 목표 달성!')).toBeVisible({ timeout: 6000 })
 
   await page.getByRole('button', { name: '보상 받기' }).click()
-  await expect(page.getByText('오늘 보상을 받았어요.')).toBeVisible()
+  await expect(page.getByText('오늘 보상은 받았어요. 내일 또 만나요.')).toBeVisible()
 })
