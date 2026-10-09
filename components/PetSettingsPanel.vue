@@ -218,12 +218,39 @@ function confirmReset(): void {
       >
     </label>
 
-    <section class="premium-tab-pack" aria-labelledby="premium-tab-pack-heading">
-      <div class="premium-tab-pack__header">
+
+    <label class="settings-checkbox">
+      <input
+        type="checkbox"
+        :checked="settings.titleAnimationEnabled"
+        @change="setTitleAnimation"
+      >
+      <span>{{ messages.settings.titleAnimation }}</span>
+    </label>
+
+    <fieldset class="settings-fieldset">
+      <legend>{{ messages.settings.themeMode }}</legend>
+      <div class="segmented-control">
+        <button
+          v-for="theme in PET_THEMES"
+          :key="theme.id"
+          class="segmented-button"
+          :class="{ 'segmented-button--active': settings.themeId === theme.id }"
+          type="button"
+          :aria-pressed="settings.themeId === theme.id"
+          @click="setTheme(theme.id)"
+        >
+          {{ messages.themes[theme.id].name }}
+        </button>
+      </div>
+    </fieldset>
+
+    <details class="premium-tab-pack" aria-labelledby="premium-tab-pack-heading">
+      <summary class="premium-tab-pack__header">
         <span>{{ messages.premium.lockedLabel }}</span>
         <strong id="premium-tab-pack-heading">{{ messages.premium.heading }}</strong>
         <small>{{ messages.premium.description }}</small>
-      </div>
+      </summary>
 
       <div class="premium-lock-group">
         <strong>{{ messages.premium.workTitlePack }}</strong>
@@ -271,33 +298,7 @@ function confirmReset(): void {
       </div>
 
       <p>{{ messages.premium.unavailable }}</p>
-    </section>
-
-    <label class="settings-checkbox">
-      <input
-        type="checkbox"
-        :checked="settings.titleAnimationEnabled"
-        @change="setTitleAnimation"
-      >
-      <span>{{ messages.settings.titleAnimation }}</span>
-    </label>
-
-    <fieldset class="settings-fieldset">
-      <legend>{{ messages.settings.themeMode }}</legend>
-      <div class="segmented-control">
-        <button
-          v-for="theme in PET_THEMES"
-          :key="theme.id"
-          class="segmented-button"
-          :class="{ 'segmented-button--active': settings.themeId === theme.id }"
-          type="button"
-          :aria-pressed="settings.themeId === theme.id"
-          @click="setTheme(theme.id)"
-        >
-          {{ messages.themes[theme.id].name }}
-        </button>
-      </div>
-    </fieldset>
+    </details>
 
     <div class="settings-danger-zone" role="group" :aria-label="messages.settings.resetHeading">
       <div>

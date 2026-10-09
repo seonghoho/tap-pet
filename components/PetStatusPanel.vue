@@ -4,12 +4,14 @@ import type { PetAction, PetSpecies, PetStats, PetStatus, ThemeId } from '~/type
 
 const props = defineProps<{
   species: PetSpecies
+  name?: string
   stats: PetStats
   status: PetStatus
   themeId: ThemeId
   level: number
   activeReaction?: PetAction | null
 }>()
+
 const { messages } = useLocale()
 
 const statRows = computed(() => [
@@ -45,14 +47,22 @@ const statRows = computed(() => [
     </div>
 
     <div class="pet-status__content">
-      <div class="section-heading">
-        <p class="eyebrow">{{ messages.species[species].label }}</p>
-        <h2>{{ messages.status.labels[status] }}</h2>
-        <p>{{ messages.status.messages[status] }}</p>
+      <div class="section-heading pet-status__heading">
+        <p class="eyebrow">{{ messages.species[species].label }} · {{ messages.stats.level }} {{ level }}</p>
+        <h2>
+          {{ name ?? messages.species[species].label }}
+          <span class="pet-status__mood">{{ messages.status.labels[status] }}</span>
+        </h2>
+        <p class="pet-status__voice">{{ messages.status.messages[status] }}</p>
       </div>
 
       <div class="stat-list">
-        <div v-for="stat in statRows" :key="stat.key" class="stat-row">
+        <div
+          v-for="stat in statRows"
+          :key="stat.key"
+          class="stat-row"
+          :class="[`stat-row--${stat.key}`, { 'stat-row--low': stat.value < 30 }]"
+        >
           <div class="stat-row__label">
             <span>{{ stat.label }}</span>
             <strong>{{ stat.value }}</strong>

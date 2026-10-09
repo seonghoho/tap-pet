@@ -104,6 +104,10 @@ function createActionMessages() {
       limitReached: 'Care limit reached',
       ariaLabel: '{action}: {state}',
     },
+    time: {
+      remaining: '{minutes}m {seconds}s',
+      remainingSeconds: '{seconds}s',
+    },
     actionButtonState: {
       ready: 'Ready',
       recommended: 'Recommended',

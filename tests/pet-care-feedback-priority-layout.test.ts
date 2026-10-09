@@ -157,38 +157,29 @@ describe('care feedback priority layout', () => {
     vi.useRealTimers()
   })
 
-  it('orders primary result, overview, chips, and follow-up sections', () => {
+  it('orders primary result, chips, growth, and follow-up lines', () => {
     const template = readComponentTemplate('components/PetActions.vue')
     const feedbackIndex = template.indexOf('class="care-feedback"')
     const headerIndex = template.indexOf('class="care-feedback__header"')
-    const overviewIndex = template.indexOf('class="care-feedback__overview"')
-    const summaryIndex = template.indexOf('class="care-feedback__summary"')
-    const growthIndex = template.indexOf('class="care-feedback__growth"')
     const chipsIndex = template.indexOf('class="care-feedback__chips"')
-    const followupIndex = template.indexOf('class="care-feedback__follow-up"')
-    const nextIndex = template.indexOf('class="care-feedback__next"')
+    const growthIndex = template.indexOf('class="care-feedback__growth"')
     const noteIndex = template.indexOf('class="care-feedback__note"')
+    const nextIndex = template.indexOf('class="care-feedback__next"')
+    const checkbackIndex = template.indexOf('class="care-feedback__checkback"')
 
     expect(feedbackIndex).toBeGreaterThan(-1)
     expect(headerIndex).toBeGreaterThan(feedbackIndex)
-    expect(overviewIndex).toBeGreaterThan(headerIndex)
-    expect(summaryIndex).toBeGreaterThan(overviewIndex)
-    expect(growthIndex).toBeGreaterThan(summaryIndex)
-    expect(chipsIndex).toBeGreaterThan(growthIndex)
-    expect(followupIndex).toBeGreaterThan(chipsIndex)
-    expect(nextIndex).toBeGreaterThan(followupIndex)
-    expect(noteIndex).toBeGreaterThan(followupIndex)
-    expect(template).toContain('v-if="shouldShowFeedbackFollowup"')
+    expect(chipsIndex).toBeGreaterThan(headerIndex)
+    expect(growthIndex).toBeGreaterThan(chipsIndex)
+    expect(noteIndex).toBeGreaterThan(growthIndex)
+    expect(nextIndex).toBeGreaterThan(noteIndex)
+    expect(checkbackIndex).toBeGreaterThan(nextIndex)
 
-    const overviewBlock = extractElementBlock(template, 'care-feedback__overview')
-    const followupBlock = extractElementBlock(template, 'care-feedback__follow-up')
+    const feedbackBlock = extractElementBlock(template, 'care-feedback')
 
-    expect(overviewBlock).toContain('class="care-feedback__summary"')
-    expect(overviewBlock).toContain('class="care-feedback__growth"')
-    expect(overviewBlock).not.toContain('class="care-feedback__chips"')
-    expect(followupBlock).toContain('class="care-feedback__next"')
-    expect(followupBlock).toContain('class="care-feedback__checkback"')
-    expect(followupBlock).toContain('class="care-feedback__note"')
+    expect(feedbackBlock).toContain('class="care-feedback__next"')
+    expect(feedbackBlock).toContain('class="care-feedback__checkback"')
+    expect(feedbackBlock).toContain('class="care-feedback__note"')
   })
 
   it('shows follow-up when next action, reduced reward note, or checkback hint is available', () => {
@@ -252,15 +243,11 @@ describe('care feedback priority layout', () => {
     expect(quietSetup.shouldShowFeedbackFollowup.value).toBe(true)
   })
 
-  it('defines responsive overview and follow-up styles', () => {
+  it('defines follow-up line styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.care-feedback__overview')
-    expect(css).toContain('.care-feedback__follow-up')
-    expect(css).toMatch(/\.care-feedback__overview\s*\{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/)
-    expect(css).toMatch(/\.care-feedback__follow-up\s*\{[^}]*border-top: 1px solid var\(--app-border\);/)
     expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.care-feedback__overview\s*\{[^}]*grid-template-columns: 1fr;/,
+      /\.care-feedback__next,\s*\.care-feedback__checkback\s*\{[^}]*border-top: 1px solid var\(--app-border\);/,
     )
   })
 })

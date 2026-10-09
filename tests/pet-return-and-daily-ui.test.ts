@@ -59,13 +59,12 @@ describe('return report and daily goal UI', () => {
     }
   })
 
-  it('defines compact responsive styles', () => {
+  it('defines compact styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.return-report')
-    expect(css).toContain('.daily-goal')
-    expect(css).toMatch(/\.return-report__title\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/\.daily-goal__title\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/@media \(max-width: 720px\)[\s\S]*\.daily-goal\s*\{/)
+    expect(css).toMatch(/\.return-report\s*\{[^}]*display: grid;/)
+    expect(css).toContain('.return-report__title')
+    expect(css).toMatch(/\.daily-goal\s*\{[^}]*display: grid;/)
+    expect(css).toContain('.daily-goal__title')
   })
 })

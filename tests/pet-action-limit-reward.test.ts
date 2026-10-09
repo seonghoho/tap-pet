@@ -48,7 +48,7 @@ describe('pet action limit reward feedback', () => {
     const template = readComponentTemplate('components/PetActions.vue')
     const source = readSource('components/PetActions.vue')
 
-    expect(template).toContain('v-if="shouldShowRecommendation"')
+    expect(template).toContain('v-else-if="shouldShowRecommendation"')
     expect(source).toContain('props.recommendedCareAction')
     expect(source).toContain('!isLimitReached.value')
     expect(source).toContain('return !isLimitReached.value && !props.activeReaction')

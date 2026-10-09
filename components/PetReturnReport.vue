@@ -14,13 +14,13 @@ const reportTitle = computed(() => {
   const report = props.report
   if (!report) return ''
 
-  return `${messages.value.returnReport.elapsed[report.bucket]} · ${messages.value.returnReport.heading}`
+  return messages.value.returnReport.status[report.status].replace('{name}', props.petName)
 })
 const reportDetail = computed(() => {
   const report = props.report
   if (!report) return ''
 
-  return messages.value.returnReport.status[report.status].replace('{name}', props.petName)
+  return messages.value.returnReport.elapsed[report.bucket]
 })
 const reportAction = computed(() => {
   const action = props.report?.recommendedAction
@@ -35,11 +35,8 @@ const reportAction = computed(() => {
 
 <template>
   <section v-if="shouldShowReport" class="return-report" aria-live="polite">
-    <div>
-      <span>{{ messages.returnReport.heading }}</span>
-      <strong class="return-report__title">{{ reportTitle }}</strong>
-    </div>
-    <p>{{ reportDetail }}</p>
+    <span>{{ reportDetail }}</span>
+    <strong class="return-report__title">{{ reportTitle }}</strong>
     <small>{{ reportAction }}</small>
   </section>
 </template>

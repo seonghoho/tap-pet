@@ -13,52 +13,52 @@ export type HabitatMotion = {
 }
 
 export const DEFAULT_HABITAT_POSITION = {
-  x: 52,
-  y: 58,
+  x: 50,
+  y: 60,
 } as const
 
 export const STATUS_HABITAT_BOUNDS: Record<PetStatus, HabitatBounds> = {
   fine: {
-    minX: 18,
-    maxX: 82,
-    minY: 34,
-    maxY: 67,
+    minX: 22,
+    maxX: 78,
+    minY: 54,
+    maxY: 62,
   },
   happy: {
-    minX: 18,
-    maxX: 82,
-    minY: 34,
-    maxY: 67,
+    minX: 22,
+    maxX: 78,
+    minY: 54,
+    maxY: 62,
   },
   hungry: {
-    minX: 16,
-    maxX: 84,
-    minY: 48,
-    maxY: 70,
+    minX: 18,
+    maxX: 34,
+    minY: 58,
+    maxY: 64,
   },
   sleepy: {
-    minX: 64,
+    minX: 76,
     maxX: 82,
-    minY: 58,
-    maxY: 72,
+    minY: 60,
+    maxY: 64,
   },
   bored: {
-    minX: 30,
-    maxX: 70,
-    minY: 48,
-    maxY: 68,
+    minX: 40,
+    maxX: 60,
+    minY: 58,
+    maxY: 64,
   },
   dirty: {
-    minX: 18,
-    maxX: 40,
+    minX: 22,
+    maxX: 44,
     minY: 58,
-    maxY: 72,
+    maxY: 64,
   },
   excited: {
-    minX: 12,
-    maxX: 88,
-    minY: 28,
-    maxY: 64,
+    minX: 18,
+    maxX: 82,
+    minY: 48,
+    maxY: 60,
   },
 }
 

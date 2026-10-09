@@ -4,7 +4,8 @@ import { useHead } from '#app'
 import { DEFAULT_SETTINGS } from '~/constants/pet'
 import type { AppLocale } from '~/types/i18n'
 import type { PetAction, PetSettings, PetSpecies, PetStatus } from '~/types/pet'
-import { getTabPresentation } from '~/utils/tabPresentation'
+import { renderPetArtSvg } from '~/utils/petArt'
+import { getTabPresentation, svgToDataUrl } from '~/utils/tabPresentation'
 import { getThemeById, resolveThemeId } from '~/utils/theme'
 
 const pet = usePetStore()
@@ -58,6 +59,17 @@ const tabPresentation = computed(() =>
     isDocumentVisible: isDocumentVisible.value,
     level: currentPet.value?.growth.level,
   }),
+)
+const faviconDataUrl = computed(() => svgToDataUrl(tabPresentation.value.faviconSvg))
+const brandIcon = computed(() =>
+  svgToDataUrl(
+    renderPetArtSvg({
+      species: currentPet.value?.species ?? 'cat',
+      status: 'happy',
+      variant: 'icon',
+      idPrefix: 'brand',
+    }),
+  ),
 )
 const themeStyle = computed<Record<string, string>>(() => {
   const colors = activeTheme.value.colors
@@ -123,7 +135,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
   <div class="app-shell" :style="themeStyle">
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">TP</div>
+        <img class="brand-mark" :src="brandIcon" alt="" aria-hidden="true">
         <div>
           <h1>{{ messages.app.name }}</h1>
           <p>{{ messages.app.tagline }}</p>
@@ -131,14 +143,10 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
       </div>
 
       <div class="topbar-actions">
-        <LocaleSwitcher
-          :selected-locale="locale"
-          :label="messages.locale.label"
-          @select="handleLocaleSelect"
-        />
         <div class="tab-preview" aria-live="polite">
-          <span class="tab-preview__dot" aria-hidden="true" />
-          <span>{{ tabPresentation.title }}</span>
+          <img class="tab-preview__icon" :src="faviconDataUrl" alt="" aria-hidden="true">
+          <span class="tab-preview__title">{{ tabPresentation.title }}</span>
+          <span class="tab-preview__close" aria-hidden="true">×</span>
         </div>
         <button
           v-if="currentPet"
@@ -151,7 +159,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
       </div>
     </header>
 
-    <main class="app-grid">
+    <main class="app-grid" :class="{ 'app-grid--setup': pet.isReady.value && !currentPet }">
       <section class="main-panel" aria-labelledby="pet-panel-title">
         <div v-if="!pet.isReady.value" class="empty-panel">
           <p class="eyebrow">{{ messages.app.loading }}</p>
@@ -167,6 +175,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
         <template v-else>
           <PetStatusPanel
             :species="currentPet.species"
+            :name="currentPet.name"
             :stats="currentPet.stats"
             :status="effectiveStatus"
             :theme-id="resolvedThemeId"
@@ -195,6 +204,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
       </section>
 
       <aside
+        v-if="currentPet"
         id="tab-settings"
         ref="sidePanelElement"
         class="side-stack"
@@ -226,6 +236,15 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
         />
       </aside>
     </main>
+
+    <footer class="app-footer">
+      <span>{{ messages.app.footerNote }}</span>
+      <LocaleSwitcher
+        :selected-locale="locale"
+        :label="messages.locale.label"
+        @select="handleLocaleSelect"
+      />
+    </footer>
 
     <p v-if="pet.storageError.value" class="storage-warning" role="status">
       {{ messages.app.storageWarning }} {{ pet.storageError.value }}

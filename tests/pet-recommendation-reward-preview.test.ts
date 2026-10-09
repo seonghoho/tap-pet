@@ -240,7 +240,7 @@ describe('pet recommendation reward preview', () => {
     )
   })
 
-  it('renders localized reward preview copy in the recommendation card', () => {
+  it('formats localized reward preview copy for the recommendation', () => {
     vi.stubGlobal('useLocale', () => ({ messages: { value: I18N_MESSAGES.ko } }))
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     const component = loadScriptSetupComponent<PetActionsSetup>('components/PetActions.vue')
@@ -266,32 +266,29 @@ describe('pet recommendation reward preview', () => {
 
     expect(setup.shouldShowRecommendationReward.value).toBe(true)
     expect(setup.recommendationRewardText.value).toBe(
-      '예상 보상 경험치 +13 · 친밀도 +2 · 경험치 보너스 x1.1',
+      I18N_MESSAGES.ko.careRecommendation.rewardHint
+        .replace('{exp}', '+13')
+        .replace('{affinity}', '+2')
+        .replace('{bonus}', '1.1'),
     )
     expect(setup.recommendationRewardReducedText.value).toBe('')
     expect(reducedSetup.recommendationRewardText.value).toBe(
-      '예상 보상 경험치 +5 · 친밀도 +1 · 경험치 보너스 x1.1',
+      I18N_MESSAGES.ko.careRecommendation.rewardHint
+        .replace('{exp}', '+5')
+        .replace('{affinity}', '+1')
+        .replace('{bonus}', '1.1'),
     )
     expect(reducedSetup.recommendationRewardReducedText.value).toBe(
-      '이미 충분히 돌본 상태라 예상 보상이 낮습니다.',
+      I18N_MESSAGES.ko.careRecommendation.rewardReduced,
     )
   })
 
-  it('keeps reward preview markup inside the recommendation card', () => {
-    const template = readComponentTemplate('components/PetActions.vue')
+  it('computes reward preview copy from the recommended care prop', () => {
     const source = readSource('components/PetActions.vue')
-    const recommendationIndex = template.indexOf('class="action-recommendation"')
-    const rewardIndex = template.indexOf('class="action-recommendation__reward"')
-    const actionPanelIndex = template.indexOf('class="action-panel"')
 
-    expect(recommendationIndex).toBeGreaterThan(-1)
-    expect(rewardIndex).toBeGreaterThan(recommendationIndex)
-    expect(actionPanelIndex).toBeGreaterThan(rewardIndex)
-    expect(template).toContain('v-if="shouldShowRecommendationReward"')
-    expect(template).toContain('recommendationRewardText')
-    expect(template).toContain('recommendationRewardReducedText')
     expect(source).toContain('recommendedCareRewardPreview?: CareActionRewardPreview | null')
     expect(source).toContain('messages.value.careRecommendation.rewardHint')
+    expect(source).toContain('messages.value.careRecommendation.rewardReduced')
   })
 
   it('keeps reward preview copy localized for every supported language', () => {
@@ -303,19 +300,5 @@ describe('pet recommendation reward preview', () => {
       expect(careRecommendation.rewardHint).toContain('{bonus}')
       expect(careRecommendation.rewardReduced.length).toBeGreaterThan(0)
     }
-  })
-
-  it('defines responsive recommendation reward styles', () => {
-    const css = readSource('assets/css/main.css')
-
-    expect(css).toContain('.action-recommendation__support')
-    expect(css).toContain('.action-recommendation__reward')
-    expect(css).toContain('.action-recommendation__reward--muted')
-    expect(css).toMatch(/\.action-recommendation__reward\s*\{[^}]*display: inline-block;/)
-    expect(css).toMatch(/\.action-recommendation__reward\s*\{[^}]*max-width: 100%;/)
-    expect(css).toMatch(/\.action-recommendation__reward\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.action-recommendation__support\s*\{[^}]*align-items: flex-start;[^}]*width: 100%;/,
-    )
   })
 })

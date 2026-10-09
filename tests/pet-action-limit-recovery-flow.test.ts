@@ -116,9 +116,14 @@ describe('pet action limit recovery flow', () => {
     const setup = setupPetActions()
 
     expect(setup.isLimitReached.value).toBe(true)
-    expect(setup.actionLimitRecoveryWaitText?.value).toBe('30m 00s 후 자동 초기화')
+    expect(setup.actionLimitRecoveryWaitText?.value).toBe(
+      I18N_MESSAGES.ko.actionLimit.waitDetail.replace(
+        '{time}',
+        I18N_MESSAGES.ko.time.remaining.replace('{minutes}', '30').replace('{seconds}', '00'),
+      ),
+    )
     expect(setup.actionLimitRecoveryRewardText?.value).toBe(
-      `지금 +${ACTION_LIMIT_AD_REWARD_USES}회 추가`,
+      I18N_MESSAGES.ko.actionLimit.rewardDetail.replace('{count}', String(ACTION_LIMIT_AD_REWARD_USES)),
     )
   })
 
@@ -152,10 +157,13 @@ describe('pet action limit recovery flow', () => {
   it('defines responsive locked recovery card styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toMatch(/\.action-limit--locked\s*\{[^}]*display: grid;/)
+    expect(css).toMatch(/\.action-limit--locked\s*\{[^}]*border-radius: 18px;/)
     expect(css).toMatch(/\.action-limit__recovery\s*\{[^}]*display: grid;/)
     expect(css).toMatch(/\.action-limit__recovery\s*\{[^}]*grid-template-columns:/)
-    expect(css).toMatch(/\.action-limit__option\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/\.action-limit__option--reward\s*\{[^}]*cursor: pointer;/)
+    expect(css).toMatch(/\.action-limit__option\s*\{[^}]*min-width: 0;/)
+    expect(css).toContain('.action-limit__option--reward')
+    expect(css).toMatch(
+      /@media \(max-width: 720px\)[\s\S]*\.action-limit__recovery\s*\{[^}]*grid-template-columns: minmax\(0, 1fr\);/,
+    )
   })
 })

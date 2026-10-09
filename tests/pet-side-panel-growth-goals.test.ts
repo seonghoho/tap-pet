@@ -119,36 +119,54 @@ describe('pet side panel growth goals', () => {
     vi.unstubAllGlobals()
   })
 
-  it('renders growth goals before the existing progress gauges', () => {
+  it('renders growth goals with inline progress gauges', () => {
     const template = readComponentTemplate('components/PetSidePanel.vue')
     const goalIndex = template.indexOf('class="progress-goals"')
-    const progressIndex = template.indexOf('class="progress-list"')
+    const goalRowIndex = template.indexOf('class="progress-goal"')
+    const trackIndex = template.indexOf('class="stat-track"', goalRowIndex)
 
     expect(goalIndex).toBeGreaterThan(-1)
-    expect(progressIndex).toBeGreaterThan(goalIndex)
+    expect(goalRowIndex).toBeGreaterThan(goalIndex)
+    expect(trackIndex).toBeGreaterThan(goalRowIndex)
+    expect(template).not.toContain('class="progress-list"')
     expect(template).toContain('messages.sidePanelProgress.progressGoalHeading')
     expect(template).toContain('progressGoalRows')
-    expect(template).toContain('class="progress-goal"')
+    expect(template).toContain(':style="{ width: `${goal.percent}%` }"')
   })
 
   it('summarizes remaining level and affinity goals', () => {
     const setup = setupSidePanel()
+    const sidePanelProgress = I18N_MESSAGES.ko.sidePanelProgress
+    const levelText = sidePanelProgress.levelGoalRemaining
+      .replace('{level}', '3')
+      .replace('{remaining}', '55')
+      .replace('{exp}', I18N_MESSAGES.ko.stats.exp)
+    const affinityText = sidePanelProgress.affinityGoalRemaining
+      .replace('{level}', '4')
+      .replace('{remaining}', '110')
+    const affinityDetail = sidePanelProgress.affinityGoalDetail
+      .replace('{current}', '30')
+      .replace('{required}', '140')
+      .replace('{currentBonus}', '1.3')
+      .replace('{nextBonus}', '1.4')
 
-    expect(setup.levelGoalText?.value).toBe('레벨 3까지 55 경험치')
-    expect(setup.affinityGoalText?.value).toBe('보상 보너스 4까지 110')
-    expect(setup.affinityGoalDetail?.value).toBe('현재 30/140 · 돌봄 경험치 x1.3 → x1.4')
+    expect(setup.levelGoalText?.value).toBe(levelText)
+    expect(setup.affinityGoalText?.value).toBe(affinityText)
+    expect(setup.affinityGoalDetail?.value).toBe(affinityDetail)
     expect(setup.progressGoalRows?.value).toEqual([
       {
         id: 'level',
-        label: '레벨 목표',
-        text: '레벨 3까지 55 경험치',
-        detail: '현재 80/135',
+        label: sidePanelProgress.levelGoalLabel,
+        text: levelText,
+        detail: sidePanelProgress.goalProgressDetail.replace('{current}', '80').replace('{required}', '135'),
+        percent: 59,
       },
       {
         id: 'affinity',
-        label: '보상 보너스',
-        text: '보상 보너스 4까지 110',
-        detail: '현재 30/140 · 돌봄 경험치 x1.3 → x1.4',
+        label: sidePanelProgress.affinityGoalLabel,
+        text: affinityText,
+        detail: affinityDetail,
+        percent: 21,
       },
     ])
   })
@@ -168,8 +186,8 @@ describe('pet side panel growth goals', () => {
       },
     })
 
-    expect(setup.levelGoalText?.value).toBe('다음 목표 준비 완료')
-    expect(setup.affinityGoalText?.value).toBe('다음 목표 준비 완료')
+    expect(setup.levelGoalText?.value).toBe(I18N_MESSAGES.ko.sidePanelProgress.goalComplete)
+    expect(setup.affinityGoalText?.value).toBe(I18N_MESSAGES.ko.sidePanelProgress.goalComplete)
   })
 
   it('uses max bonus copy when the next affinity multiplier is capped', () => {
@@ -181,9 +199,17 @@ describe('pet side panel growth goals', () => {
         percent: 5,
       },
     })
+    const sidePanelProgress = I18N_MESSAGES.ko.sidePanelProgress
 
-    expect(setup.affinityGoalText?.value).toBe('보상 보너스 6까지 210')
-    expect(setup.affinityGoalDetail?.value).toBe('현재 10/220 · 돌봄 경험치 최대 x1.5')
+    expect(setup.affinityGoalText?.value).toBe(
+      sidePanelProgress.affinityGoalRemaining.replace('{level}', '6').replace('{remaining}', '210'),
+    )
+    expect(setup.affinityGoalDetail?.value).toBe(
+      sidePanelProgress.affinityGoalMaxDetail
+        .replace('{current}', '10')
+        .replace('{required}', '220')
+        .replace('{currentBonus}', '1.5'),
+    )
   })
 
   it('keeps growth goal copy localized for every supported language', () => {
@@ -211,15 +237,10 @@ describe('pet side panel growth goals', () => {
     }
   })
 
-  it('defines compact responsive growth goal styles', () => {
+  it('defines compact growth goal styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.progress-goals')
-    expect(css).toContain('.progress-goal')
-    expect(css).toMatch(/\.progress-goals__list\s*\{[^}]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/)
-    expect(css).toMatch(/\.progress-goal strong\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.progress-goals__list\s*\{[^}]*grid-template-columns: 1fr;/,
-    )
+    expect(css).toMatch(/\.progress-goal,\s*\.level-unlock\s*\{[^}]*display: grid;/)
+    expect(css).toMatch(/\.progress-goal \.stat-track\s*\{/)
   })
 })

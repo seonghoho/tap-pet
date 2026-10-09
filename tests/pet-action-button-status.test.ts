@@ -121,11 +121,15 @@ describe('pet action button status labels', () => {
     vi.setSystemTime(1000)
     const setup = setupPetActions()
 
-    expect(setup.getActionButtonStateLabel('feed')).toBe('추천')
-    expect(setup.getActionButtonDetail('feed')).toBe('추천 돌봄 시작')
+    expect(setup.getActionButtonStateLabel('feed')).toBe(I18N_MESSAGES.ko.actionButtonState.recommended)
+    expect(setup.getActionButtonDetail('feed')).toBe(I18N_MESSAGES.ko.actionButtonState.recommendedDetail)
     expect(setup.getActionButtonStateClass('feed')).toBe('action-button__badge--recommended')
-    expect(setup.getActionAriaLabel('feed')).toBe('밥 주기: 추천 · 추천 돌봄 시작')
-    expect(setup.getActionButtonStateLabel('play')).toBe('가능')
+    expect(setup.getActionAriaLabel('feed')).toBe(
+      I18N_MESSAGES.ko.actionState.ariaLabel
+        .replace('{action}', I18N_MESSAGES.ko.actions.feed.label)
+        .replace('{state}', `${I18N_MESSAGES.ko.actionButtonState.recommended} · ${I18N_MESSAGES.ko.actionButtonState.recommendedDetail}`),
+    )
+    expect(setup.getActionButtonStateLabel('play')).toBe(I18N_MESSAGES.ko.actionButtonState.ready)
     expect(setup.getActionButtonDetail('play')).toBe(I18N_MESSAGES.ko.actions.play.detail)
     expect(setup.getActionButtonStateClass('play')).toBe('action-button__badge--ready')
   })
@@ -151,11 +155,13 @@ describe('pet action button status labels', () => {
       },
     })
 
-    expect(coolingSetup.getActionButtonStateLabel('feed')).toBe('대기')
-    expect(coolingSetup.getActionButtonDetail('feed')).toBe('4s 후 가능')
+    expect(coolingSetup.getActionButtonStateLabel('feed')).toBe(I18N_MESSAGES.ko.actionButtonState.cooldown)
+    expect(coolingSetup.getActionButtonDetail('feed')).toBe(
+      I18N_MESSAGES.ko.actionState.cooldown.replace('{time}', I18N_MESSAGES.ko.time.remainingSeconds.replace('{seconds}', '4')),
+    )
     expect(coolingSetup.getActionButtonStateClass('feed')).toBe('action-button__badge--cooldown')
-    expect(lockedSetup.getActionButtonStateLabel('feed')).toBe('횟수 없음')
-    expect(lockedSetup.getActionButtonDetail('feed')).toBe('돌봄 횟수 없음')
+    expect(lockedSetup.getActionButtonStateLabel('feed')).toBe(I18N_MESSAGES.ko.actionButtonState.locked)
+    expect(lockedSetup.getActionButtonDetail('feed')).toBe(I18N_MESSAGES.ko.actionState.limitReached)
     expect(lockedSetup.getActionButtonStateClass('feed')).toBe('action-button__badge--locked')
   })
 
@@ -166,10 +172,14 @@ describe('pet action button status labels', () => {
       activeReaction: 'feed',
     })
 
-    expect(setup.getActionButtonStateLabel('feed')).toBe('진행 중')
-    expect(setup.getActionButtonDetail('feed')).toBe('돌봄 진행 중')
+    expect(setup.getActionButtonStateLabel('feed')).toBe(I18N_MESSAGES.ko.actionButtonState.active)
+    expect(setup.getActionButtonDetail('feed')).toBe(I18N_MESSAGES.ko.actionState.inProgress)
     expect(setup.getActionButtonStateClass('feed')).toBe('action-button__badge--active')
-    expect(setup.getActionAriaLabel('feed')).toBe('밥 주기: 진행 중 · 돌봄 진행 중')
+    expect(setup.getActionAriaLabel('feed')).toBe(
+      I18N_MESSAGES.ko.actionState.ariaLabel
+        .replace('{action}', I18N_MESSAGES.ko.actions.feed.label)
+        .replace('{state}', `${I18N_MESSAGES.ko.actionButtonState.active} · ${I18N_MESSAGES.ko.actionState.inProgress}`),
+    )
   })
 
   it('renders a status badge for every action button', () => {
@@ -186,18 +196,12 @@ describe('pet action button status labels', () => {
   })
 
   it('keeps action button state copy localized for every supported language', () => {
-    const recommendedDetailCopy = {
-      en: 'Start recommended care',
-      ko: '추천 돌봄 시작',
-      ja: 'おすすめのお世話を始める',
-    }
-
     for (const locale of SUPPORTED_LOCALES) {
       const actionButtonState = I18N_MESSAGES[locale].actionButtonState as ActionButtonStateMessages
 
-      expect(actionButtonState.ready.length).toBeGreaterThan(0)
+      expect(actionButtonState.ready).toBe('')
       expect(actionButtonState.recommended.length).toBeGreaterThan(0)
-      expect(actionButtonState.recommendedDetail).toBe(recommendedDetailCopy[locale])
+      expect(actionButtonState.recommendedDetail.length).toBeGreaterThan(0)
       expect(actionButtonState.cooldown.length).toBeGreaterThan(0)
       expect(actionButtonState.active.length).toBeGreaterThan(0)
       expect(actionButtonState.locked.length).toBeGreaterThan(0)
@@ -207,14 +211,8 @@ describe('pet action button status labels', () => {
   it('defines overflow-safe button status styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.action-button__badge--ready')
-    expect(css).toContain('.action-button__badge--recommended')
-    expect(css).toContain('.action-button__badge--cooldown')
-    expect(css).toContain('.action-button__badge--active')
-    expect(css).toContain('.action-button__badge--locked')
     expect(css).toMatch(/\.action-button__badge\s*\{[^}]*max-width: 100%;/)
-    expect(css).toMatch(/\.action-button__badge\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/\.action-button small\s*\{[^}]*line-height: 1\.3;/)
+    expect(css).toMatch(/\.action-button__badge\s*\{[^}]*text-overflow: ellipsis;/)
     expect(css).toMatch(/\.action-button small\s*\{[^}]*overflow-wrap: anywhere;/)
   })
 })

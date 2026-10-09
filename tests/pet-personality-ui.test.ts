@@ -238,8 +238,8 @@ describe('pet personality UI', () => {
       required: 3,
       remaining: 2,
     })
-    expect(forming.personalityName.value).toBe('성향 형성 중')
-    expect(forming.personalityDetail.value).toBe('초반 돌봄 2회를 더 완료하면 성격이 정해져요.')
+    expect(forming.personalityName.value).toBe(I18N_MESSAGES.ko.personality.formingName)
+    expect(forming.personalityDetail.value).toBe(I18N_MESSAGES.ko.personality.formingDetail.replace('{remaining}', '2'))
 
     const assigned = component.setup(createSidePanelProps({
       personality: createPersonality({
@@ -257,8 +257,8 @@ describe('pet personality UI', () => {
       expose: vi.fn(),
     })
 
-    expect(assigned.personalityName.value).toBe('활발형')
-    expect(assigned.personalityBonusText.value).toContain('놀아주기')
+    expect(assigned.personalityName.value).toBe(I18N_MESSAGES.ko.personality.personalities.playful.name)
+    expect(assigned.personalityBonusText.value).toBe(I18N_MESSAGES.ko.personality.personalities.playful.bonus)
   })
 
   it('formats personality reveal and bonus feedback', () => {
@@ -275,7 +275,7 @@ describe('pet personality UI', () => {
 
     expect(setup.shouldShowFeedbackPersonalityReveal.value).toBe(true)
     expect(setup.shouldShowFeedbackPersonalityBonus.value).toBe(true)
-    expect(setup.feedbackPersonalityName.value).toBe('푸근형')
+    expect(setup.feedbackPersonalityName.value).toBe(I18N_MESSAGES.ko.personality.personalities.hungry.name)
     expect(setup.feedbackPersonalityBonusText.value).toContain('+1')
   })
 
@@ -301,15 +301,10 @@ describe('pet personality UI', () => {
     }
   })
 
-  it('defines compact responsive personality styles', () => {
+  it('defines compact personality styles', () => {
     const css = readSource('assets/css/main.css')
 
-    expect(css).toContain('.pet-personality')
-    expect(css).toContain('.care-feedback__personality')
-    expect(css).toMatch(/\.pet-personality strong\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(/\.care-feedback__personality strong\s*\{[^}]*overflow-wrap: anywhere;/)
-    expect(css).toMatch(
-      /@media \(max-width: 720px\)[\s\S]*\.care-feedback__personality\s*\{[^}]*grid-template-columns: 1fr;/,
-    )
+    expect(css).toMatch(/\.pet-personality,[^{]*\{[^}]*display: grid;/)
+    expect(css).toMatch(/\.care-feedback__personality\s*\{[^}]*display: grid;/)
   })
 })

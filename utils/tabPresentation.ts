@@ -10,11 +10,7 @@ import { DEFAULT_LOCALE } from '~/constants/i18n'
 import type { AppLocale } from '~/types/i18n'
 import type { DisguiseTitleId, PetSettings, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
 import { getAvailableLevelUnlocks } from '~/utils/petLevelUnlocks'
-import {
-  getPetPixelPalette,
-  renderPetPixelSpriteSvg,
-} from '~/utils/petPixelSprite'
-import { getThemeById } from '~/utils/theme'
+import { renderPetArtSvg } from '~/utils/petArt'
 
 export type TabPresentation = {
   title: string
@@ -83,31 +79,21 @@ export function getTabPresentation(input: {
 export function getFaviconSvg(
   species: PetSpecies,
   status: PetStatus,
-  themeId: ThemeId,
+  _themeId: ThemeId,
   options: {
     level?: number
   } = {},
 ): string {
-  const theme = getThemeById(themeId)
-  const baseColor = theme.statusColors[status]
-  const contrast = theme.colors.petContrast
-  const bgColor = theme.colors.surface
   const hasBrightAccent = getAvailableLevelUnlocks(options.level ?? 1).some(
     (unlock) => unlock.id === 'favicon-bright-accent',
   )
 
-  return renderPetPixelSpriteSvg({
+  return renderPetArtSvg({
     species,
     status,
-    backgroundColor: bgColor,
+    variant: 'icon',
+    idPrefix: 'tab-pet-favicon',
     accentBoost: hasBrightAccent,
-    palette: getPetPixelPalette({
-      body: baseColor,
-      contrast,
-      accent: theme.statusColors.excited,
-      dirt: theme.colors.warning,
-      bubble: theme.statusColors.sleepy,
-    }),
   })
 }
 

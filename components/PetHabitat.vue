@@ -149,7 +149,7 @@ function randomWithin(min: number, max: number): number {
     </span>
 
     <span
-      v-if="activeReaction === 'play' && species === 'dog'"
+      v-if="activeReaction === 'play' && species !== 'cat'"
       class="pet-habitat__reaction pet-habitat__reaction--play-dog"
       aria-hidden="true"
     >

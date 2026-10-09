@@ -158,6 +158,12 @@ const feedbackGrowthDetail = computed(() => {
     .replace('{required}', String(feedbackGrowthRequired.value))
     .replace('{exp}', messages.value.stats.exp)
 })
+const careFeedbackDoneText = computed(() => {
+  const feedback = props.careFeedback
+  if (!feedback) return ''
+
+  return messages.value.careFeedback.done[feedback.action]
+})
 const careFeedbackTitle = computed(() => {
   const feedback = props.careFeedback
   if (!feedback) return ''
@@ -481,9 +487,11 @@ function formatRemainingTime(milliseconds: number): string {
   const minutes = Math.floor(totalSeconds / 60)
   const seconds = totalSeconds % 60
 
-  if (minutes <= 0) return `${seconds}s`
+  if (minutes <= 0) return messages.value.time.remainingSeconds.replace('{seconds}', String(seconds))
 
-  return `${minutes}m ${seconds.toString().padStart(2, '0')}s`
+  return messages.value.time.remaining
+    .replace('{minutes}', String(minutes))
+    .replace('{seconds}', seconds.toString().padStart(2, '0'))
 }
 
 function formatElapsedTime(milliseconds: number): string {
@@ -521,13 +529,15 @@ function getLevelUnlockDetail(unlock: PetLevelUnlock): string {
 
 <template>
   <div class="action-section">
-    <div class="action-limit" :class="{ 'action-limit--locked': isLimitReached }">
+    <div
+      v-if="isLimitReached"
+      class="action-limit action-limit--locked"
+    >
       <div class="action-limit__copy">
         <span>{{ actionLimitText }}</span>
         <small>{{ actionLimitMetaText }}</small>
       </div>
       <div
-        v-if="isLimitReached"
         class="action-limit__recovery"
         role="group"
         :aria-label="messages.actionLimit.recoveryLabel"
@@ -552,42 +562,17 @@ function getLevelUnlockDetail(unlock: PetLevelUnlock): string {
     </div>
 
     <div v-if="activeReaction" class="care-progress" role="status">
-      <div>
-        <span>{{ messages.careProgress.heading }}</span>
-        <strong>{{ activeReactionTitle }}</strong>
-      </div>
+      <span class="care-progress__dot" aria-hidden="true" />
+      <strong>{{ activeReactionTitle }}</strong>
       <small>{{ activeReactionDetail }}</small>
-      <span class="care-progress__bar" aria-hidden="true" />
     </div>
 
     <div
-      v-if="shouldShowRecommendation"
+      v-else-if="shouldShowRecommendation"
       class="action-recommendation"
       aria-live="polite"
     >
-      <div>
-        <span>{{ messages.careRecommendation.heading }}</span>
-        <strong>{{ recommendationTitle }}</strong>
-      </div>
-      <div class="action-recommendation__support">
-        <small>{{ recommendationDetail }}</small>
-        <span v-if="shouldShowRecommendationEvidence" class="action-recommendation__evidence">
-          {{ recommendationEvidenceText }}
-        </span>
-        <span v-if="shouldShowRecommendationReward" class="action-recommendation__reward">
-          {{ recommendationRewardText }}
-        </span>
-        <span
-          v-if="recommendationRewardReducedText"
-          class="action-recommendation__reward action-recommendation__reward--muted"
-        >
-          {{ recommendationRewardReducedText }}
-        </span>
-      </div>
-    </div>
-
-    <div v-if="shouldShowActionAvailability" class="action-availability" aria-live="polite">
-      {{ actionAvailabilityText }}
+      <strong>{{ recommendationTitle }}</strong>
     </div>
 
     <div class="action-panel">
@@ -595,15 +580,24 @@ function getLevelUnlockDetail(unlock: PetLevelUnlock): string {
         v-for="action in actions"
         :key="action.id"
         class="action-button"
-        :class="{ 'action-button--recommended': getActionButtonState(action.id) === 'recommended' }"
+        :class="[
+          `action-button--${action.id}`,
+          `action-button--${getActionButtonState(action.id)}`,
+          { 'action-button--recommended': getActionButtonState(action.id) === 'recommended' },
+        ]"
         type="button"
         :disabled="isActionDisabled(action.id)"
         :aria-label="getActionAriaLabel(action.id)"
         @click="emit('action', action.id)"
       >
+        <CareIcon :action="action.id" />
         <span class="action-button__label">
           <span>{{ messages.actions[action.id].label }}</span>
-          <em class="action-button__badge" :class="getActionButtonStateClass(action.id)">
+          <em
+            v-if="getActionButtonStateLabel(action.id)"
+            class="action-button__badge"
+            :class="getActionButtonStateClass(action.id)"
+          >
             {{ getActionButtonStateLabel(action.id) }}
           </em>
         </span>
@@ -611,70 +605,16 @@ function getLevelUnlockDetail(unlock: PetLevelUnlock): string {
       </button>
     </div>
 
+    <p v-if="!isLimitReached" class="action-meta">
+      <span>{{ actionLimitText }}</span>
+      <span v-if="shouldShowActionAvailability" class="action-availability">{{ actionAvailabilityText }}</span>
+      <span v-else>{{ actionLimitMetaText }}</span>
+    </p>
+
     <div v-if="careFeedback" class="care-feedback" aria-live="polite">
       <div class="care-feedback__header">
-        <span>{{ careFeedbackTitle }}</span>
+        <span>{{ careFeedbackDoneText }}</span>
         <strong>+{{ careFeedback.gainedExp }} {{ messages.stats.exp }}</strong>
-      </div>
-
-      <div class="care-feedback__overview">
-        <div class="care-feedback__summary">
-          <span>{{ messages.careFeedback.summaryLabel }}</span>
-          <strong>{{ careFeedbackSummary }}</strong>
-        </div>
-
-        <div v-if="shouldShowFeedbackGrowth" class="care-feedback__growth">
-          <span>{{ messages.careFeedback.growthLabel }}</span>
-          <div>
-            <strong>{{ feedbackGrowthTitle }}</strong>
-            <small>{{ feedbackGrowthDetail }}</small>
-            <div
-              class="care-feedback__growth-track"
-              role="progressbar"
-              :aria-label="messages.careFeedback.growthLabel"
-              :aria-valuemin="0"
-              :aria-valuenow="feedbackGrowthCurrent"
-              :aria-valuemax="feedbackGrowthRequired"
-            >
-              <span
-                class="care-feedback__growth-fill"
-                :style="{ width: `${feedbackGrowthPercent}%` }"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div v-if="shouldShowFeedbackLevelUnlocks" class="care-feedback__unlock">
-          <span>{{ messages.levelUnlocks.unlockedLabel }}</span>
-          <ul class="care-feedback__unlock-list" role="list">
-            <li
-              v-for="unlock in feedbackLevelUnlocks"
-              :key="unlock.id"
-              class="care-feedback__unlock-item"
-            >
-              <strong>{{ getLevelUnlockName(unlock) }}</strong>
-              <small>{{ getLevelUnlockDetail(unlock) }}</small>
-            </li>
-          </ul>
-        </div>
-
-        <div
-          v-if="shouldShowFeedbackPersonalityReveal || shouldShowFeedbackPersonalityBonus"
-          class="care-feedback__personality"
-        >
-          <span>
-            {{
-              shouldShowFeedbackPersonalityReveal
-                ? messages.personality.revealLabel
-                : messages.personality.bonusLabel
-            }}
-          </span>
-          <div>
-            <strong>{{ feedbackPersonalityName }}</strong>
-            <small v-if="shouldShowFeedbackPersonalityReveal">{{ feedbackPersonalityDetail }}</small>
-            <small v-if="shouldShowFeedbackPersonalityBonus">{{ feedbackPersonalityBonusText }}</small>
-          </div>
-        </div>
       </div>
 
       <div class="care-feedback__chips" :aria-label="messages.careFeedback.ariaLabel">
@@ -700,27 +640,71 @@ function getLevelUnlockDetail(unlock: PetLevelUnlock): string {
         </span>
       </div>
 
-      <div v-if="shouldShowFeedbackFollowup" class="care-feedback__follow-up">
-        <div v-if="shouldShowFeedbackNextAction" class="care-feedback__next">
-          <span>{{ messages.careFeedback.nextLabel }}</span>
-          <div>
-            <strong>{{ feedbackNextActionTitle }}</strong>
-            <small>{{ feedbackNextActionDetail }}</small>
-          </div>
+      <div v-if="shouldShowFeedbackGrowth" class="care-feedback__growth">
+        <div class="care-feedback__growth-copy">
+          <strong>{{ feedbackGrowthTitle }}</strong>
+          <small>{{ feedbackGrowthDetail }}</small>
         </div>
-
-        <div v-if="shouldShowFeedbackCheckback" class="care-feedback__checkback">
-          <span>{{ messages.careFeedback.checkbackLabel }}</span>
-          <div>
-            <strong>{{ careFeedbackRetentionTitle }}</strong>
-            <small>{{ careFeedbackCheckbackText }}</small>
-          </div>
+        <div
+          class="care-feedback__growth-track"
+          role="progressbar"
+          :aria-label="messages.careFeedback.growthLabel"
+          :aria-valuemin="0"
+          :aria-valuenow="feedbackGrowthCurrent"
+          :aria-valuemax="feedbackGrowthRequired"
+        >
+          <span
+            class="care-feedback__growth-fill"
+            :style="{ width: `${feedbackGrowthPercent}%` }"
+          />
         </div>
-
-        <p v-if="careFeedback.wasReduced" class="care-feedback__note">
-          {{ messages.careFeedback.reduced }}
-        </p>
       </div>
+
+      <div v-if="shouldShowFeedbackLevelUnlocks" class="care-feedback__unlock">
+        <span>{{ messages.levelUnlocks.unlockedLabel }}</span>
+        <ul class="care-feedback__unlock-list" role="list">
+          <li
+            v-for="unlock in feedbackLevelUnlocks"
+            :key="unlock.id"
+            class="care-feedback__unlock-item"
+          >
+            <strong>{{ getLevelUnlockName(unlock) }}</strong>
+            <small>{{ getLevelUnlockDetail(unlock) }}</small>
+          </li>
+        </ul>
+      </div>
+
+      <div
+        v-if="shouldShowFeedbackPersonalityReveal || shouldShowFeedbackPersonalityBonus"
+        class="care-feedback__personality"
+      >
+        <span>
+          {{
+            shouldShowFeedbackPersonalityReveal
+              ? messages.personality.revealLabel
+              : messages.personality.bonusLabel
+          }}
+        </span>
+        <div>
+          <strong>{{ feedbackPersonalityName }}</strong>
+          <small v-if="shouldShowFeedbackPersonalityReveal">{{ feedbackPersonalityDetail }}</small>
+          <small v-if="shouldShowFeedbackPersonalityBonus">{{ feedbackPersonalityBonusText }}</small>
+        </div>
+      </div>
+
+      <p v-if="careFeedback.wasReduced" class="care-feedback__note">
+        {{ messages.careFeedback.reduced }}
+      </p>
+
+      <p v-if="shouldShowFeedbackNextAction" class="care-feedback__next">
+        <span>{{ messages.careFeedback.nextLabel }}</span>
+        <strong>{{ feedbackNextActionTitle }}</strong>
+        <small>{{ feedbackNextActionDetail }}</small>
+      </p>
+      <p v-else class="care-feedback__checkback">
+        <span>{{ careFeedbackRetentionTitle }}</span>
+        <small>{{ careFeedbackCheckbackText }}</small>
+      </p>
     </div>
   </div>
 </template>

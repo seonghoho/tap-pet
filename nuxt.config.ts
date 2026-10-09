@@ -7,7 +7,13 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Project Dashboard',
+      title: 'Tab Pet',
+      link: [
+        {
+          rel: 'stylesheet',
+          href: 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css',
+        },
+      ],
       meta: [
         {
           name: 'description',
