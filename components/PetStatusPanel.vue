@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { pickVoiceLine } from '~/utils/petVoice'
-import type { PetAction, PetCareFeedback, PetSpecies, PetStats, PetStatus, ThemeId } from '~/types/pet'
+import type { PetAction, PetCareFeedback, PetOutfitId, PetSpecies, PetStats, PetStatus, ThemeId } from '~/types/pet'
 
 const props = defineProps<{
   species: PetSpecies
@@ -12,6 +12,7 @@ const props = defineProps<{
   level: number
   activeReaction?: PetAction | null
   careFeedback?: PetCareFeedback | null
+  outfit?: PetOutfitId | null
 }>()
 
 const { messages } = useLocale()
@@ -80,6 +81,7 @@ const statRows = computed(() => [
         :active-reaction="activeReaction"
         :care-feedback="careFeedback"
         :pet-name="name"
+        :outfit="outfit"
         @pet="handlePet"
         :avatar-label="`${messages.species[species].label} ${messages.status.aria[status]}`"
       />

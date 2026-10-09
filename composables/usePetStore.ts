@@ -33,7 +33,8 @@ import {
   getActionLimitInfo,
   grantRewardedActionUses,
 } from '~/utils/petActionLimit'
-import { decodePetBackup, encodePetBackup } from '~/utils/petBackup'
+import { decodePetBackupWithPurchases, encodePetBackup } from '~/utils/petBackup'
+import type { Entitlement } from '~/utils/entitlements'
 import { accumulateLiveDecay, applyOfflineDecay } from '~/utils/petDecay'
 import { createInitialPetState } from '~/utils/petFactory'
 import {
@@ -50,7 +51,7 @@ import {
 import { createPetReturnReport } from '~/utils/petReturnReport'
 import { getActiveStreak, hasCaredToday, recordStreakCare } from '~/utils/petStreak'
 import { getPetStatus } from '~/utils/petStatus'
-import { clampStat, isDisguiseTitleId, isPetSpecies, isThemeId } from '~/utils/petValidation'
+import { clampStat, isDisguiseTitleId, isPetOutfitId, isPetSpecies, isThemeId } from '~/utils/petValidation'
 
 type SidePanelMode = 'status' | 'settings'
 type ActionScheduler = (callback: () => void) => void
@@ -428,15 +429,18 @@ export function usePetStore(options: PetStoreOptions = {}) {
     dailyGoalRewardFeedbackState.value = result.feedback
   }
 
-  function exportPetBackup(): string | null {
-    return petState.value ? encodePetBackup(petState.value) : null
+  function exportPetBackup(entitlements: readonly Entitlement[] = []): string | null {
+    return petState.value ? encodePetBackup(petState.value, entitlements) : null
   }
 
-  // Replaces the current pet with one from a backup code. Returns false for an invalid code.
-  function importPetBackup(code: string): boolean {
+  // Replaces the current pet with one from a backup code. Returns the purchases carried
+  // in the code, or null for an invalid code.
+  function importPetBackup(code: string): Entitlement[] | null {
     const importedAt = Date.now()
-    const imported = decodePetBackup(code, importedAt)
-    if (!imported) return false
+    const backup = decodePetBackupWithPurchases(code, importedAt)
+    if (!backup) return null
+
+    const imported = backup.state
 
     actionGeneration.value += 1
     latestActionRunId.value += 1
@@ -452,7 +456,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
       stats: applyOfflineDecay(imported.stats, imported.lastUpdatedAt, importedAt),
     })
 
-    return true
+    return backup.entitlements
   }
 
   function resetPet(): void {
@@ -656,6 +660,10 @@ function getValidSettingsPatch(settings: Partial<PetSettings>): Partial<PetSetti
 
   if (isThemeId(settings.themeId)) {
     nextSettings.themeId = settings.themeId
+  }
+
+  if (settings.outfit === null || isPetOutfitId(settings.outfit)) {
+    nextSettings.outfit = settings.outfit
   }
 
   if (typeof settings.careNotifications === 'boolean') {

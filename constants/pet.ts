@@ -38,6 +38,7 @@ export const DEFAULT_SETTINGS: PetSettings = {
   titleAnimationEnabled: false,
   themeId: 'system',
   careNotifications: false,
+  outfit: null,
 }
 
 export const NEED_THRESHOLDS = {

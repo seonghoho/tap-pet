@@ -1,5 +1,6 @@
 import { isAnalyticsOptedOut } from '~/composables/useAnalyticsConsent'
-import type { PetAction, PetReturnReportBucket, PetSpecies, PetStatus, TitleMode } from '~/types/pet'
+import type { ShopProductId } from '~/constants/shop'
+import type { PetAction, PetOutfitId, PetReturnReportBucket, PetSpecies, PetStatus, TitleMode } from '~/types/pet'
 
 // Every product event in one typed map, so dashboards and code agree on names.
 // See docs/06-analytics-events.md for what each one is for.
@@ -19,6 +20,12 @@ export type AnalyticsEvents = {
   backup_imported: { ok: boolean }
   pin_tip_dismissed: Record<string, never>
   pet_patted: Record<string, never>
+  shop_viewed: { source: 'growth' | 'settings' }
+  checkout_started: { product: ShopProductId }
+  purchase_completed: { product: ShopProductId, amount: number }
+  purchase_failed: { code: string }
+  purchase_restored: { ok: boolean }
+  outfit_changed: { outfit: PetOutfitId | 'none' }
 }
 
 export type AnalyticsEventName = keyof AnalyticsEvents

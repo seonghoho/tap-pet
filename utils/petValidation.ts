@@ -7,12 +7,14 @@ import {
   STAT_MIN,
 } from '~/constants/pet'
 import { DISGUISE_TITLES } from '~/constants/titles'
+import { PET_OUTFITS } from '~/constants/shop'
 import { PET_THEMES } from '~/constants/themes'
 import type {
   DisguiseTitleId,
   PetActionLimit,
   PetDailyGoalState,
   PetGrowth,
+  PetOutfitId,
   PetPersonalityState,
   PetSettings,
   PetSpecies,
@@ -41,6 +43,10 @@ export function isPetSpecies(value: unknown): value is PetSpecies {
 
 export function isDisguiseTitleId(value: unknown): value is DisguiseTitleId {
   return DISGUISE_TITLES.some((title) => title.id === value)
+}
+
+export function isPetOutfitId(value: unknown): value is PetOutfitId {
+  return PET_OUTFITS.includes(value as PetOutfitId)
 }
 
 export function isThemeId(value: unknown): value is ThemeId {
@@ -72,6 +78,7 @@ export function normalizeSettings(value: unknown): PetSettings {
     titleAnimationEnabled: settings.titleAnimationEnabled === true,
     themeId: isThemeId(settings.themeId) ? settings.themeId : DEFAULT_SETTINGS.themeId,
     careNotifications: settings.careNotifications === true,
+    outfit: isPetOutfitId(settings.outfit) ? settings.outfit : null,
   }
 }
 

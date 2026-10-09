@@ -5,7 +5,7 @@ import {
   STATUS_HABITAT_BOUNDS,
   STATUS_HABITAT_MOTION,
 } from '~/constants/habitat'
-import type { PetAction, PetCareFeedback, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
+import type { PetAction, PetCareFeedback, PetOutfitId, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
 import { getAvailableLevelUnlocks } from '~/utils/petLevelUnlocks'
 import { getThemeById } from '~/utils/theme'
 
@@ -25,6 +25,7 @@ const props = defineProps<{
   activeReaction?: PetAction | null
   careFeedback?: PetCareFeedback | null
   petName?: string
+  outfit?: PetOutfitId | null
 }>()
 
 const emit = defineEmits<{
@@ -312,6 +313,7 @@ function randomWithin(min: number, max: number): number {
         :status="status"
         :theme-id="themeId"
         :aria-label="avatarLabel"
+        :outfit="outfit"
         compact
       />
       <span class="pet-habitat__shadow" aria-hidden="true" />

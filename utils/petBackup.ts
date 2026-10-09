@@ -1,24 +1,37 @@
 import { PET_STORAGE_VERSION } from '~/constants/pet'
 import type { PetState } from '~/types/pet'
+import { type Entitlement, normalizeEntitlements } from '~/utils/entitlements'
 import { parseStoredPetState, toStoredPetState } from '~/utils/petValidation'
+
+export type PetBackup = {
+  state: PetState
+  entitlements: Entitlement[]
+}
 
 const BACKUP_PREFIX = 'TABPET1.'
 
 // A copy-pasteable code so a pet can move between browsers without an account.
-export function encodePetBackup(state: PetState): string {
-  const json = JSON.stringify(toStoredPetState(state, PET_STORAGE_VERSION))
+export function encodePetBackup(state: PetState, entitlements: readonly Entitlement[] = []): string {
+  const json = JSON.stringify({ ...toStoredPetState(state, PET_STORAGE_VERSION), entitlements })
 
   return `${BACKUP_PREFIX}${toBase64Url(new TextEncoder().encode(json))}`
 }
 
 export function decodePetBackup(code: string, now = Date.now()): PetState | null {
+  return decodePetBackupWithPurchases(code, now)?.state ?? null
+}
+
+// Purchases ride along in the same code so moving browsers keeps them.
+export function decodePetBackupWithPurchases(code: string, now = Date.now()): PetBackup | null {
   const trimmed = code.trim()
   if (!trimmed.startsWith(BACKUP_PREFIX)) return null
 
   try {
     const json = new TextDecoder().decode(fromBase64Url(trimmed.slice(BACKUP_PREFIX.length)))
+    const raw = JSON.parse(json) as Record<string, unknown>
+    const state = parseStoredPetState(raw, now)
 
-    return parseStoredPetState(JSON.parse(json), now)
+    return state ? { state, entitlements: normalizeEntitlements(raw.entitlements) } : null
   } catch {
     return null
   }

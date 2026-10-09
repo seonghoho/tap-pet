@@ -9,6 +9,17 @@ import { getDisguiseTitleValue, getTabPresentation, svgToDataUrl } from '~/utils
 import { getThemeById, resolveThemeId } from '~/utils/theme'
 
 const pet = usePetStore()
+const shop = useEntitlements()
+const purchases = usePurchases()
+const purchaseNoticeText = computed(() => {
+  const notice = purchases.notice.value
+  if (!notice) return ''
+
+  const name = notice.productId ? messages.value.shop.products[notice.productId].name : ''
+  if (notice.kind === 'success') return messages.value.shop.success.replace('{name}', name)
+
+  return notice.message ? `${messages.value.shop.failed} (${notice.message})` : messages.value.shop.failed
+})
 const { locale, messages, restoreLocale, setLocale } = useLocale()
 const prefersDark = ref(false)
 const isDocumentVisible = ref(true)
@@ -18,7 +29,9 @@ let colorSchemeQuery: MediaQueryList | null = null
 
 onMounted(() => {
   restoreLocale()
+  shop.restoreEntitlements()
   pet.restorePet()
+  void purchases.handleCheckoutReturn()
   isDocumentVisible.value = document.visibilityState === 'visible'
   document.addEventListener('visibilitychange', handleVisibilityChange)
 
@@ -35,7 +48,13 @@ onBeforeUnmount(() => {
 
 const currentPet = computed(() => pet.petState.value)
 const effectiveStatus = computed<PetStatus>(() => pet.petStatus.value ?? 'happy')
-const effectiveSettings = computed<PetSettings>(() => currentPet.value?.settings ?? pet.activeSettings.value)
+// Outfits only show while the outfit pack is owned (e.g. not after site data was cleared).
+const effectiveSettings = computed<PetSettings>(() => {
+  const settings = currentPet.value?.settings ?? pet.activeSettings.value
+
+  return shop.owns('outfit-pack') ? settings : { ...settings, outfit: null }
+})
+const ownedOutfit = computed(() => effectiveSettings.value.outfit ?? null)
 const resolvedThemeId = computed(() => resolveThemeId(effectiveSettings.value.themeId, prefersDark.value))
 const activeTheme = computed(() => getThemeById(resolvedThemeId.value))
 const tabPresentation = computed(() =>
@@ -49,7 +68,7 @@ const tabPresentation = computed(() =>
     level: currentPet.value?.growth.level,
   }),
 )
-const backupCode = computed(() => (currentPet.value ? pet.exportPetBackup() : null))
+const backupCode = computed(() => (currentPet.value ? pet.exportPetBackup(shop.entitlements.value) : null))
 const faviconDataUrl = computed(() => svgToDataUrl(tabPresentation.value.faviconSvg))
 const brandIcon = computed(() =>
   svgToDataUrl(
@@ -177,7 +196,9 @@ function handleSettingsUpdate(settings: Partial<PetSettings>): void {
 }
 
 function handleImportBackup(code: string): boolean {
-  const ok = pet.importPetBackup(code)
+  const purchases = pet.importPetBackup(code)
+  const ok = purchases !== null
+  if (purchases?.length) shop.addEntitlements(purchases)
   trackEvent('backup_imported', { ok })
 
   return ok
@@ -258,6 +279,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
             :level="currentPet.growth.level"
             :active-reaction="pet.activeReaction.value"
             :care-feedback="pet.lastCareFeedback.value"
+            :outfit="ownedOutfit"
           />
           <PetReturnReport
             :report="pet.returnReport.value"
@@ -302,7 +324,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
           :backup-code="backupCode"
           :import-backup="handleImportBackup"
           :personality="currentPet.personality"
-          :settings="currentPet.settings"
+          :settings="effectiveSettings"
           @set-mode="pet.setSidePanelMode"
           @update-name="pet.updatePetName"
           @update-settings="handleSettingsUpdate"
@@ -324,6 +346,16 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
         @select="handleLocaleSelect"
       />
     </footer>
+
+    <div
+      v-if="purchaseNoticeText"
+      class="app-toast"
+      :class="`app-toast--${purchases.notice.value?.kind}`"
+      role="status"
+    >
+      <span>{{ purchaseNoticeText }}</span>
+      <button type="button" @click="purchases.dismissNotice">{{ messages.shop.dismiss }}</button>
+    </div>
 
     <p v-if="pet.storageError.value" class="storage-warning" role="status">
       {{ messages.app.storageWarning }} {{ pet.storageError.value }}

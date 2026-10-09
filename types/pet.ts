@@ -2,6 +2,8 @@ import type { AppLocale } from '~/types/i18n'
 
 export type PetSpecies = 'cat' | 'dog' | 'hedgehog' | 'rabbit' | 'penguin' | 'hamster'
 
+export type PetOutfitId = 'party-hat' | 'ribbon' | 'scarf' | 'glasses'
+
 export type PetNeedStatus = 'fine' | 'hungry' | 'sleepy' | 'dirty' | 'bored'
 export type PetDisplayStatus = PetNeedStatus | 'happy' | 'excited'
 export type PetStatus = PetDisplayStatus
@@ -27,6 +29,10 @@ export type DisguiseTitleId =
   | 'analytics'
   | 'untitled-document'
   | 'meeting-notes'
+  | 'roadmap'
+  | 'kpi-review'
+  | 'sprint-board'
+  | 'client-notes'
 
 export type TitleMode = 'status' | 'disguise'
 export type TitleVisibility = 'inactive-only' | 'always'
@@ -51,6 +57,7 @@ export type PetSettings = {
   titleAnimationEnabled: boolean
   themeId: ThemeId
   careNotifications?: boolean
+  outfit?: PetOutfitId | null
 }
 
 export type PetActionLimit = {
@@ -176,6 +183,8 @@ export type StoredPetState = PetState & {
 export type DisguiseTitlePreset = {
   id: DisguiseTitleId
   values: Record<AppLocale, string>
+  // Part of the work-title pack; selectable once that pack is owned.
+  premium?: boolean
 }
 
 export type PetTheme = {

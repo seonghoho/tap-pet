@@ -20,6 +20,7 @@
 | 위장 모드 선호 | `pet_created.title_mode`, `title_mode_changed` 비율 | |
 | 제한 마찰 | 세션당 `care_limit_reached` 비율, 그중 `care_recharge_used` 비율 | |
 | 바이럴 계수 | `share_card_created` / 주간 활성 사용자 | |
+| 구매 전환 | `checkout_started` → `purchase_completed` 비율, 상점 노출 대비 구매율 | `shop_viewed`, `checkout_started`, `purchase_completed` |
 
 ## 첫 주 퍼널
 
@@ -49,3 +50,9 @@
 | `backup_imported` | `ok` | 백업 코드 불러오기 시도 |
 | `pin_tip_dismissed` | – | "이 탭을 고정해두세요" 안내 닫기 |
 | `pet_patted` | – | 페이지를 연 뒤 처음 펫을 쓰다듬음 (방문당 1회) |
+| `shop_viewed` | `source` | 상점이 화면에 그려짐 |
+| `checkout_started` | `product` | 토스 결제창을 열기 직전 |
+| `purchase_completed` | `product`, `amount` | 서버 승인 후 구매 기록 저장 |
+| `purchase_failed` | `code` | 결제 실패 또는 승인 실패 (사용자 취소 제외) |
+| `purchase_restored` | `ok` | 주문번호로 구매 복원 시도 |
+| `outfit_changed` | `outfit` | 옷 입히기 변경 |
