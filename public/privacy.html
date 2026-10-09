@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>개인정보처리방침 · Tab Pet</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <style>
+    :root {
+      --bg: #f5f1ea;
+      --surface: #fffdf9;
+      --text: #2a2420;
+      --muted: #7a7068;
+      --line: #e6ded2;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #191614;
+        --surface: #221e1b;
+        --text: #f3ede6;
+        --muted: #a3998f;
+        --line: #3a332d;
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif;
+      letter-spacing: -0.01em;
+      line-height: 1.7;
+      margin: 0;
+      padding: 32px 16px 64px;
+    }
+
+    main {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      margin: 0 auto;
+      max-width: 760px;
+      padding: 32px 28px;
+    }
+
+    h1 { font-size: 1.6rem; margin: 0 0 4px; }
+    h2 { border-top: 1px solid var(--line); font-size: 1.05rem; margin: 28px 0 8px; padding-top: 24px; }
+    p, li { color: var(--text); font-size: 0.95rem; }
+    .muted { color: var(--muted); font-size: 0.85rem; }
+    .table-wrap { margin: 0 -4px; overflow-x: auto; }
+    table { min-width: 520px; border-collapse: collapse; font-size: 0.9rem; width: 100%; }
+    th, td { border-bottom: 1px solid var(--line); padding: 8px 6px; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    a { color: inherit; }
+    .todo { background: #ffe9a8; border-radius: 4px; color: #2a2420; padding: 0 4px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>개인정보처리방침</h1>
+    <p class="muted">시행일: 2026년 10월 9일 · <a href="/">Tab Pet으로 돌아가기</a></p>
+
+    <p>Tab Pet(이하 "서비스")은 가입 없이 쓰는 브라우저 탭 펫입니다. 서비스는 이름, 이메일, 전화번호 같은 개인 식별 정보를 받지 않습니다. 아래는 서비스가 다루는 정보와 그 이유입니다.</p>
+
+    <h2>1. 이 브라우저에만 저장하는 정보</h2>
+    <p>펫 이름, 스탯, 성장 기록, 설정, 연속 돌봄 기록, 언어 설정은 사용자의 브라우저 저장소(localStorage)에만 저장되며 서버로 보내지 않습니다. 브라우저 데이터를 지우면 함께 사라집니다. "다른 브라우저로 옮기기"의 백업 코드도 사용자가 직접 복사해 붙여넣을 때만 이동하며, 서비스가 따로 보관하지 않습니다.</p>
+
+    <h2>2. 선택적으로 수집하는 정보</h2>
+    <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>항목</th><th>목적</th><th>처리 위탁</th><th>끄는 방법</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>익명 사용 통계: 기능 사용 이벤트(예: 돌봄 종류, 레벨, 연속 일수), 페이지 방문, 브라우저 종류, 대략적 지역, 브라우저에 저장되는 무작위 식별자</td>
+          <td>어떤 기능이 쓰이는지 파악해 서비스 개선</td>
+          <td>PostHog Inc.</td>
+          <td>설정 › "익명 사용 통계 보내기" 끄기</td>
+        </tr>
+        <tr>
+          <td>오류 정보: 오류 내용, 발생 위치, 브라우저·OS 종류</td>
+          <td>오류 수정</td>
+          <td>Functional Software, Inc. (Sentry)</td>
+          <td>오류가 날 때만 전송되며, 입력 내용은 포함하지 않습니다</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <p>펫 이름, 백업 코드, 직접 쓴 탭 제목은 통계나 오류 정보에 포함하지 않습니다. 위 업체들은 해외(미국 등)에 서버를 두고 있어 정보가 국외로 이전될 수 있습니다. 통계 데이터는 수집일로부터 최대 1년간 보관 후 삭제합니다.</p>
+
+    <h2>3. 브라우저 알림</h2>
+    <p>설정에서 알림을 켜고 브라우저에서 허용한 경우에만, 탭이 열려 있는 동안 브라우저가 직접 알림을 띄웁니다. 서버 푸시나 알림용 연락처 수집은 없습니다. 브라우저 사이트 설정에서 언제든 끌 수 있습니다.</p>
+
+    <h2>4. 외부에서 불러오는 리소스</h2>
+    <p>글꼴(Pretendard)을 jsDelivr CDN에서 불러옵니다. 이 과정에서 CDN이 접속 IP 등 일반적인 웹 요청 정보를 받을 수 있습니다. 친구 카드 이미지는 브라우저 안에서 만들어지며 서버로 보내지 않습니다.</p>
+
+    <h2>5. 이용자의 권리</h2>
+    <p>브라우저에 저장된 정보는 설정 › "처음부터 다시" 또는 브라우저 데이터 삭제로 언제든 지울 수 있습니다. 익명 통계의 열람·삭제를 원하시면 아래 연락처로 요청해 주세요. 확인 후 지체 없이 처리합니다.</p>
+
+    <h2>6. 만 14세 미만 아동</h2>
+    <p>서비스는 개인 식별 정보를 받지 않으며, 아동의 정보를 별도로 수집하지 않습니다.</p>
+
+    <h2>7. 개인정보 보호책임자</h2>
+    <p>
+      운영자: <span class="todo">[운영자 이름 또는 상호]</span><br>
+      연락처: <span class="todo">[연락 이메일]</span>
+    </p>
+
+    <h2>8. 변경</h2>
+    <p>이 방침이 바뀌면 시행 7일 전부터 이 페이지에 알립니다.</p>
+
+    <h2>English summary</h2>
+    <p class="muted">Tab Pet has no accounts. Your pet lives only in this browser's localStorage. If enabled, anonymous usage events go to PostHog and error reports go to Sentry; pet names, backup codes and custom titles are never sent. You can turn off usage stats in Settings. Notifications are shown by your browser only after you allow them. Fonts load from jsDelivr.</p>
+  </main>
+</body>
+</html>

@@ -10,7 +10,6 @@ import { getThemeById, resolveThemeId } from '~/utils/theme'
 
 const pet = usePetStore()
 const { locale, messages, restoreLocale, setLocale } = useLocale()
-const runtimeConfig = useRuntimeConfig()
 const prefersDark = ref(false)
 const isDocumentVisible = ref(true)
 const sidePanelElement = ref<HTMLElement | null>(null)
@@ -39,12 +38,6 @@ const effectiveStatus = computed<PetStatus>(() => pet.petStatus.value ?? 'happy'
 const effectiveSettings = computed<PetSettings>(() => currentPet.value?.settings ?? pet.activeSettings.value)
 const resolvedThemeId = computed(() => resolveThemeId(effectiveSettings.value.themeId, prefersDark.value))
 const activeTheme = computed(() => getThemeById(resolvedThemeId.value))
-const adsenseClient = computed(() => String(runtimeConfig.public.adsenseClient || ''))
-const adsenseSidebarSlot = computed(() => String(runtimeConfig.public.adsenseSidebarSlot || ''))
-const adsenseConfigEnabled = computed(() => String(runtimeConfig.public.adsenseEnabled) === 'true')
-const adsenseEnabled = computed(() =>
-  adsenseConfigEnabled.value && adsenseClient.value.length > 0 && adsenseSidebarSlot.value.length > 0,
-)
 const tabPresentation = computed(() =>
   getTabPresentation({
     species: currentPet.value?.species,
@@ -317,17 +310,14 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
           @reset="pet.resetPet"
         />
         <GuidePanel v-if="currentPet" />
-        <AdSenseDisplay
-          v-if="currentPet && adsenseEnabled"
-          :client="adsenseClient"
-          :slot="adsenseSidebarSlot"
-          :enabled="adsenseEnabled"
-        />
       </aside>
     </main>
 
     <footer class="app-footer">
-      <span>{{ messages.app.footerNote }}</span>
+      <span>
+        {{ messages.app.footerNote }}
+        <a class="app-footer__link" href="/privacy.html" target="_blank" rel="noopener">{{ messages.privacy.link }}</a>
+      </span>
       <LocaleSwitcher
         :selected-locale="locale"
         :label="messages.locale.label"

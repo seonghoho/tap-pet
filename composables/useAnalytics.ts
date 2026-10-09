@@ -1,3 +1,4 @@
+import { isAnalyticsOptedOut } from '~/composables/useAnalyticsConsent'
 import type { PetAction, PetReturnReportBucket, PetSpecies, PetStatus, TitleMode } from '~/types/pet'
 
 // Every product event in one typed map, so dashboards and code agree on names.
@@ -27,6 +28,7 @@ type AnalyticsWindow = Window & { dataLayer?: unknown[] }
 // always re-emitted as a DOM event, so any analytics SDK can subscribe later.
 export function trackEvent<Name extends AnalyticsEventName>(name: Name, properties: AnalyticsEvents[Name]): void {
   if (!import.meta.client || typeof window === 'undefined') return
+  if (isAnalyticsOptedOut()) return
 
   const payload = { event: `tab_pet_${name}`, ...properties }
   const analyticsWindow = window as AnalyticsWindow
