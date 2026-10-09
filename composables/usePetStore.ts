@@ -19,9 +19,15 @@ import type {
   PetSpecies,
   PetStats,
   PetState,
+  PetStatus,
   ThemeId,
 } from '~/types/pet'
-import { applyCareAction, getCareActionRewardPreview, getRecommendedCareAction } from '~/utils/petCare'
+import {
+  applyCareAction,
+  getCareActionRewardPreview,
+  getRecommendedCareAction,
+  isPetRestingFromCare,
+} from '~/utils/petCare'
 import {
   consumeActionLimitUse,
   getActionLimitInfo,
@@ -116,10 +122,12 @@ export function usePetStore(options: PetStoreOptions = {}) {
   const recommendedCareAction = computed(() => {
     if (!petState.value || !petStatus.value) return null
 
-    return getRecommendedCareAction({
+    const recommendation = getRecommendedCareAction({
       stats: petState.value.stats,
       status: petStatus.value,
     })
+
+    return isPetRestingFromCare(recommendation, petState.value.stats) ? null : recommendation
   })
   const recommendedCareRewardPreview = computed(() => {
     const recommendation = recommendedCareAction.value
@@ -175,10 +183,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
         state: restored.state,
         previousLastUpdatedAt: restored.previousLastUpdatedAt,
         now: restoredAt,
-        recommendedCareAction: getRecommendedCareAction({
-          stats: restored.state.stats,
-          status: restoredStatus,
-        }),
+        recommendedCareAction: getRestAwareRecommendation(restored.state.stats, restoredStatus),
       })
     } else {
       returnReport.value = null
@@ -562,6 +567,12 @@ function usePetClock(now: Ref<number>, onTick: () => void): void {
     clockIntervalId = null
     clockTickHandler = null
   })
+}
+
+function getRestAwareRecommendation(stats: PetStats, status: PetStatus) {
+  const recommendation = getRecommendedCareAction({ stats, status })
+
+  return isPetRestingFromCare(recommendation, stats) ? null : recommendation
 }
 
 function isSidePanelMode(mode: unknown): mode is SidePanelMode {

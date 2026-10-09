@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { PetAction, PetSpecies, PetStats, PetStatus, ThemeId } from '~/types/pet'
+import type { PetAction, PetCareFeedback, PetSpecies, PetStats, PetStatus, ThemeId } from '~/types/pet'
 
 const props = defineProps<{
   species: PetSpecies
@@ -10,6 +10,7 @@ const props = defineProps<{
   themeId: ThemeId
   level: number
   activeReaction?: PetAction | null
+  careFeedback?: PetCareFeedback | null
 }>()
 
 const { messages } = useLocale()
@@ -42,6 +43,7 @@ const statRows = computed(() => [
         :theme-id="themeId"
         :level="level"
         :active-reaction="activeReaction"
+        :care-feedback="careFeedback"
         :avatar-label="`${messages.species[species].label} ${messages.status.aria[status]}`"
       />
     </div>

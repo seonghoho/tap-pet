@@ -278,6 +278,9 @@ const shouldShowRecommendation = computed(
     !props.careFeedback,
   ),
 )
+const shouldShowRest = computed(
+  () => !props.recommendedCareAction && !isLimitReached.value && !props.activeReaction && !props.careFeedback,
+)
 const recommendedActionCooldownRemaining = computed(() => {
   const recommendation = props.recommendedCareAction
   if (!recommendation) return 0
@@ -479,7 +482,10 @@ function getActionButtonDetail(action: PetAction): string {
 function getActionAriaLabel(action: PetAction): string {
   return messages.value.actionState.ariaLabel
     .replace('{action}', messages.value.actions[action].label)
-    .replace('{state}', `${getActionButtonStateLabel(action)} · ${getActionButtonDetail(action)}`)
+    .replace(
+      '{state}',
+      [getActionButtonStateLabel(action), getActionButtonDetail(action)].filter(Boolean).join(' · '),
+    )
 }
 
 function formatRemainingTime(milliseconds: number): string {
@@ -575,6 +581,10 @@ function getLevelUnlockDetail(unlock: PetLevelUnlock): string {
     >
       <strong>{{ recommendationTitle }}</strong>
     </div>
+
+    <p v-else-if="shouldShowRest" class="action-rest" aria-live="polite">
+      {{ messages.careRecommendation.rest }}
+    </p>
 
     <div class="action-panel">
       <button

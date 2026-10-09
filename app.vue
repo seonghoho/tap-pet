@@ -97,8 +97,9 @@ useHead(() => ({
   },
 }))
 
-function handleSpeciesSelect(species: PetSpecies): void {
+function handleSpeciesSelect(species: PetSpecies, name: string): void {
   pet.initializePet(species)
+  pet.updatePetName(name)
 }
 
 function handleAction(action: PetAction): void {
@@ -179,6 +180,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
             :theme-id="resolvedThemeId"
             :level="currentPet.growth.level"
             :active-reaction="pet.activeReaction.value"
+            :care-feedback="pet.lastCareFeedback.value"
           />
           <PetReturnReport
             :report="pet.returnReport.value"
@@ -198,6 +200,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
             @action="handleAction"
             @reward-ad="pet.grantRewardedAdActions"
           />
+          <PinTabTip />
         </template>
       </section>
 

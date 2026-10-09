@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, ref } from 'vue'
+import { DEFAULT_PET_NAMES } from '~/constants/pet'
 import type { PetSettings, PetSpecies, TitleMode } from '~/types/pet'
 import { renderPetArtSvg } from '~/utils/petArt'
 import { getDisguiseTitleValue, svgToDataUrl } from '~/utils/tabPresentation'
@@ -10,11 +11,26 @@ const props = withDefaults(defineProps<{
   titleMode: 'status',
 })
 const emit = defineEmits<{
-  select: [species: PetSpecies]
+  select: [species: PetSpecies, name: string]
   updateSettings: [settings: Partial<PetSettings>]
 }>()
 const { locale, messages } = useLocale()
 const titleModeOptions: TitleMode[] = ['status', 'disguise']
+const pendingSpecies = ref<PetSpecies | null>(null)
+const draftName = ref('')
+const nameInput = ref<HTMLInputElement | null>(null)
+
+function chooseSpecies(species: PetSpecies): void {
+  pendingSpecies.value = species
+  draftName.value = DEFAULT_PET_NAMES[species]
+  void nextTick(() => nameInput.value?.select())
+}
+
+function confirmName(): void {
+  if (!pendingSpecies.value) return
+
+  emit('select', pendingSpecies.value, draftName.value.trim() || DEFAULT_PET_NAMES[pendingSpecies.value])
+}
 const demoTitles = computed(() => {
   if (props.titleMode === 'disguise') {
     const disguise = getDisguiseTitleValue('project-dashboard', locale.value)
@@ -55,7 +71,41 @@ const demoIcons = computed(() => ({
 </script>
 
 <template>
-  <div class="setup-panel">
+  <form
+    v-if="pendingSpecies"
+    class="setup-panel setup-naming"
+    @submit.prevent="confirmName"
+  >
+    <PetAvatar
+      :species="pendingSpecies"
+      status="excited"
+      :aria-label="messages.species[pendingSpecies].label"
+    />
+    <div class="section-heading setup-naming__heading">
+      <p class="eyebrow">{{ messages.species[pendingSpecies].label }}</p>
+      <h2>{{ messages.setup.naming.title }}</h2>
+    </div>
+    <label class="setup-naming__field">
+      <span class="visually-hidden">{{ messages.settings.petName }}</span>
+      <input
+        ref="nameInput"
+        v-model="draftName"
+        class="settings-input setup-naming__input"
+        type="text"
+        maxlength="12"
+        autocomplete="off"
+      >
+      <small>{{ messages.setup.naming.hint }}</small>
+    </label>
+    <button class="primary-button" type="submit">
+      {{ messages.setup.naming.start }}
+    </button>
+    <button class="text-button" type="button" @click="pendingSpecies = null">
+      {{ messages.setup.naming.back }}
+    </button>
+  </form>
+
+  <div v-else class="setup-panel">
     <div class="section-heading setup-panel__heading">
       <p class="eyebrow">{{ messages.setup.eyebrow }}</p>
       <h2>{{ messages.setup.title }}</h2>
@@ -70,7 +120,7 @@ const demoIcons = computed(() => ({
         :key="option.species"
         class="species-option"
         type="button"
-        @click="emit('select', option.species)"
+        @click="chooseSpecies(option.species)"
       >
         <PetAvatar
           :species="option.species"

@@ -27,6 +27,7 @@ test('selecting a species reveals the care panel', async ({ page }) => {
   await page.goto('/')
 
   await page.getByRole('button', { name: /고양이/ }).first().click()
+  await page.getByRole('button', { name: '같이 살기 시작' }).click()
 
   await expect(page.getByRole('button', { name: /먹이|밥/ })).toBeVisible()
   await expect(page.locator('.pet-status').getByText('배부름', { exact: true })).toBeVisible()
@@ -35,6 +36,7 @@ test('selecting a species reveals the care panel', async ({ page }) => {
 test('reload restores the selected species', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: /고양이/ }).first().click()
+  await page.getByRole('button', { name: '같이 살기 시작' }).click()
   await expect(page.getByRole('button', { name: /먹이|밥/ })).toBeVisible()
 
   await page.reload()

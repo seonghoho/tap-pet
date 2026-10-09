@@ -63,6 +63,12 @@ export const I18N_MESSAGES = {
         status: 'Show mood',
         disguise: 'Look like work',
       },
+      naming: {
+        title: 'What should we call them?',
+        hint: 'You can change it anytime in settings.',
+        start: 'Start living together',
+        back: 'Pick someone else',
+      },
       tabPreview: {
         label: 'How it looks in your tab bar',
         normal: 'Tab Pet',
@@ -203,6 +209,11 @@ export const I18N_MESSAGES = {
         },
       },
     },
+    pinTip: {
+      title: 'Pin this tab',
+      body: 'Right-click the tab and choose “Pin”. It stays tiny, and a dot shows up when your friend needs you.',
+      dismiss: 'Got it',
+    },
     returnReport: {
       heading: 'Welcome back',
       elapsed: {
@@ -303,6 +314,7 @@ export const I18N_MESSAGES = {
       detail: 'Just a sec.',
     },
     careRecommendation: {
+      rest: 'All set for now. Keep the tab open — they\'ll let you know.',
       heading: 'Suggested',
       title: '{action} would make their day',
       badge: 'Recommended',
@@ -541,6 +553,12 @@ export const I18N_MESSAGES = {
         status: '기분 보여주기',
         disguise: '업무 탭처럼 숨기기',
       },
+      naming: {
+        title: '이름을 지어줄래요?',
+        hint: '설정에서 언제든 바꿀 수 있어요.',
+        start: '같이 살기 시작',
+        back: '다른 친구 고를래요',
+      },
       tabPreview: {
         label: '탭에서는 이렇게 보여요',
         normal: 'Tab Pet',
@@ -681,6 +699,11 @@ export const I18N_MESSAGES = {
         },
       },
     },
+    pinTip: {
+      title: '이 탭을 고정해두세요',
+      body: '탭을 우클릭해서 ‘고정’을 누르면 작게 자리 잡아요. 친구가 부르면 아이콘에 점이 떠요.',
+      dismiss: '알겠어요',
+    },
     returnReport: {
       heading: '다시 왔네요',
       elapsed: {
@@ -781,6 +804,7 @@ export const I18N_MESSAGES = {
       detail: '잠깐만 기다려 주세요.',
     },
     careRecommendation: {
+      rest: '지금은 돌봐줄 게 없어요. 탭만 켜두면 필요할 때 부를게요.',
       heading: '추천',
       title: '지금은 {action}가 제일 반가울 거예요',
       badge: '추천',
@@ -1019,6 +1043,12 @@ export const I18N_MESSAGES = {
         status: '気分を表示',
         disguise: '仕事タブに見せる',
       },
+      naming: {
+        title: '名前をつけてあげる？',
+        hint: '設定でいつでも変えられます。',
+        start: 'いっしょに暮らす',
+        back: 'ほかの子にする',
+      },
       tabPreview: {
         label: 'タブサインのプレビュー',
         normal: 'Tab Pet',
@@ -1159,6 +1189,11 @@ export const I18N_MESSAGES = {
         },
       },
     },
+    pinTip: {
+      title: 'このタブを固定しよう',
+      body: 'タブを右クリックして「固定」を選ぶと小さく収まります。呼ばれるとアイコンに点が出ます。',
+      dismiss: 'OK',
+    },
     returnReport: {
       heading: 'おかえりなさい',
       elapsed: {
@@ -1259,6 +1294,7 @@ export const I18N_MESSAGES = {
       detail: 'まもなく結果とステータスの変化が表示されます。',
     },
     careRecommendation: {
+      rest: 'いまはお世話いらないよ。タブを開いておけば呼ぶね。',
       heading: 'おすすめのお世話',
       title: '次は{action}',
       badge: 'おすすめ',
