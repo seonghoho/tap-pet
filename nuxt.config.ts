@@ -36,8 +36,12 @@ export default defineNuxtConfig({
     strict: true,
   },
   runtimeConfig: {
+    // Server-only secrets for purchases. Without them the shop shows "coming soon".
+    tossSecretKey: process.env.NUXT_TOSS_SECRET_KEY ?? '',
+    purchaseSigningSecret: process.env.NUXT_PURCHASE_SIGNING_SECRET ?? '',
     // All optional: without a key the matching integration stays off. See .env.example.
     public: {
+      tossClientKey: process.env.NUXT_PUBLIC_TOSS_CLIENT_KEY ?? '',
       siteUrl,
       appEnv: process.env.NUXT_PUBLIC_APP_ENV ?? 'development',
       posthogKey: process.env.NUXT_PUBLIC_POSTHOG_KEY ?? '',

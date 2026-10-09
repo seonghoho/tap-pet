@@ -1,4 +1,4 @@
-import type { PetSpecies, PetStatus } from '~/types/pet'
+import type { PetOutfitId, PetSpecies, PetStatus } from '~/types/pet'
 
 // Hand-drawn emoticon style pets: thick warm outline, flat fills, tiny low-set dot eyes,
 // hatched blush and stubby limbs. One renderer draws both the room character and the
@@ -51,6 +51,7 @@ export function renderPetArtSvg(input: {
   idPrefix?: string
   accentBoost?: boolean
   label?: string
+  outfit?: PetOutfitId | null
 }): string {
   const icon = (input.variant ?? 'full') === 'icon'
   const ctx: Ctx = {
@@ -70,6 +71,7 @@ export function renderPetArtSvg(input: {
     renderLimbs(ctx),
     renderBody(ctx),
     renderFace(ctx),
+    input.outfit ? renderOutfit(ctx, input.outfit) : '',
     icon ? '</g>' : '',
     icon ? '' : renderStatusProps(ctx),
     input.accentBoost ? (icon ? sparkle(20, 20, 11) : sparkle(14, 58, 6)) : '',
@@ -321,6 +323,65 @@ function renderMouth(layout: FaceLayout, ctx: Ctx): string {
       return usesW
         ? `<path d="M56 ${y}Q58.5 ${y + 3.5} 61 ${y}Q63.5 ${y + 3.5} 66 ${y}" ${line}/>`
         : `<path d="M57.5 ${y + 2}L61 ${y - 1}L64.5 ${y + 2}" ${line}/>`
+  }
+}
+
+// ---------- outfits (cosmetic pack) ----------
+
+const HEAD_TOP: Record<PetSpecies, number> = {
+  cat: 37,
+  dog: 37,
+  hedgehog: 34,
+  rabbit: 37,
+  penguin: 30,
+  hamster: 37,
+}
+
+function renderOutfit(ctx: Ctx, outfit: PetOutfitId): string {
+  const w = ctx.sw * 0.8
+  const top = HEAD_TOP[ctx.species]
+
+  switch (outfit) {
+    case 'party-hat': {
+      const base = top + 6
+
+      return [
+        `<g transform="rotate(10 61 ${base})">`,
+        `<path d="M47 ${base}L61 ${base - 30}L75 ${base}Q61 ${base + 6} 47 ${base}Z" fill="#8fc3ea" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
+        `<circle cx="57" cy="${base - 10}" r="2.4" fill="#ffffff"/><circle cx="65" cy="${base - 4}" r="2.4" fill="#ffffff"/><circle cx="62" cy="${base - 18}" r="2" fill="#ffffff"/>`,
+        `<circle cx="61" cy="${base - 31}" r="5" fill="#ffd25e" stroke="${INK}" stroke-width="${w}"/>`,
+        '</g>',
+      ].join('')
+    }
+    case 'ribbon': {
+      const x = 80
+      const y = top + 9
+
+      return [
+        `<path d="M${x} ${y}C${x - 17} ${y - 17} ${x - 22} ${y + 6} ${x} ${y}Z" fill="#ff9aa6" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
+        `<path d="M${x} ${y}C${x + 17} ${y - 17} ${x + 22} ${y + 6} ${x} ${y}Z" fill="#ff9aa6" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
+        `<circle cx="${x}" cy="${y - 1}" r="4.6" fill="#ff7f8f" stroke="${INK}" stroke-width="${w}"/>`,
+      ].join('')
+    }
+    case 'scarf':
+      return [
+        `<path d="M78 90L84 106L94 103L88 88Z" fill="#ff8a7a" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
+        `<path d="M23 83Q61 97 99 83L99 92Q61 106 23 92Z" fill="#ff8a7a" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
+        `<path d="M40 90L42 97M56 92L57 99M72 91L71 98" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.8"/>`,
+      ].join('')
+    case 'glasses': {
+      const layout = FACE_LAYOUT[ctx.species]
+      const left = 61 - layout.eyeDx
+      const right = 61 + layout.eyeDx
+      const y = layout.eyeY
+      const r = ctx.icon ? 9 : 8
+
+      return [
+        `<circle cx="${left}" cy="${y}" r="${r}" fill="#ffffff" fill-opacity="0.25" stroke="${INK}" stroke-width="${w}"/>`,
+        `<circle cx="${right}" cy="${y}" r="${r}" fill="#ffffff" fill-opacity="0.25" stroke="${INK}" stroke-width="${w}"/>`,
+        `<path d="M${left + r} ${y - 1}Q61 ${y - 4} ${right - r} ${y - 1}" fill="none" stroke="${INK}" stroke-width="${w}" stroke-linecap="round"/>`,
+      ].join('')
+    }
   }
 }
 

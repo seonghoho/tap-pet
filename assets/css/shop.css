@@ -1,0 +1,227 @@
+/* Shop, outfits and purchase feedback. */
+
+.shop-panel {
+  border-top: 1px solid var(--app-border);
+  display: grid;
+  gap: 12px;
+  padding-top: 18px;
+}
+
+.shop-panel__header {
+  display: grid;
+  gap: 2px;
+}
+
+.shop-panel__header strong {
+  font-size: 0.9375rem;
+}
+
+.shop-panel__header small {
+  color: var(--app-muted);
+}
+
+.shop-product {
+  background: var(--app-bg);
+  border-radius: 18px;
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.shop-product__preview {
+  display: flex;
+  justify-content: space-around;
+}
+
+.shop-product__preview .pet-avatar {
+  height: 56px;
+  width: 56px;
+}
+
+.shop-product__titles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.shop-product__titles span {
+  background: var(--app-surface);
+  border-radius: 8px 8px 3px 3px;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+}
+
+.shop-product__copy {
+  display: grid;
+  gap: 2px;
+}
+
+.shop-product__copy strong {
+  font-size: 0.9375rem;
+}
+
+.shop-product__copy small {
+  color: var(--app-muted);
+}
+
+.shop-product__buy {
+  background: var(--app-accent);
+  border: 0;
+  border-radius: 14px;
+  color: var(--app-accent-text);
+  font-weight: 700;
+  min-height: 44px;
+}
+
+.shop-product__buy:disabled {
+  background: var(--app-surface-strong);
+  color: var(--app-muted);
+}
+
+.shop-product__owned {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  justify-content: space-between;
+}
+
+.shop-product__owned span {
+  color: var(--app-success);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.shop-product__owned small {
+  color: var(--app-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.6875rem;
+  overflow-wrap: anywhere;
+}
+
+.shop-restore {
+  font-size: 0.8125rem;
+}
+
+.shop-restore summary {
+  color: var(--app-muted);
+  cursor: pointer;
+}
+
+.shop-restore > small {
+  color: var(--app-muted);
+  display: block;
+  margin: 6px 0;
+}
+
+.shop-restore__form {
+  display: flex;
+  gap: 6px;
+}
+
+.shop-teaser {
+  align-items: center;
+  background: var(--app-bg);
+  border: 0;
+  border-radius: 18px;
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.shop-teaser .pet-avatar {
+  flex: 0 0 52px;
+  height: 52px;
+  width: 52px;
+}
+
+.shop-teaser span {
+  display: grid;
+  gap: 2px;
+}
+
+.shop-teaser small {
+  color: var(--app-muted);
+}
+
+.outfit-list {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.outfit-button {
+  align-items: center;
+  background: var(--app-bg);
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  display: grid;
+  font-size: 0.6875rem;
+  gap: 2px;
+  justify-items: center;
+  min-width: 0;
+  padding: 6px 2px 8px;
+}
+
+.outfit-button .pet-avatar {
+  height: 44px;
+  width: 44px;
+}
+
+.outfit-button span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.outfit-button--active {
+  border-color: var(--app-text);
+  font-weight: 700;
+}
+
+.choice-button--locked {
+  opacity: 0.55;
+}
+
+.choice-button em {
+  font-size: 0.625rem;
+  font-style: normal;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.app-toast {
+  align-items: center;
+  background: var(--app-text);
+  border-radius: 16px;
+  bottom: 20px;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--app-text) 25%, transparent);
+  color: var(--app-bg);
+  display: flex;
+  gap: 12px;
+  left: 50%;
+  max-width: calc(100% - 32px);
+  padding: 12px 12px 12px 18px;
+  position: fixed;
+  transform: translateX(-50%);
+  width: max-content;
+  z-index: 50;
+}
+
+.app-toast--error {
+  background: #b5362b;
+  color: #ffffff;
+}
+
+.app-toast button {
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  border: 0;
+  border-radius: 10px;
+  color: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  white-space: nowrap;
+}

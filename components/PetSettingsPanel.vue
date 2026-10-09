@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import {
-  PREMIUM_QUIET_SIGNAL_PACKS,
-  PREMIUM_THEME_PACKS,
-  PREMIUM_WORK_TITLE_PACKS,
-} from '~/constants/premium'
+import { PET_OUTFITS } from '~/constants/shop'
 import { PET_THEMES } from '~/constants/themes'
 import { DISGUISE_TITLES, getDisguiseTitleLabel } from '~/constants/titles'
-import type { PremiumMockItem } from '~/constants/premium'
 import type {
   DisguiseTitleId,
+  PetOutfitId,
   PetSettings,
+  PetSpecies,
   ThemeId,
   TitleMode,
   TitleVisibility,
@@ -18,6 +15,7 @@ import type {
 
 const props = defineProps<{
   name: string
+  species?: PetSpecies
   settings: PetSettings
   backupCode?: string | null
   importBackup?: (code: string) => boolean
@@ -39,6 +37,14 @@ const backupDraft = ref('')
 const backupNotice = ref('')
 const isBackupConfirming = ref(false)
 const { copyText } = useClipboard()
+const shop = useEntitlements()
+const ownsOutfits = computed(() => shop.owns('outfit-pack'))
+const ownsWorkTitles = computed(() => shop.owns('work-title-pack'))
+
+function setOutfit(outfit: PetOutfitId | null): void {
+  emit('updateSettings', { outfit })
+  trackEvent('outfit_changed', { outfit: outfit ?? 'none' })
+}
 const analyticsConsent = useAnalyticsConsent()
 
 function setAnalyticsSharing(event: Event): void {
@@ -131,14 +137,6 @@ function setTheme(themeId: ThemeId): void {
   emit('updateSettings', { themeId })
 }
 
-function getPremiumValue(item: PremiumMockItem): string {
-  return item.values[locale.value]
-}
-
-function getPremiumDetail(item: PremiumMockItem): string {
-  return item.detail[locale.value]
-}
-
 async function setCareNotifications(event: Event): Promise<void> {
   const input = event.target as HTMLInputElement | null
   const enabled = Boolean(input?.checked)
@@ -218,6 +216,34 @@ function confirmReset(): void {
       >
     </label>
 
+    <fieldset v-if="ownsOutfits && species" class="settings-fieldset">
+      <legend>{{ messages.shop.outfitHeading }}</legend>
+      <div class="outfit-list">
+        <button
+          class="outfit-button"
+          :class="{ 'outfit-button--active': !settings.outfit }"
+          type="button"
+          :aria-pressed="!settings.outfit"
+          @click="setOutfit(null)"
+        >
+          <PetAvatar :species="species" status="happy" compact />
+          <span>{{ messages.shop.outfitNone }}</span>
+        </button>
+        <button
+          v-for="outfit in PET_OUTFITS"
+          :key="outfit"
+          class="outfit-button"
+          :class="{ 'outfit-button--active': settings.outfit === outfit }"
+          type="button"
+          :aria-pressed="settings.outfit === outfit"
+          @click="setOutfit(outfit)"
+        >
+          <PetAvatar :species="species" status="happy" :outfit="outfit" compact />
+          <span>{{ messages.shop.outfits[outfit] }}</span>
+        </button>
+      </div>
+    </fieldset>
+
     <fieldset class="settings-fieldset">
       <legend>{{ messages.settings.titleMode }}</legend>
       <div class="segmented-control">
@@ -259,12 +285,17 @@ function confirmReset(): void {
           v-for="title in DISGUISE_TITLES"
           :key="title.id"
           class="choice-button"
-          :class="{ 'choice-button--active': settings.disguiseTitleId === title.id }"
+          :class="{
+            'choice-button--active': settings.disguiseTitleId === title.id,
+            'choice-button--locked': title.premium && !ownsWorkTitles,
+          }"
           type="button"
+          :disabled="title.premium && !ownsWorkTitles"
           :aria-pressed="settings.disguiseTitleId === title.id"
           @click="setDisguiseTitle(title.id)"
         >
           {{ getDisguiseTitleLabel(title.id, locale) }}
+          <em v-if="title.premium && !ownsWorkTitles">{{ messages.shop.packLabel }}</em>
         </button>
       </div>
     </fieldset>
@@ -337,60 +368,7 @@ function confirmReset(): void {
       </div>
     </fieldset>
 
-    <details class="premium-tab-pack" aria-labelledby="premium-tab-pack-heading">
-      <summary class="premium-tab-pack__header">
-        <span>{{ messages.premium.lockedLabel }}</span>
-        <strong id="premium-tab-pack-heading">{{ messages.premium.heading }}</strong>
-        <small>{{ messages.premium.description }}</small>
-      </summary>
-
-      <div class="premium-lock-group">
-        <strong>{{ messages.premium.workTitlePack }}</strong>
-        <button
-          v-for="item in PREMIUM_WORK_TITLE_PACKS"
-          :key="item.id"
-          class="premium-lock-row"
-          type="button"
-          :disabled="true"
-        >
-          <span>{{ getPremiumValue(item) }}</span>
-          <small>{{ getPremiumDetail(item) }}</small>
-          <em>{{ messages.premium.lockedLabel }}</em>
-        </button>
-      </div>
-
-      <div class="premium-lock-group">
-        <strong>{{ messages.premium.quietSignalPack }}</strong>
-        <button
-          v-for="item in PREMIUM_QUIET_SIGNAL_PACKS"
-          :key="item.id"
-          class="premium-lock-row"
-          type="button"
-          :disabled="true"
-        >
-          <span>{{ getPremiumValue(item) }}</span>
-          <small>{{ getPremiumDetail(item) }}</small>
-          <em>{{ messages.premium.lockedLabel }}</em>
-        </button>
-      </div>
-
-      <div class="premium-lock-group">
-        <strong>{{ messages.premium.themePack }}</strong>
-        <button
-          v-for="item in PREMIUM_THEME_PACKS"
-          :key="item.id"
-          class="premium-lock-row"
-          type="button"
-          :disabled="true"
-        >
-          <span>{{ getPremiumValue(item) }}</span>
-          <small>{{ getPremiumDetail(item) }}</small>
-          <em>{{ messages.premium.lockedLabel }}</em>
-        </button>
-      </div>
-
-      <p>{{ messages.premium.unavailable }}</p>
-    </details>
+    <ShopPanel v-if="species" :species="species" source="settings" />
 
     <section class="settings-backup" aria-labelledby="settings-backup-title">
       <div>

@@ -1,4 +1,4 @@
-import type { PetSpecies } from '~/types/pet'
+import type { PetOutfitId, PetSpecies } from '~/types/pet'
 import { PET_ART_PALETTES, renderPetArtSvg } from '~/utils/petArt'
 import { svgToDataUrl } from '~/utils/tabPresentation'
 
@@ -7,6 +7,7 @@ export const SHARE_CARD_HEIGHT = 1350
 
 export type ShareCardInput = {
   species: PetSpecies
+  outfit?: PetOutfitId | null
   name: string
   subtitle: string
   highlight: string
@@ -36,7 +37,7 @@ export async function renderShareCard(input: ShareCardInput): Promise<Blob> {
   context.fill()
 
   const pet = await loadImage(
-    svgToDataUrl(renderPetArtSvg({ species: input.species, status: 'excited', idPrefix: 'share-card' })),
+    svgToDataUrl(renderPetArtSvg({ species: input.species, status: 'excited', idPrefix: 'share-card', outfit: input.outfit })),
   )
   context.drawImage(pet, (SHARE_CARD_WIDTH - 640) / 2, 120, 640, 640)
 

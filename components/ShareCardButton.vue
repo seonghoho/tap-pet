@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { PetSpecies } from '~/types/pet'
+import type { PetOutfitId, PetSpecies } from '~/types/pet'
 import { renderShareCard, shareOrDownloadCard } from '~/utils/petShareCard'
 
 const props = defineProps<{
@@ -8,6 +8,7 @@ const props = defineProps<{
   name: string
   level: number
   streakDays: number
+  outfit?: PetOutfitId | null
 }>()
 
 const emit = defineEmits<{
@@ -38,6 +39,7 @@ async function share(): Promise<void> {
   try {
     const blob = await renderShareCard({
       species: props.species,
+      outfit: props.outfit,
       name: props.name,
       subtitle: subtitle.value,
       highlight: highlight.value,

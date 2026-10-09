@@ -54,6 +54,26 @@ export const DISGUISE_TITLES: DisguiseTitlePreset[] = [
       ja: '会議メモ',
     },
   },
+  {
+    id: 'roadmap',
+    premium: true,
+    values: { en: 'Roadmap', ko: '로드맵', ja: 'ロードマップ' },
+  },
+  {
+    id: 'kpi-review',
+    premium: true,
+    values: { en: 'KPI Review', ko: 'KPI 리뷰', ja: 'KPIレビュー' },
+  },
+  {
+    id: 'sprint-board',
+    premium: true,
+    values: { en: 'Sprint Board', ko: '스프린트 보드', ja: 'スプリントボード' },
+  },
+  {
+    id: 'client-notes',
+    premium: true,
+    values: { en: 'Client Notes', ko: '클라이언트 노트', ja: 'クライアントメモ' },
+  },
 ]
 
 export function getDisguiseTitleLabel(titleId: DisguiseTitleId, locale: AppLocale): string {

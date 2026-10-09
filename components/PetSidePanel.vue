@@ -264,28 +264,18 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
           </p>
         </section>
 
-        <section
-          v-if="level >= 3"
-          class="premium-tab-pack premium-tab-pack--compact" aria-labelledby="premium-tab-pack-preview-title">
-          <div class="premium-tab-pack__header">
-            <span>{{ messages.premium.lockedLabel }}</span>
-            <strong id="premium-tab-pack-preview-title">{{ messages.premium.heading }}</strong>
-            <small>{{ messages.premium.description }}</small>
-          </div>
-
-          <div class="premium-lock-group">
-            <div class="premium-lock-row premium-lock-row--static">
-              <span>{{ messages.premium.workTitlePack }}</span>
-              <small>{{ messages.premium.workTitlePackDetail }}</small>
-              <em>{{ messages.premium.lockedLabel }}</em>
-            </div>
-            <div class="premium-lock-row premium-lock-row--static">
-              <span>{{ messages.premium.quietSignalPack }}</span>
-              <small>{{ messages.premium.quietSignalPackDetail }}</small>
-              <em>{{ messages.premium.lockedLabel }}</em>
-            </div>
-          </div>
-        </section>
+        <button
+          v-if="level >= 3 && species"
+          class="shop-teaser"
+          type="button"
+          @click="emit('setMode', 'settings')"
+        >
+          <PetAvatar :species="species" status="excited" outfit="party-hat" compact />
+          <span>
+            <strong>{{ messages.shop.heading }}</strong>
+            <small>{{ messages.shop.teaser }}</small>
+          </span>
+        </button>
       </template>
 
       <section v-else class="level-unlocks level-unlocks--compact" aria-labelledby="level-unlocks-title">
@@ -310,6 +300,7 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
         :name="name"
         :level="level"
         :streak-days="streak?.current ?? 0"
+        :outfit="settings.outfit"
       />
     </div>
 
@@ -318,6 +309,7 @@ function getLevelUnlockRequirement(unlock: PetLevelUnlock): string {
       class="pet-side-panel__body"
       :name="name"
       :settings="settings"
+      :species="species"
       :backup-code="backupCode"
       :import-backup="importBackup"
       @update-name="emit('updateName', $event)"

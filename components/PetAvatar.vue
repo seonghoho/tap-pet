@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
-import type { PetSpecies, PetStatus, ThemeId } from '~/types/pet'
+import type { PetOutfitId, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
 import { renderPetArtSvg } from '~/utils/petArt'
 
 const props = withDefaults(
@@ -10,6 +10,7 @@ const props = withDefaults(
     themeId?: ThemeId
     ariaLabel?: string
     compact?: boolean
+    outfit?: PetOutfitId | null
   }>(),
   {
     compact: false,
@@ -22,6 +23,7 @@ const svg = computed(() =>
     species: props.species,
     status: props.status,
     idPrefix: `pet-${uid}`,
+    outfit: props.outfit,
   }),
 )
 </script>

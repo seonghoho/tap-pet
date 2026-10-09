@@ -8,7 +8,7 @@ import {
 import { DEFAULT_THEME_ID } from '~/constants/themes'
 import { DEFAULT_LOCALE } from '~/constants/i18n'
 import type { AppLocale } from '~/types/i18n'
-import type { DisguiseTitleId, PetSettings, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
+import type { DisguiseTitleId, PetOutfitId, PetSettings, PetSpecies, PetStatus, ThemeId } from '~/types/pet'
 import { getAvailableLevelUnlocks } from '~/utils/petLevelUnlocks'
 import { petNeedsCare, renderPetArtSvg } from '~/utils/petArt'
 
@@ -77,7 +77,7 @@ export function getTabPresentation(input: {
       locale,
       isDocumentVisible: input.isDocumentVisible ?? false,
     }),
-    faviconSvg: getFaviconSvg(species, status, themeId, { level: input.level }),
+    faviconSvg: getFaviconSvg(species, status, themeId, { level: input.level, outfit: settings.outfit }),
   }
 }
 
@@ -87,6 +87,7 @@ export function getFaviconSvg(
   _themeId: ThemeId,
   options: {
     level?: number
+    outfit?: PetOutfitId | null
   } = {},
 ): string {
   const hasBrightAccent = getAvailableLevelUnlocks(options.level ?? 1).some(
@@ -99,6 +100,7 @@ export function getFaviconSvg(
     variant: 'icon',
     idPrefix: 'tab-pet-favicon',
     accentBoost: hasBrightAccent,
+    outfit: options.outfit,
   })
 }
 
