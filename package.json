@@ -13,7 +13,9 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "build:extension": "node extension/build.mjs"
+    "build:extension": "node extension/build.mjs",
+    "pack:extension": "node extension/pack.mjs",
+    "store:images": "npm run build:extension && node extension/store/shots.mjs"
   },
   "dependencies": {
     "@sentry/vue": "^11.6.0",
