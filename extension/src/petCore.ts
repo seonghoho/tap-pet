@@ -1,7 +1,8 @@
 // The extension's pet model: the same rules as the website, minus the page-only parts
 // (reaction hold, cooldown timers, reward feedback). Pure functions, easy to test.
 import { PET_STORAGE_VERSION } from '~/constants/pet'
-import type { PetAction, PetSpecies, PetState, PetStatus } from '~/types/pet'
+import type { PetAction, PetOutfitId, PetSpecies, PetState, PetStatus } from '~/types/pet'
+import { type Entitlement, ownsProduct } from '~/utils/entitlements'
 import { consumeActionLimitUse, getActionLimitInfo } from '~/utils/petActionLimit'
 import { applyCareAction } from '~/utils/petCare'
 import { applyOfflineDecay } from '~/utils/petDecay'
@@ -65,4 +66,13 @@ export function statusOf(state: PetState, now: number): PetStatus {
 
 export function remainingCare(state: PetState, now: number): number {
   return getActionLimitInfo(state.actionLimit, now).remaining
+}
+
+// Same rule as the website: an outfit shows only while the outfit pack is owned.
+export function visibleOutfit(state: PetState, entitlements: readonly Entitlement[]): PetOutfitId | null {
+  return ownsProduct(entitlements, 'outfit-pack') ? state.settings.outfit ?? null : null
+}
+
+export function wearOutfit(state: PetState, outfit: PetOutfitId | null, now: number): PetState {
+  return { ...state, settings: { ...state.settings, outfit }, lastUpdatedAt: now }
 }

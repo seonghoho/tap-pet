@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { ACTION_LIMIT_BASE_USES } from '~/constants/pet'
 import { pickLocale } from '~/extension/src/messages'
-import { adoptPet, careFor, loadPet, remainingCare, serializePet, statusOf } from '~/extension/src/petCore'
-import { decodePetBackup, encodePetBackup } from '~/utils/petBackup'
+import { adoptPet, careFor, loadPet, remainingCare, serializePet, statusOf, visibleOutfit, wearOutfit } from '~/extension/src/petCore'
+import type { Entitlement } from '~/utils/entitlements'
+import { decodePetBackup, decodePetBackupWithPurchases, encodePetBackup } from '~/utils/petBackup'
 
 const HOUR = 1000 * 60 * 60
 const NOW = new Date(2026, 9, 10, 14).getTime()
@@ -45,6 +46,25 @@ describe('extension pet core', () => {
     const pet = adoptPet('hamster', '콩이', NOW)
 
     expect(decodePetBackup(encodePetBackup(pet), NOW)?.name).toBe('콩이')
+  })
+
+  it('shows the outfit only while the outfit pack is owned, like the website', () => {
+    const outfitPack: Entitlement = { productId: 'outfit-pack', orderId: 'order-1', issuedAt: NOW, signature: 'sig' }
+    const pet = wearOutfit(adoptPet('cat', '몽이', NOW), 'ribbon', NOW)
+
+    expect(visibleOutfit(pet, [outfitPack])).toBe('ribbon')
+    expect(visibleOutfit(pet, [])).toBeNull()
+    expect(visibleOutfit(wearOutfit(pet, null, NOW), [outfitPack])).toBeNull()
+    expect(loadPet(serializePet(pet), NOW)?.settings.outfit).toBe('ribbon')
+  })
+
+  it('carries purchases and the chosen outfit in the backup code', () => {
+    const outfitPack: Entitlement = { productId: 'outfit-pack', orderId: 'order-1', issuedAt: NOW, signature: 'sig' }
+    const pet = wearOutfit(adoptPet('dog', '초코', NOW), 'scarf', NOW)
+    const backup = decodePetBackupWithPurchases(encodePetBackup(pet, [outfitPack]), NOW)!
+
+    expect(backup.entitlements).toEqual([outfitPack])
+    expect(visibleOutfit(backup.state, backup.entitlements)).toBe('scarf')
   })
 
   it('follows the browser language', () => {

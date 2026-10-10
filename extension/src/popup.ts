@@ -1,13 +1,15 @@
 // Toolbar popup: see the pet, care for it, or move it between the website and the extension.
 import { DEFAULT_PET_NAMES } from '~/constants/pet'
-import type { PetAction, PetSpecies, PetState } from '~/types/pet'
+import { PET_OUTFITS } from '~/constants/shop'
+import type { PetAction, PetOutfitId, PetSpecies, PetState } from '~/types/pet'
+import { type Entitlement, mergeEntitlements, normalizeEntitlements, ownsProduct } from '~/utils/entitlements'
 import { renderPetArtSvg } from '~/utils/petArt'
-import { decodePetBackupWithPurchases, encodePetBackup } from '~/utils/petBackup'
+import { type PetBackup, decodePetBackupWithPurchases, encodePetBackup } from '~/utils/petBackup'
 import { getActiveStreak } from '~/utils/petStreak'
 import { pickVoiceLine } from '~/utils/petVoice'
 import { getMessages } from './messages'
-import { adoptPet, careFor, loadPet, remainingCare, serializePet, statusOf } from './petCore'
-import { NOTIFY_KEY, PET_KEY, readStorage, writeStorage } from './storage'
+import { adoptPet, careFor, loadPet, remainingCare, serializePet, statusOf, visibleOutfit, wearOutfit } from './petCore'
+import { ENTITLEMENTS_KEY, NOTIFY_KEY, PET_KEY, readStorage, writeStorage } from './storage'
 
 const SPECIES: PetSpecies[] = ['cat', 'dog', 'hedgehog', 'rabbit', 'penguin', 'hamster']
 const ACTIONS: PetAction[] = ['feed', 'play', 'sleep', 'wash']
@@ -21,6 +23,7 @@ const ACTION_ICONS: Record<PetAction, string> = {
 const messages = getMessages()
 const root = document.getElementById('app')!
 let pet: PetState | null = null
+let entitlements: Entitlement[] = []
 let flashLine = ''
 let flashTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -28,12 +31,22 @@ void start()
 
 async function start(): Promise<void> {
   pet = loadPet(await readStorage(PET_KEY), Date.now())
+  entitlements = normalizeEntitlements(await readStorage(ENTITLEMENTS_KEY))
   if (pet) await save()
   render()
 }
 
 async function save(): Promise<void> {
   if (pet) await writeStorage({ [PET_KEY]: serializePet(pet) })
+}
+
+// A backup code replaces the pet but only adds purchases, never removes them.
+async function applyBackup(backup: PetBackup): Promise<void> {
+  pet = { ...backup.state, lastUpdatedAt: Date.now() }
+  entitlements = mergeEntitlements(entitlements, backup.entitlements)
+  await writeStorage({ [ENTITLEMENTS_KEY]: entitlements })
+  await save()
+  render()
 }
 
 function render(): void {
@@ -61,7 +74,7 @@ function renderPet(state: PetState): HTMLElement {
   const view = el('div', 'pet')
 
   const hero = el('div', 'pet__hero')
-  hero.append(art(renderPetArtSvg({ species: state.species, status, idPrefix: 'popup' }), 'pet__art'))
+  hero.append(art(renderPetArtSvg({ species: state.species, status, idPrefix: 'popup', outfit: visibleOutfit(state, entitlements) }), 'pet__art'))
   const heading = el('div', 'pet__heading')
   const name = el('strong', 'pet__name', state.name)
   const mood = el('span', 'pet__mood', messages.status.labels[status])
@@ -145,7 +158,7 @@ function renderMore(state: PetState): HTMLElement {
   const copy = el('button', 'ghost', messages.backup.copy)
   copy.type = 'button'
   copy.addEventListener('click', () => {
-    void navigator.clipboard.writeText(encodePetBackup(state)).then(() => {
+    void navigator.clipboard.writeText(encodePetBackup(state, entitlements)).then(() => {
       copy.textContent = messages.backup.copied
     })
   })
@@ -165,13 +178,43 @@ function renderMore(state: PetState): HTMLElement {
       return
     }
 
-    pet = { ...backup.state, lastUpdatedAt: Date.now() }
-    void save().then(render)
+    void applyBackup(backup)
   })
 
+  if (ownsProduct(entitlements, 'outfit-pack')) details.append(renderOutfits(state))
   details.append(notify, backupTitle, backupHint, copy, input, importButton, notice)
 
   return details
+}
+
+function renderOutfits(state: PetState): HTMLElement {
+  const group = el('div', 'outfits')
+  group.append(el('strong', 'more__title', messages.shop.outfitHeading))
+  const list = el('div', 'outfits__list')
+  const current = state.settings.outfit ?? null
+
+  for (const outfit of [null, ...PET_OUTFITS] as (PetOutfitId | null)[]) {
+    const label = outfit ? messages.shop.outfits[outfit] : messages.shop.outfitNone
+    const option = el('button', `outfits__option${outfit === current ? ' outfits__option--active' : ''}`)
+    option.type = 'button'
+    option.title = label
+    option.setAttribute('aria-label', label)
+    option.setAttribute('aria-pressed', String(outfit === current))
+    option.append(art(renderPetArtSvg({ species: state.species, status: 'happy', idPrefix: `outfit-${outfit ?? 'none'}`, outfit }), 'outfits__art'))
+    option.addEventListener('click', () => {
+      if (!pet) return
+      pet = wearOutfit(pet, outfit, Date.now())
+      void save().then(() => {
+        render()
+        root.querySelector<HTMLDetailsElement>('.more')?.setAttribute('open', '')
+      })
+    })
+    list.append(option)
+  }
+
+  group.append(list)
+
+  return group
 }
 
 function renderAdoption(): HTMLElement {
@@ -227,8 +270,7 @@ function renderImportOnly(): HTMLElement {
       return
     }
 
-    pet = { ...backup.state, lastUpdatedAt: Date.now() }
-    void save().then(render)
+    void applyBackup(backup)
   })
   details.append(input, button, notice)
 

@@ -34,6 +34,23 @@ test('extension popup: adopt a pet, care for it, and keep it after reopening', a
 
     const stored = await worker.evaluate(() => chrome.storage.local.get('pet'))
     expect((stored.pet as { species: string }).species).toBe('rabbit')
+
+    // No outfit pack yet: no outfit picker.
+    await popup.locator('.more summary').click()
+    await expect(popup.locator('.outfits__option')).toHaveCount(0)
+
+    // A purchase brought over by backup code unlocks the picker; the choice is saved.
+    await worker.evaluate(() => chrome.storage.local.set({
+      entitlements: [{ productId: 'outfit-pack', orderId: 'e2e-order', issuedAt: 1, signature: 'e2e' }],
+    }))
+    await popup.reload()
+    await popup.locator('.more summary').click()
+    await expect(popup.locator('.outfits__option')).toHaveCount(5)
+    await popup.locator('.outfits__option').nth(2).click()
+    await expect(popup.locator('.outfits__option').nth(2)).toHaveAttribute('aria-pressed', 'true')
+
+    const dressed = await worker.evaluate(() => chrome.storage.local.get('pet'))
+    expect((dressed.pet as { settings: { outfit: string } }).settings.outfit).toBe('ribbon')
   } finally {
     await context.close()
   }
