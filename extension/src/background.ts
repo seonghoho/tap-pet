@@ -1,10 +1,11 @@
 // Service worker: keeps the toolbar icon in sync with the pet and nudges when care is needed.
 import { CARE_NOTIFICATION_COOLDOWN_MS } from '~/constants/pet'
 import type { PetStatus } from '~/types/pet'
+import { normalizeEntitlements } from '~/utils/entitlements'
 import { petNeedsCare, renderPetArtSvg } from '~/utils/petArt'
 import { getMessages } from './messages'
-import { loadPet, serializePet, statusOf } from './petCore'
-import { LAST_NOTIFIED_KEY, LAST_STATUS_KEY, NOTIFY_KEY, PET_KEY, readStorage, writeStorage } from './storage'
+import { loadPet, serializePet, statusOf, visibleOutfit } from './petCore'
+import { ENTITLEMENTS_KEY, LAST_NOTIFIED_KEY, LAST_STATUS_KEY, NOTIFY_KEY, PET_KEY, readStorage, writeStorage } from './storage'
 
 const ALARM = 'tab-pet-tick'
 const ICON_SIZES = [16, 32] as const
@@ -18,7 +19,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === ALARM) void refresh()
 })
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'local' && PET_KEY in changes) void refreshIcon()
+  if (area === 'local' && (PET_KEY in changes || ENTITLEMENTS_KEY in changes)) void refreshIcon()
 })
 chrome.notifications.onClicked.addListener(() => {
   void chrome.action.openPopup?.().catch(() => undefined)
@@ -48,7 +49,8 @@ async function refreshIcon(): Promise<void> {
 
   const status = statusOf(pet, now)
   const messages = getMessages()
-  const svg = renderPetArtSvg({ species: pet.species, status, variant: 'icon', idPrefix: 'ext', outfit: null })
+  const outfit = visibleOutfit(pet, normalizeEntitlements(await readStorage(ENTITLEMENTS_KEY)))
+  const svg = renderPetArtSvg({ species: pet.species, status, variant: 'icon', idPrefix: 'ext', outfit })
 
   await chrome.action.setIcon({ imageData: await rasterize(svg) })
   await chrome.action.setTitle({ title: `${pet.name} · ${messages.status.labels[status]}` })

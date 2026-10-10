@@ -195,3 +195,17 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   font-weight: 700;
   padding: 12px;
 }
+
+.outfits { display: grid; gap: 6px; margin-top: 6px; }
+.outfits__list { display: grid; gap: 6px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+.outfits__option {
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 2px;
+}
+
+.outfits__option--active { border-color: var(--text); }
+.outfits__art { display: block; height: 48px; margin: 0 auto; width: 48px; }
+.outfits__art svg { display: block; height: 100%; width: 100%; }
