@@ -1,0 +1,36 @@
+name: Update screenshot baselines
+
+# Run from the Actions tab (pick a branch) after an intended visual change.
+# Regenerates e2e/layout.spec.ts-snapshots/*-linux.png and commits them to that branch.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.59.1-noble
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright test e2e/layout.spec.ts --update-snapshots
+        env:
+          HOME: /root
+      - name: Commit changed baselines
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add e2e/layout.spec.ts-snapshots
+          if git diff --cached --quiet; then
+            echo "Baselines unchanged."
+          else
+            git commit -m "test(e2e): update linux screenshot baselines"
+            git push
+          fi
