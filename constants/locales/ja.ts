@@ -14,6 +14,12 @@ export const ja = {
     label: '言語',
   },
   setup: {
+    invite: {
+      eyebrow: '友だちからの招待',
+      title: '友だちは{species}と暮らしています',
+      description: '同じ子を迎えても、別の子を選んでもOK。登録不要、10秒で始められます。',
+      cta: '{species}を迎える',
+    },
     eyebrow: 'セットアップ',
     title: 'タブの相棒を選択',
     description: '本文はシンプルに保ち、ブラウザタブがペットの反応を伝えます。',
@@ -510,6 +516,7 @@ export const ja = {
     button: '友だちカードを共有',
     making: 'カードを作成中…',
     saved: 'カードを保存しました。',
+    savedWithLink: 'カードを保存して招待リンクをコピーしました。カードと一緒に貼り付けてください。',
     failed: 'カードを作れませんでした。もう一度お試しください。',
     subtitle: '{species} · レベル {level}',
     streak: '{days}日連続でお世話中',

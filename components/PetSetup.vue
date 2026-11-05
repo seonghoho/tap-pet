@@ -7,8 +7,11 @@ import { getDisguiseTitleValue, svgToDataUrl } from '~/utils/tabPresentation'
 
 const props = withDefaults(defineProps<{
   titleMode?: TitleMode
+  // Species from a friend's shared card (?ref=share&pet=...), shown as a one-tap invite.
+  invitedSpecies?: PetSpecies | null
 }>(), {
   titleMode: 'status',
+  invitedSpecies: null,
 })
 const emit = defineEmits<{
   select: [species: PetSpecies, name: string]
@@ -31,6 +34,20 @@ function confirmName(): void {
 
   emit('select', pendingSpecies.value, draftName.value.trim() || DEFAULT_PET_NAMES[pendingSpecies.value])
 }
+const inviteCopy = computed(() => {
+  if (!props.invitedSpecies) return null
+
+  const label = messages.value.species[props.invitedSpecies].label
+  const copy = messages.value.setup.invite
+
+  return {
+    eyebrow: copy.eyebrow,
+    title: copy.title.replace('{species}', label),
+    description: copy.description.replace('{species}', label),
+    cta: copy.cta.replace('{species}', label),
+  }
+})
+
 const demoTitles = computed(() => {
   if (props.titleMode === 'disguise') {
     const disguise = getDisguiseTitleValue('project-dashboard', locale.value)
@@ -106,6 +123,24 @@ const demoIcons = computed(() => ({
   </form>
 
   <div v-else class="setup-panel">
+    <section v-if="invitedSpecies && inviteCopy" class="setup-invite" aria-live="polite">
+      <PetAvatar
+        :species="invitedSpecies"
+        status="excited"
+        theme-id="system"
+        :aria-label="messages.species[invitedSpecies].label"
+        compact
+      />
+      <div class="setup-invite__copy">
+        <p class="eyebrow">{{ inviteCopy.eyebrow }}</p>
+        <h2>{{ inviteCopy.title }}</h2>
+        <p>{{ inviteCopy.description }}</p>
+      </div>
+      <button class="primary-button" type="button" @click="chooseSpecies(invitedSpecies)">
+        {{ inviteCopy.cta }}
+      </button>
+    </section>
+
     <div class="section-heading setup-panel__heading">
       <p class="eyebrow">{{ messages.setup.eyebrow }}</p>
       <h2>{{ messages.setup.title }}</h2>

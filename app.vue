@@ -7,6 +7,7 @@ import type { PetAction, PetSettings, PetSpecies, PetStatus } from '~/types/pet'
 import { renderPetArtSvg } from '~/utils/petArt'
 import { getDisguiseTitleValue, getTabPresentation, svgToDataUrl } from '~/utils/tabPresentation'
 import { getThemeById, resolveThemeId } from '~/utils/theme'
+import { readInviteSpecies } from '~/utils/shareLink'
 
 const pet = usePetStore()
 const shop = useEntitlements()
@@ -24,6 +25,7 @@ const { locale, messages, restoreLocale, setLocale } = useLocale()
 const prefersDark = ref(false)
 const isDocumentVisible = ref(true)
 const sidePanelElement = ref<HTMLElement | null>(null)
+const invitedSpecies = ref<PetSpecies | null>(null)
 
 let colorSchemeQuery: MediaQueryList | null = null
 
@@ -32,6 +34,10 @@ onMounted(() => {
   shop.restoreEntitlements()
   pet.restorePet()
   void purchases.handleCheckoutReturn()
+  invitedSpecies.value = readInviteSpecies(window.location.search)
+  if (invitedSpecies.value) {
+    trackEvent('invite_landed', { species: invitedSpecies.value, has_pet: Boolean(pet.petState.value) })
+  }
   isDocumentVisible.value = document.visibilityState === 'visible'
   document.addEventListener('visibilitychange', handleVisibilityChange)
 
@@ -152,6 +158,8 @@ function handleSpeciesSelect(species: PetSpecies, name: string): void {
     species,
     title_mode: effectiveSettings.value.titleMode,
     custom_name: name !== DEFAULT_PET_NAMES[species],
+    source: invitedSpecies.value ? 'invite' : 'direct',
+    invited_same_species: invitedSpecies.value === species,
   })
 }
 
@@ -265,6 +273,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
           v-else-if="!currentPet"
           id="pet-panel-title"
           :title-mode="effectiveSettings.titleMode"
+          :invited-species="invitedSpecies"
           @select="handleSpeciesSelect"
           @update-settings="handleSettingsUpdate"
         />

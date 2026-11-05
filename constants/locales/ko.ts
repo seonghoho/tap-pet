@@ -14,6 +14,12 @@ export const ko = {
     label: '언어',
   },
   setup: {
+    invite: {
+      eyebrow: '친구가 보낸 초대',
+      title: '친구네 탭에 사는 {species}, 우리 탭에도?',
+      description: '같은 친구를 데려와도 되고, 다른 친구를 골라도 돼요. 가입 없이 10초면 끝나요.',
+      cta: '{species} 데려오기',
+    },
     eyebrow: '처음 오셨네요',
     title: '같이 지낼 친구를 골라주세요',
     description: '탭 아이콘에 살면서, 배고프거나 심심하면 살짝 티를 내요.',
@@ -510,6 +516,7 @@ export const ko = {
     button: '친구 카드 공유하기',
     making: '카드 만드는 중…',
     saved: '카드를 저장했어요.',
+    savedWithLink: '카드를 저장하고 초대 링크를 복사했어요. 카드와 함께 붙여넣어 주세요.',
     failed: '카드를 만들지 못했어요. 다시 해볼게요.',
     subtitle: '{species} · 레벨 {level}',
     streak: '{days}일째 함께 돌보는 중',

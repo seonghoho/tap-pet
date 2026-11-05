@@ -12,6 +12,47 @@
   font-size: 1.75rem;
 }
 
+/* Shown above the picker when someone arrives from a friend's shared card. */
+.setup-invite {
+  align-items: center;
+  background: color-mix(in srgb, var(--app-accent) 10%, var(--app-surface-strong));
+  border: 1.5px solid color-mix(in srgb, var(--app-accent) 45%, transparent);
+  border-radius: 20px;
+  display: grid;
+  gap: 8px 16px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding: 16px 20px;
+}
+
+.setup-invite .pet-avatar {
+  height: 72px;
+  width: 72px;
+}
+
+.setup-invite__copy {
+  display: grid;
+  gap: 2px;
+}
+
+.setup-invite__copy h2 {
+  font-size: 1.15rem;
+}
+
+.setup-invite__copy p:last-child {
+  color: var(--app-muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 560px) {
+  .setup-invite {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .setup-invite .primary-button {
+    grid-column: 1 / -1;
+  }
+}
+
 .species-grid {
   display: grid;
   gap: 12px;
