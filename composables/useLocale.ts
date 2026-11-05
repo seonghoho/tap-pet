@@ -2,6 +2,7 @@ import { computed, readonly } from 'vue'
 import { useState } from '#app'
 import { DEFAULT_LOCALE, I18N_MESSAGES, I18N_STORAGE_KEY } from '~/constants/i18n'
 import type { AppLocale } from '~/types/i18n'
+import { pickLocale } from '~/utils/locale'
 
 const LOCALES: AppLocale[] = ['en', 'ko', 'ja']
 
@@ -15,11 +16,11 @@ export function useLocale() {
 
     try {
       const storedLocale = localStorage.getItem(I18N_STORAGE_KEY)
-      if (isAppLocale(storedLocale)) {
-        locale.value = storedLocale
-      }
+      // A visitor who never picked a language gets their browser's (e.g. an English
+      // friend opening a shared card), instead of always landing on Korean.
+      locale.value = isAppLocale(storedLocale) ? storedLocale : pickLocale(navigator.language)
     } catch {
-      // Fall back to the default locale when localStorage is blocked.
+      locale.value = pickLocale(navigator.language)
     } finally {
       hasRestoredLocale.value = true
     }

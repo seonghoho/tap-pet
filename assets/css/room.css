@@ -129,16 +129,22 @@
   transition:
     left var(--pet-speed) ease-in-out,
     top var(--pet-speed) ease-in-out;
-  width: 140px;
+  width: var(--room-pet-size);
   z-index: 2;
+}
+
+/* The pet is the hero of the room: scale with the room instead of a fixed 140px. */
+.pet-habitat {
+  --room-pet-size: clamp(128px, 31cqw, 188px);
+  container-type: inline-size;
 }
 
 .pet-habitat__pet .pet-avatar {
   grid-area: 1 / 1;
-  height: 140px;
+  height: var(--room-pet-size);
   transform-origin: 50% 90%;
   transition: transform 180ms ease;
-  width: 140px;
+  width: var(--room-pet-size);
 }
 
 .pet-habitat__pet--left .pet-avatar {

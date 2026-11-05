@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ACTION_LIMIT_AD_REWARD_USES } from '~/constants/pet'
 import type {
   PetAction,
@@ -417,17 +417,40 @@ const shouldShowFeedbackFollowup = computed(() =>
   ),
 )
 
-onMounted(() => {
+// Smooth 250ms ticks only while a cooldown bar is moving; otherwise once a second
+// (enough for the "refills in mm:ss" line), and slow right down in a hidden tab.
+function nextTickDelay(): number {
+  if (document.visibilityState === 'hidden') return 5000
+
+  const current = Date.now()
+  const cooling = Object.values(props.cooldowns).some((until) => until > current)
+
+  return cooling ? 250 : 1000
+}
+
+function tick(): void {
   now.value = Date.now()
-  cooldownTimer = window.setInterval(() => {
-    now.value = Date.now()
-  }, 250)
+  cooldownTimer = window.setTimeout(tick, nextTickDelay())
+}
+
+onMounted(() => {
+  tick()
 })
+
+// A new cooldown should start animating right away, not on the next slow tick.
+watch(
+  () => props.cooldowns,
+  () => {
+    if (cooldownTimer === null) return
+    window.clearTimeout(cooldownTimer)
+    tick()
+  },
+)
 
 onBeforeUnmount(() => {
   if (!cooldownTimer) return
 
-  window.clearInterval(cooldownTimer)
+  window.clearTimeout(cooldownTimer)
   cooldownTimer = null
 })
 

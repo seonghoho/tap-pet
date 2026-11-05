@@ -19,7 +19,9 @@ const purchaseNoticeText = computed(() => {
   const name = notice.productId ? messages.value.shop.products[notice.productId].name : ''
   if (notice.kind === 'success') return messages.value.shop.success.replace('{name}', name)
 
-  return notice.message ? `${messages.value.shop.failed} (${notice.message})` : messages.value.shop.failed
+  const failed = notice.message ? `${messages.value.shop.failed} (${notice.message})` : messages.value.shop.failed
+
+  return notice.orderId ? `${failed} ${messages.value.shop.restoreWithOrderId.replace('{orderId}', notice.orderId)}` : failed
 })
 const { locale, messages, restoreLocale, setLocale } = useLocale()
 const prefersDark = ref(false)
@@ -269,14 +271,18 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
           <h2 id="pet-panel-title">{{ messages.app.restoring }}</h2>
         </div>
 
-        <PetSetup
-          v-else-if="!currentPet"
-          id="pet-panel-title"
-          :title-mode="effectiveSettings.titleMode"
-          :invited-species="invitedSpecies"
-          @select="handleSpeciesSelect"
-          @update-settings="handleSettingsUpdate"
-        />
+        <template v-else-if="!currentPet">
+          <p v-if="pet.unreadableSave.value" class="unreadable-save" role="alert">
+            {{ messages.setup.unreadableSave }}
+          </p>
+          <PetSetup
+            id="pet-panel-title"
+            :title-mode="effectiveSettings.titleMode"
+            :invited-species="invitedSpecies"
+            @select="handleSpeciesSelect"
+            @update-settings="handleSettingsUpdate"
+          />
+        </template>
 
         <template v-else>
           <PetStatusPanel

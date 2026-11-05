@@ -6,8 +6,7 @@ import {
   ACTION_LIMIT_AD_REWARD_USES,
   ACTION_LIMIT_REWARD_FEEDBACK_TTL_MS,
   ACTION_REACTION_HOLD_MS,
-  DEFAULT_SETTINGS,
-} from '~/constants/pet'
+  DEFAULT_SETTINGS, PET_STORAGE_KEY } from '~/constants/pet'
 import type {
   DisguiseTitleId,
   PetAction,
@@ -104,6 +103,8 @@ export function usePetStore(options: PetStoreOptions = {}) {
 
   // Runtime-only: the fractional decay not yet applied, and when we last measured it.
   const decayCarry = useState<PetStats>('tab-pet:decay-carry', () => ({ ...EMPTY_DECAY_CARRY }))
+  // A save existed but couldn't be read; it was set aside under its own key.
+  const unreadableSave = useState<boolean>('tab-pet:unreadable-save', () => false)
   const lastDecayAt = useState<number | null>('tab-pet:last-decay-at', () => null)
 
   usePetClock(now, () => applyLiveDecay())
@@ -202,8 +203,12 @@ export function usePetStore(options: PetStoreOptions = {}) {
     } else {
       returnReport.value = null
     }
-    startLiveDecay(restoredAt)
+    startLiveDecay(restoredAt, restored.decayCarry)
+    unreadableSave.value = restored.unreadable
     hasRestored.value = true
+    if (typeof window.addEventListener === 'function') {
+      window.addEventListener('storage', handleStorageFromOtherTab)
+    }
     isReady.value = true
   }
 
@@ -241,6 +246,9 @@ export function usePetStore(options: PetStoreOptions = {}) {
     actionLimitRewardFeedbackState.value = null
     dailyGoalRewardFeedbackState.value = null
     const wasRecommendedCareAction = recommendedCareAction.value?.action === action
+    // With every stat comfortable there is no recommendation; any care then counts,
+    // so an attentive player can still finish today's goal.
+    const countsForDailyGoal = recommendedCareAction.value ? wasRecommendedCareAction : true
     actionCooldowns.value = {
       ...actionCooldowns.value,
       [action]: startedAt + ACTION_COOLDOWN_MS[action],
@@ -290,7 +298,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
         rewardBonus: personalityBonus,
       })
       const nextAffinityLevel = getAffinityLevel(result.growth.affinityExp)
-      const resolvedDailyGoal = wasRecommendedCareAction
+      const resolvedDailyGoal = countsForDailyGoal
         ? progressDailyGoal(previousState.dailyGoal, {
             goalId: 'recommended-care',
             now: resolvedAt,
@@ -482,9 +490,22 @@ export function usePetStore(options: PetStoreOptions = {}) {
     storage.clearPetState()
   }
 
-  function startLiveDecay(at: number): void {
+  // Another tab of Tab Pet saved (care, settings, reset). Adopt its state so the two
+  // tabs never overwrite each other's progress or double the care limit.
+  function handleStorageFromOtherTab(event: StorageEvent): void {
+    if (event.key !== PET_STORAGE_KEY && event.key !== null) return
+
+    const at = Date.now()
+    const loaded = storage.loadPetStateWithMeta(at)
+    now.value = at
+    petState.value = loaded.state
+    activeReaction.value = null
+    startLiveDecay(at, loaded.decayCarry)
+  }
+
+  function startLiveDecay(at: number, carry: PetStats | null = null): void {
     lastDecayAt.value = at
-    decayCarry.value = { ...EMPTY_DECAY_CARRY }
+    decayCarry.value = carry ? { ...carry } : { ...EMPTY_DECAY_CARRY }
   }
 
   // Offline time is applied on restore; this keeps stats moving while the tab stays open.
@@ -574,6 +595,7 @@ export function usePetStore(options: PetStoreOptions = {}) {
     sidePanelMode: readonly(sidePanelMode),
     storageError: storage.storageError,
     restorePet,
+    unreadableSave,
     initializePet,
     applyLiveDecay,
     performAction,

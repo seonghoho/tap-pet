@@ -14,6 +14,7 @@ export const en = {
     label: 'Language',
   },
   setup: {
+    unreadableSave: 'We could not read your saved friend. The original data is kept aside in this browser; if you have a backup code, you can load it in Settings.',
     invite: {
       eyebrow: 'A friend invited you',
       title: 'Your friend lives with a {species}',
@@ -269,6 +270,12 @@ export const en = {
     title: 'Pin this tab',
     body: 'Right-click the tab and choose “Pin”. It stays tiny, and a dot shows up when your friend needs you.',
     dismiss: 'Got it',
+    mobile: {
+      title: 'Lives in your tab on a computer',
+      body: 'Phone browsers hide tab icons. Send the link to your computer and watch your friend from the tab while you work.',
+      send: 'Send link to computer',
+      copied: 'Link copied. Open it on your computer.',
+    },
   },
   returnReport: {
     heading: 'Welcome back',
@@ -580,6 +587,7 @@ export const en = {
     },
   },
   shop: {
+    restoreWithOrderId: 'If you were charged, enter order {orderId} in “Restore purchase”.',
     heading: 'Tab extras',
     description: 'Buy once, keep forever, even if you start over with a new friend.',
     owned: 'Owned',
