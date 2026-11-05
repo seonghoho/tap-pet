@@ -115,6 +115,15 @@ export const ko = {
       excited: '신난',
     },
   },
+  room: {
+    sounds: {
+      feed: '냠냠!',
+      play: '신난다!',
+      sleep: '쿨쿨…',
+      wash: '뽀득뽀득!',
+    },
+    pats: ['헤헤', '좋아!', '더 해줘요', '간지러워~', '♡'],
+  },
   voice: {
     petLabel: '{name} 쓰다듬기',
     fine: [

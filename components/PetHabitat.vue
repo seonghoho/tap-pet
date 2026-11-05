@@ -35,17 +35,35 @@ const emit = defineEmits<{
 const { messages } = useLocale()
 const unlockedIds = computed(() => new Set(getAvailableLevelUnlocks(props.level).map((unlock) => unlock.id)))
 const isPetting = ref(false)
+// Bumped on every pat so the heart burst and line restart even on rapid taps.
+const patCount = ref(0)
+const patLine = ref('')
 let pettingTimer: ReturnType<typeof setTimeout> | null = null
 
-// Petting is pure affection: no stats, no limits, just a squish and some hearts.
+// Petting is pure affection: no stats, no limits, just a squish, hearts and a happy line.
 function petThePet(): void {
   isPetting.value = true
+  patCount.value += 1
+  const lines = messages.value.room.pats
+  patLine.value = lines[Math.floor(Math.random() * lines.length)] ?? ''
   if (pettingTimer) clearTimeout(pettingTimer)
   pettingTimer = setTimeout(() => {
     isPetting.value = false
-  }, 900)
+  }, 1100)
   emit('pet')
 }
+
+// A little word bubble for each kind of care ("Nom nom!", "Zzz…").
+const reactionSound = computed(() => (props.activeReaction ? messages.value.room.sounds[props.activeReaction] : ''))
+
+// Hearts fan out at slightly different angles and sizes so a burst feels alive.
+const HEART_BURST = [
+  { x: -34, y: -8, size: 16, delay: 0 },
+  { x: -14, y: -26, size: 22, delay: 60 },
+  { x: 10, y: -34, size: 26, delay: 120 },
+  { x: 32, y: -20, size: 18, delay: 30 },
+  { x: 44, y: 0, size: 14, delay: 150 },
+]
 // The one or two numbers that matter, floated above the pet right after care.
 const floatingGains = computed(() => {
   const feedback = props.careFeedback
@@ -166,9 +184,9 @@ function randomWithin(min: number, max: number): number {
     :data-reaction="activeReaction ?? undefined"
     :style="habitatStyle"
   >
+    <RoomScene :status="status" :is-dark="themeId === 'dark'" :active-reaction="activeReaction" />
+
     <div class="pet-habitat__back-wall" aria-hidden="true">
-      <span class="pet-habitat__shelf" />
-      <span class="pet-habitat__window" />
       <svg
         v-if="unlockedIds.has('room-lights')"
         class="pet-habitat__item pet-habitat__item--lights"
@@ -198,8 +216,6 @@ function randomWithin(min: number, max: number): number {
     </div>
 
     <div class="pet-habitat__floor" aria-hidden="true">
-      <span class="pet-habitat__bowl" />
-      <span class="pet-habitat__cushion" />
       <svg
         v-if="unlockedIds.has('room-lamp')"
         class="pet-habitat__item pet-habitat__item--lamp"
@@ -295,9 +311,39 @@ function randomWithin(min: number, max: number): number {
       <span v-for="gain in floatingGains" :key="gain">{{ gain }}</span>
     </div>
 
-    <span v-if="isPetting" class="pet-habitat__hearts" aria-hidden="true">
-      <svg v-for="index in 3" :key="index" viewBox="-9 -9 18 16">
+    <span v-if="isPetting" :key="`hearts-${patCount}`" class="pet-habitat__hearts" aria-hidden="true">
+      <svg
+        v-for="(heart, index) in HEART_BURST"
+        :key="index"
+        viewBox="-9 -9 18 16"
+        :style="{ '--hx': `${heart.x}px`, '--hy': `${heart.y}px`, width: `${heart.size}px`, animationDelay: `${heart.delay}ms` }"
+      >
         <path d="M0 6C-7 1-8-5-4-7C-2-8 0-6.5 0-5C0-6.5 2-8 4-7C8-5 7 1 0 6Z" fill="#ff9aa6" stroke="#4a3934" stroke-width="1.6" />
+      </svg>
+    </span>
+
+    <span
+      v-if="isPetting && patLine"
+      :key="`pat-${patCount}`"
+      class="pet-habitat__bubble pet-habitat__bubble--pat"
+      aria-hidden="true"
+    >{{ patLine }}</span>
+
+    <span
+      v-if="reactionSound"
+      :key="`sound-${activeReaction}`"
+      class="pet-habitat__bubble"
+      aria-hidden="true"
+    >{{ reactionSound }}</span>
+
+    <span
+      v-if="careFeedback && !activeReaction"
+      :key="`burst-${careFeedback.createdAt}`"
+      class="pet-habitat__burst"
+      aria-hidden="true"
+    >
+      <svg v-for="n in 6" :key="n" viewBox="-10 -10 20 20" :style="{ '--burst-angle': `${n * 60 - 30}deg` }">
+        <path d="M0-8Q2-2 8 0Q2 2 0 8Q-2 2-8 0Q-2-2 0-8Z" fill="#ffd25e" stroke="#4a3934" stroke-width="1.4" stroke-linejoin="round" />
       </svg>
     </span>
 

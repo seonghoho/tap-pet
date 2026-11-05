@@ -1,0 +1,176 @@
+/* The illustrated room (components/RoomScene.vue). Sizes use cqw of .pet-habitat so the
+   furniture scales with the room; positions are percentages so nothing is cropped. */
+
+.room {
+  --room-wall: #fdf1e2;
+  --room-wall-dot: #f6dcc0;
+  --room-wainscot: #f8e3c9;
+  --room-wainscot-line: #efcfa9;
+  --room-floor: #ecc49a;
+  --room-floor-line: #dcab7b;
+  --room-ink: #4a3934;
+
+  inset: 0;
+  position: absolute;
+  z-index: 0;
+}
+
+.room--dark {
+  --room-wall: #3b3456;
+  --room-wall-dot: #4b4370;
+  --room-wainscot: #342d4c;
+  --room-wainscot-line: #2c2642;
+  --room-floor: #6a5040;
+  --room-floor-line: #5a4335;
+}
+
+.room > * {
+  position: absolute;
+}
+
+.room__wall {
+  background-color: var(--room-wall);
+  background-image:
+    radial-gradient(var(--room-wall-dot) 2px, transparent 2.4px),
+    radial-gradient(var(--room-wall-dot) 2px, transparent 2.4px);
+  background-position: 0 0, 14px 14px;
+  background-size: 28px 28px;
+  inset: 0 0 30% 0;
+  transition: background-color 600ms ease;
+}
+
+/* Lower wall panel with soft vertical stripes and a baseboard. */
+.room__wainscot {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 22px, var(--room-wainscot-line) 22px 24px),
+    var(--room-wainscot);
+  border-bottom: 3px solid var(--room-ink);
+  border-top: 3px solid var(--room-ink);
+  bottom: 30%;
+  height: 13%;
+  left: 0;
+  right: 0;
+}
+
+.room__floor {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(12.5% - 2px), var(--room-floor-line) calc(12.5% - 2px) 12.5%),
+    linear-gradient(180deg, color-mix(in srgb, var(--room-ink) 14%, transparent) 0 6px, transparent 6px),
+    var(--room-floor);
+  bottom: 0;
+  height: 30%;
+  left: 0;
+  right: 0;
+}
+
+/* Afternoon light falling from the window onto the floor. */
+.room__sunbeam {
+  background: linear-gradient(180deg, rgba(255, 246, 214, 0.55), rgba(255, 246, 214, 0));
+  bottom: 0;
+  clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%);
+  height: 70%;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  right: 6%;
+  width: 34%;
+}
+
+.room--evening .room__sunbeam {
+  background: linear-gradient(180deg, rgba(255, 190, 140, 0.5), rgba(255, 190, 140, 0));
+}
+
+/* At night a warm pool of lamplight keeps the room cosy instead of murky. */
+.room__glow {
+  background: radial-gradient(ellipse at center, rgba(255, 200, 130, 0.26), rgba(255, 200, 130, 0) 70%);
+  bottom: -10%;
+  height: 70%;
+  left: 20%;
+  pointer-events: none;
+  width: 60%;
+}
+
+.room__window {
+  right: 6%;
+  top: 5%;
+  width: max(96px, 21cqw);
+}
+
+.room__shelf {
+  left: 6%;
+  top: 20%;
+  width: max(90px, 19cqw);
+}
+
+.room__rug {
+  bottom: 3%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 52cqw;
+}
+
+.room__bowl {
+  bottom: 9%;
+  left: 6%;
+  width: max(50px, 10cqw);
+}
+
+.room__yarn {
+  bottom: 5%;
+  left: 24%;
+  width: max(28px, 6cqw);
+}
+
+.room__bed {
+  bottom: 5%;
+  right: 3%;
+  width: max(96px, 22cqw);
+}
+
+.room__dust {
+  bottom: 14%;
+  width: max(22px, 4.5cqw);
+}
+
+.room__dust--1 {
+  left: 36%;
+}
+
+.room__dust--2 {
+  bottom: 6%;
+  right: 30%;
+}
+
+.room__cloud {
+  animation: room-cloud-drift 18s ease-in-out infinite alternate;
+}
+
+.room__star {
+  animation: room-twinkle 2.6s ease-in-out infinite;
+}
+
+.room__star--late {
+  animation-delay: 1.3s;
+}
+
+/* Sleeping (or sleepy) pets get the lights turned down. */
+.room__dimmer {
+  background: #1f2448;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms ease;
+}
+
+.room--dim .room__dimmer {
+  opacity: 0.22;
+}
+
+@keyframes room-cloud-drift {
+  from {
+    transform: translateX(-6px);
+  }
+
+  to {
+    transform: translateX(26px);
+  }
+}
