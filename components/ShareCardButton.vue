@@ -10,6 +10,13 @@ const props = defineProps<{
   level: number
   streakDays: number
   outfit?: PetOutfitId | null
+  // Overrides the pill on the card, e.g. "Reached level 3!" from a celebration.
+  highlight?: string
+  // Where the share started, for analytics.
+  source?: 'panel' | 'celebration'
+  // Visual variant: the celebration card uses the big coral button.
+  primary?: boolean
+  label?: string
 }>()
 
 const emit = defineEmits<{
@@ -28,7 +35,9 @@ const subtitle = computed(() =>
     .replace('{level}', String(props.level)),
 )
 const highlight = computed(() =>
-  props.streakDays > 0
+  props.highlight
+    ? props.highlight
+    : props.streakDays > 0
     ? messages.value.shareCard.streak.replace('{days}', String(props.streakDays))
     : messages.value.shareCard.fresh,
 )
@@ -65,7 +74,7 @@ async function share(): Promise<void> {
     } else {
       notice.value = ''
     }
-    trackEvent('share_card_created', { result })
+    trackEvent('share_card_created', { result, source: props.source ?? 'panel' })
     emit('shared', result)
   } catch {
     notice.value = messages.value.shareCard.failed
@@ -77,7 +86,7 @@ async function share(): Promise<void> {
 
 <template>
   <div class="share-card">
-    <button class="share-card__button" type="button" :disabled="isMaking" @click="share">
+    <button class="share-card__button" :class="{ 'primary-button': primary }" type="button" :disabled="isMaking" @click="share">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path
           d="M12 15V4m0 0L8 8m4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"
@@ -88,7 +97,7 @@ async function share(): Promise<void> {
           stroke-linejoin="round"
         />
       </svg>
-      {{ isMaking ? messages.shareCard.making : messages.shareCard.button }}
+      {{ isMaking ? messages.shareCard.making : (label ?? messages.shareCard.button) }}
     </button>
     <small v-if="notice" role="status">{{ notice }}</small>
   </div>

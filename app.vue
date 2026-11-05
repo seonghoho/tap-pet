@@ -8,6 +8,10 @@ import { renderPetArtSvg } from '~/utils/petArt'
 import { getDisguiseTitleValue, getTabPresentation, svgToDataUrl } from '~/utils/tabPresentation'
 import { getThemeById, resolveThemeId } from '~/utils/theme'
 import { readInviteSpecies } from '~/utils/shareLink'
+import type { Celebration } from '~/components/CelebrationCard.vue'
+
+// Streak days worth a celebration card.
+const STREAK_MILESTONES = new Set([3, 7, 14, 30, 50, 100])
 
 const pet = usePetStore()
 const shop = useEntitlements()
@@ -28,6 +32,10 @@ const prefersDark = ref(false)
 const isDocumentVisible = ref(true)
 const sidePanelElement = ref<HTMLElement | null>(null)
 const invitedSpecies = ref<PetSpecies | null>(null)
+const celebration = ref<Celebration | null>(null)
+// The streak as it was when the page loaded. Restoring a pet moves the streak from 0
+// to N in one go; that is not an extension, so we compare against this baseline.
+let seenStreak: number | null = null
 
 let colorSchemeQuery: MediaQueryList | null = null
 
@@ -36,6 +44,7 @@ onMounted(() => {
   shop.restoreEntitlements()
   pet.restorePet()
   void purchases.handleCheckoutReturn()
+  seenStreak = pet.streakInfo.value?.current ?? 0
   invitedSpecies.value = readInviteSpecies(window.location.search)
   if (invitedSpecies.value) {
     trackEvent('invite_landed', { species: invitedSpecies.value, has_pet: Boolean(pet.petState.value) })
@@ -137,10 +146,34 @@ useCareNotifications({
 
 watch(
   () => pet.streakInfo.value?.current ?? 0,
-  (days, previousDays) => {
-    if (days > previousDays && days > 1) trackEvent('streak_extended', { days })
+  (days) => {
+    if (seenStreak === null) return
+    const extended = days > seenStreak
+    seenStreak = days
+    if (!extended) return
+
+    if (days > 1) trackEvent('streak_extended', { days })
+    if (STREAK_MILESTONES.has(days) && !celebration.value) showCelebration({ kind: 'streak', days })
   },
 )
+// A level up always gets its own card (it wins over a streak card shown at the same time).
+watch(
+  () => pet.lastCareFeedback.value,
+  (feedback) => {
+    if (!feedback?.didLevelUp) return
+
+    const level = pet.petState.value?.growth.level ?? 1
+    const unlockNames = (feedback.levelUnlocks ?? []).map(
+      (unlock) => messages.value.levelUnlocks.rewards[unlock.id]?.name ?? '',
+    ).filter(Boolean)
+    showCelebration({ kind: 'level', level, unlockNames })
+  },
+)
+
+function showCelebration(next: Celebration): void {
+  celebration.value = next
+  trackEvent('celebration_shown', { kind: next.kind, value: next.kind === 'level' ? next.level : next.days })
+}
 watch(
   () => pet.returnReport.value,
   (report) => {
@@ -375,5 +408,15 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
     <p v-if="pet.storageError.value" class="storage-warning" role="status">
       {{ messages.app.storageWarning }} {{ pet.storageError.value }}
     </p>
+    <CelebrationCard
+      v-if="celebration && currentPet"
+      :celebration="celebration"
+      :species="currentPet.species"
+      :name="currentPet.name"
+      :level="currentPet.growth.level"
+      :streak-days="pet.streakInfo.value?.current ?? 0"
+      :outfit="ownedOutfit"
+      @close="celebration = null"
+    />
   </div>
 </template>

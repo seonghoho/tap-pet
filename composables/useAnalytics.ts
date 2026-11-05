@@ -22,7 +22,8 @@ export type AnalyticsEvents = {
   title_mode_changed: { mode: TitleMode }
   notifications_toggled: { enabled: boolean }
   notification_shown: { status: PetStatus }
-  share_card_created: { result: 'shared' | 'downloaded' }
+  share_card_created: { result: 'shared' | 'downloaded', source: 'panel' | 'celebration' }
+  celebration_shown: { kind: 'level' | 'streak', value: number }
   backup_exported: Record<string, never>
   backup_imported: { ok: boolean }
   pin_tip_dismissed: Record<string, never>

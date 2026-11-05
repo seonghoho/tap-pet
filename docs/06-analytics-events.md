@@ -46,7 +46,8 @@
 | `title_mode_changed` | `mode` | 탭 제목 모드 변경 (온보딩/설정) |
 | `notifications_toggled` | `enabled` | 알림 설정을 켜거나 끔 (권한 허용 후) |
 | `notification_shown` | `status` | 브라우저 알림을 실제로 띄움 |
-| `share_card_created` | `result` (`shared`/`downloaded`) | 친구 카드 공유 또는 저장 |
+| `share_card_created` | `result` (`shared`/`downloaded`), `source` (`panel`/`celebration`) | 친구 카드 공유 또는 저장 |
+| `celebration_shown` | `kind` (`level`/`streak`), `value` | 레벨 업 또는 연속 돌봄 3·7·14·30·50·100일 축하 카드 |
 | `backup_exported` | – | 백업 코드 복사 성공 |
 | `backup_imported` | `ok` | 백업 코드 불러오기 시도 |
 | `pin_tip_dismissed` | – | "이 탭을 고정해두세요" 안내 닫기 |

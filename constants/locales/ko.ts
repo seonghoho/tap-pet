@@ -528,6 +528,17 @@ export const ko = {
     invalid: '코드가 맞지 않아요. 전부 복사했는지 확인해 주세요.',
     imported: '이사 완료!',
   },
+  celebration: {
+    levelTitle: '레벨 {level} 달성!',
+    levelBody: '{name}, 한 뼘 자랐어요. 계속 같이 있어줘서 고마워요.',
+    streakTitle: '{days}일 연속 함께했어요!',
+    streakBody: '{name}도 매일 이 탭에서 기다리고 있었대요.',
+    unlocked: '새로 생겼어요: {item}',
+    share: '친구에게 자랑하기',
+    close: '좋아요',
+    shareLevel: '레벨 {level} 달성!',
+    shareStreak: '{days}일 연속 돌봄 중!',
+  },
   shareCard: {
     button: '친구 카드 공유하기',
     making: '카드 만드는 중…',

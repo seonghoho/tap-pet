@@ -528,6 +528,17 @@ export const en = {
     invalid: 'That code doesn\'t look right. Check that you copied all of it.',
     imported: 'Moved in!',
   },
+  celebration: {
+    levelTitle: 'Level {level}!',
+    levelBody: '{name} grew a little. Thanks for sticking around.',
+    streakTitle: '{days} days in a row!',
+    streakBody: '{name} has been waiting in this tab every day.',
+    unlocked: 'New: {item}',
+    share: 'Show a friend',
+    close: 'Yay',
+    shareLevel: 'Reached level {level}!',
+    shareStreak: '{days} days of care in a row!',
+  },
   shareCard: {
     button: 'Share friend card',
     making: 'Making the card…',
