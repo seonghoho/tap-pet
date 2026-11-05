@@ -19,7 +19,7 @@
 | 첫 돌봄 전환율 | `pet_created` 후 10분 안에 `care_performed` | `pet_created`, `care_performed` |
 | 위장 모드 선호 | `pet_created.title_mode`, `title_mode_changed` 비율 | |
 | 제한 마찰 | 세션당 `care_limit_reached` 비율, 그중 `care_recharge_used` 비율 | |
-| 바이럴 계수 | `share_card_created` / 주간 활성 사용자 | |
+| 바이럴 계수 (K) | 공유 1건당 `pet_created(source=invite)` 수 × 활성 사용자당 공유 수 | `share_card_created`, `invite_landed`, `pet_created` |
 | 구매 전환 | `checkout_started` → `purchase_completed` 비율, 상점 노출 대비 구매율 | `shop_viewed`, `checkout_started`, `purchase_completed` |
 
 ## 첫 주 퍼널
@@ -35,7 +35,8 @@
 
 | 이벤트 | 속성 | 언제 |
 | --- | --- | --- |
-| `pet_created` | `species`, `title_mode`, `custom_name` | 온보딩에서 "같이 살기 시작" |
+| `pet_created` | `species`, `title_mode`, `custom_name`, `source` (`invite`/`direct`), `invited_same_species` | 온보딩에서 "같이 살기 시작" |
+| `invite_landed` | `species`, `has_pet` | 친구 카드 링크(`?ref=share&pet=`)로 들어옴 |
 | `care_performed` | `action`, `recommended`, `level` | 돌봄 횟수가 실제로 차감된 돌봄 |
 | `care_limit_reached` | `level` | 돌봄 직후 남은 횟수가 0이 됨 |
 | `care_recharge_used` | – | 하루 한 번 충전을 실제로 사용 |

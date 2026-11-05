@@ -12,6 +12,8 @@ export type ShareCardInput = {
   subtitle: string
   highlight: string
   footer: string
+  // Site host printed under the footer so people who only see the image can find us.
+  link?: string
 }
 
 const INK = '#2a2420'
@@ -60,7 +62,13 @@ export async function renderShareCard(input: ShareCardInput): Promise<Blob> {
 
   context.fillStyle = MUTED
   context.font = `500 34px ${FONT}`
-  context.fillText(input.footer, SHARE_CARD_WIDTH / 2, 1200, SHARE_CARD_WIDTH - 200)
+  context.fillText(input.footer, SHARE_CARD_WIDTH / 2, input.link ? 1176 : 1200, SHARE_CARD_WIDTH - 200)
+
+  if (input.link) {
+    context.fillStyle = '#ff6b4a'
+    context.font = `700 38px ${FONT}`
+    context.fillText(input.link, SHARE_CARD_WIDTH / 2, 1232, SHARE_CARD_WIDTH - 200)
+  }
 
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('Could not create image.'))), 'image/png')
@@ -68,12 +76,19 @@ export async function renderShareCard(input: ShareCardInput): Promise<Blob> {
 }
 
 // Uses the system share sheet when it can take files, otherwise saves the PNG.
-export async function shareOrDownloadCard(blob: Blob, fileName: string, text: string): Promise<'shared' | 'downloaded'> {
+// The link rides inside the text too: many share targets drop `url` when files are attached.
+export async function shareOrDownloadCard(
+  blob: Blob,
+  fileName: string,
+  text: string,
+  url?: string,
+): Promise<'shared' | 'downloaded'> {
   const file = new File([blob], fileName, { type: 'image/png' })
+  const textWithLink = url ? `${text}\n${url}` : text
 
   if (navigator.canShare?.({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], text })
+      await navigator.share({ files: [file], text: textWithLink })
 
       return 'shared'
     } catch (error) {
@@ -81,12 +96,12 @@ export async function shareOrDownloadCard(blob: Blob, fileName: string, text: st
     }
   }
 
-  const url = URL.createObjectURL(blob)
+  const objectUrl = URL.createObjectURL(blob)
   const link = document.createElement('a')
-  link.href = url
+  link.href = objectUrl
   link.download = fileName
   link.click()
-  setTimeout(() => URL.revokeObjectURL(url), 1000)
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
 
   return 'downloaded'
 }

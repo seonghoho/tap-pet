@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import type { PetOutfitId, PetSpecies } from '~/types/pet'
 import { renderShareCard, shareOrDownloadCard } from '~/utils/petShareCard'
+import { buildShareUrl, shareHost } from '~/utils/shareLink'
 
 const props = defineProps<{
   species: PetSpecies
@@ -16,6 +17,8 @@ const emit = defineEmits<{
 }>()
 
 const { messages } = useLocale()
+const { copyText } = useClipboard()
+const siteUrl = String(useRuntimeConfig().public.siteUrl || '')
 const isMaking = ref(false)
 const notice = ref('')
 
@@ -37,6 +40,8 @@ async function share(): Promise<void> {
   notice.value = ''
 
   try {
+    const origin = siteUrl || window.location.origin
+    const shareUrl = buildShareUrl(origin, props.species)
     const blob = await renderShareCard({
       species: props.species,
       outfit: props.outfit,
@@ -44,13 +49,22 @@ async function share(): Promise<void> {
       subtitle: subtitle.value,
       highlight: highlight.value,
       footer: messages.value.shareCard.footer,
+      link: shareHost(origin),
     })
     const result = await shareOrDownloadCard(
       blob,
       `tab-pet-${props.species}.png`,
       messages.value.shareCard.text.replace('{name}', props.name),
+      shareUrl,
     )
-    notice.value = result === 'downloaded' ? messages.value.shareCard.saved : ''
+    // Desktop browsers mostly can't share files, so the image is saved instead.
+    // Copy the invite link alongside it so the post has something to click.
+    if (result === 'downloaded') {
+      const copied = await copyText(shareUrl)
+      notice.value = copied ? messages.value.shareCard.savedWithLink : messages.value.shareCard.saved
+    } else {
+      notice.value = ''
+    }
     trackEvent('share_card_created', { result })
     emit('shared', result)
   } catch {

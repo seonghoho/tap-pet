@@ -14,6 +14,12 @@ export const en = {
     label: 'Language',
   },
   setup: {
+    invite: {
+      eyebrow: 'A friend invited you',
+      title: 'Your friend lives with a {species}',
+      description: 'Bring the same friend home, or pick someone else. No sign-up, about ten seconds.',
+      cta: 'Adopt a {species}',
+    },
     eyebrow: 'Hi there',
     title: 'Pick a friend to keep you company',
     description: 'They live in your tab icon and quietly let you know when they need you.',
@@ -510,6 +516,7 @@ export const en = {
     button: 'Share friend card',
     making: 'Making the card…',
     saved: 'Card saved to your downloads.',
+    savedWithLink: 'Card saved and invite link copied. Paste it with the card.',
     failed: 'Couldn\'t make the card. Try again.',
     subtitle: '{species} · Level {level}',
     streak: '{days} days of care in a row',

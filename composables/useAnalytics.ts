@@ -5,7 +5,14 @@ import type { PetAction, PetOutfitId, PetReturnReportBucket, PetSpecies, PetStat
 // Every product event in one typed map, so dashboards and code agree on names.
 // See docs/06-analytics-events.md for what each one is for.
 export type AnalyticsEvents = {
-  pet_created: { species: PetSpecies, title_mode: TitleMode, custom_name: boolean }
+  pet_created: {
+    species: PetSpecies
+    title_mode: TitleMode
+    custom_name: boolean
+    source: 'invite' | 'direct'
+    invited_same_species: boolean
+  }
+  invite_landed: { species: PetSpecies, has_pet: boolean }
   care_performed: { action: PetAction, recommended: boolean, level: number }
   care_limit_reached: { level: number }
   care_recharge_used: Record<string, never>
