@@ -20,12 +20,14 @@ const BLUSH_LINE = '#f27f8a'
 const BADGE = '#ff6b4a'
 
 export const PET_ART_PALETTES: Record<PetSpecies, PetArtPalette> = {
-  cat: { body: '#ffe6c2', belly: '#fff6e8', mark: '#f3b97c', inner: '#ffc4c4', tile: '#fff0d9' },
-  dog: { body: '#fffaf2', belly: '#fffaf2', mark: '#e8c096', inner: '#e8c096', tile: '#fdeedd' },
-  hedgehog: { body: '#ffecd6', belly: '#fff6ea', mark: '#a98a70', inner: '#c4a68b', tile: '#f3e7da' },
+  // Orange-cream tabby with a pale muzzle.
+  cat: { body: '#ffd29e', belly: '#fff6ea', mark: '#ec9a52', inner: '#ffb8c0', tile: '#fff0d9' },
+  // Cream pup with caramel floppy ears and an eye patch.
+  dog: { body: '#fffaf2', belly: '#fffaf2', mark: '#d9a273', inner: '#d9a273', tile: '#fdeedd' },
+  hedgehog: { body: '#ffe8cc', belly: '#fff6ea', mark: '#9c7a5e', inner: '#c4a68b', tile: '#f3e7da' },
   rabbit: { body: '#ffffff', belly: '#ffffff', mark: '#ffd1d6', inner: '#ffc4cb', tile: '#fde6ea' },
-  penguin: { body: '#7487a8', belly: '#fffdf8', mark: '#ffb85c', inner: '#5f7192', tile: '#dfe9f6' },
-  hamster: { body: '#ffd7a3', belly: '#fffaf1', mark: '#f2b56e', inner: '#ffc4c4', tile: '#ffedd6' },
+  penguin: { body: '#5f7398', belly: '#fffdf8', mark: '#ffb347', inner: '#4f6286', tile: '#dfe9f6' },
+  hamster: { body: '#ffcd8f', belly: '#fffaf1', mark: '#e9a560', inner: '#ffb8c0', tile: '#ffedd6' },
 }
 
 const OPEN_EYE_STATUSES: ReadonlySet<PetStatus> = new Set(['fine', 'happy', 'hungry'])
@@ -60,18 +62,20 @@ export function renderPetArtSvg(input: {
     p: PET_ART_PALETTES[input.species],
     id: sanitizeId(input.idPrefix ?? `pet-${input.species}-${input.status}-${icon ? 'icon' : 'full'}`),
     icon,
-    sw: icon ? 5 : 3.4,
+    sw: icon ? 4.6 : 3.2,
   }
+  const head = HEADS[ctx.species]
   const parts = [
-    `<defs><clipPath id="${ctx.id}-clip"><path d="${bodyPath(ctx.species)}"/></clipPath></defs>`,
-    icon ? '' : `<ellipse cx="60" cy="106" rx="32" ry="4.5" fill="${INK}" opacity="0.1"/>`,
-    // Icons drop the tile and the limbs and zoom onto the head: at 16px every pixel
-    // goes to the silhouette (ears, colour) and the face, so species read at a glance.
-    icon ? `<g transform="translate(60 ${ICON_CY[ctx.species]}) scale(${ICON_SCALE[ctx.species]}) translate(-61 -${ICON_CY[ctx.species]})">` : '',
-    renderBehind(ctx),
-    icon ? '' : renderLimbs(ctx),
-    renderBody(ctx),
+    `<defs><clipPath id="${ctx.id}-clip"><path d="${headPath(ctx.species)}"/></clipPath></defs>`,
+    icon ? '' : `<ellipse cx="60" cy="108" rx="30" ry="4.5" fill="${INK}" opacity="0.1"/>`,
+    // Icons zoom onto the head: at 16px every pixel goes to ears, colour and face.
+    icon ? `<g transform="translate(60 ${head.cy + 2}) scale(${head.iconScale}) translate(-60 -${head.cy + 2})">` : '',
+    icon ? '' : renderTail(ctx),
+    icon ? '' : renderBody(ctx),
+    renderEarsBehind(ctx),
+    renderHead(ctx),
     renderFace(ctx),
+    icon ? '' : renderPaws(ctx),
     input.outfit ? renderOutfit(ctx, input.outfit) : '',
     icon ? '</g>' : '',
     icon ? '' : renderStatusProps(ctx),
@@ -86,305 +90,398 @@ export function renderPetArtSvg(input: {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"${unlockAttr}${a11y} data-species="${input.species}" data-status="${input.status}">${parts.join('')}</svg>`
 }
 
-// Per-species framing for the head-crop icon (centre y and zoom inside the 120 box).
-const ICON_CY: Record<PetSpecies, number> = { cat: 64, dog: 70, hedgehog: 72, rabbit: 56, penguin: 66, hamster: 68 }
-const ICON_SCALE: Record<PetSpecies, number> = { cat: 1.32, dog: 1.3, hedgehog: 1.2, rabbit: 1.12, penguin: 1.4, hamster: 1.38 }
+// ---------- anatomy: a big round head on a small body (chibi proportions) ----------
 
-// ---------- silhouettes ----------
+type Head = { cx: number, cy: number, rx: number, ry: number, iconScale: number }
 
-// Slightly lopsided mochi: wide, soft bottom so it reads as "sitting".
-const MOCHI = 'M61 37C84 37 99 53 100 75C101 93 87 102 60 102C33 102 19 94 20 75C21 52 37 37 61 37Z'
-const EGG = 'M61 30C83 30 97 50 98 74C99 94 85 103 60 103C35 103 21 94 22 74C23 49 38 30 61 30Z'
-const HEDGEHOG_FACE = 'M61 46C80 46 94 58 95 76C96 93 83 102 60 102C37 102 24 93 25 76C26 58 41 46 61 46Z'
+const HEADS: Record<PetSpecies, Head> = {
+  cat: { cx: 60, cy: 54, rx: 34, ry: 29, iconScale: 1.3 },
+  dog: { cx: 60, cy: 54, rx: 33, ry: 30, iconScale: 1.3 },
+  rabbit: { cx: 60, cy: 60, rx: 31, ry: 27, iconScale: 1.12 },
+  hamster: { cx: 60, cy: 60, rx: 38, ry: 33, iconScale: 1.22 },
+  hedgehog: { cx: 60, cy: 58, rx: 30, ry: 27, iconScale: 1.12 },
+  penguin: { cx: 60, cy: 50, rx: 32, ry: 30, iconScale: 1.3 },
+}
 
-function bodyPath(species: PetSpecies): string {
-  if (species === 'penguin') return EGG
-  if (species === 'hedgehog') return HEDGEHOG_FACE
+// Eye line, eye spacing and where the nose sits, per species.
+const FACE: Record<PetSpecies, { eyeY: number, eyeDx: number, noseY: number }> = {
+  cat: { eyeY: 57, eyeDx: 14, noseY: 64 },
+  dog: { eyeY: 54, eyeDx: 14, noseY: 64 },
+  rabbit: { eyeY: 62, eyeDx: 13, noseY: 69 },
+  hamster: { eyeY: 59, eyeDx: 15, noseY: 67 },
+  hedgehog: { eyeY: 61, eyeDx: 12, noseY: 69 },
+  penguin: { eyeY: 51, eyeDx: 12, noseY: 60 },
+}
 
-  return MOCHI
+function ellipsePath(cx: number, cy: number, rx: number, ry: number): string {
+  return `M${cx - rx} ${cy}A${rx} ${ry} 0 1 0 ${cx + rx} ${cy}A${rx} ${ry} 0 1 0 ${cx - rx} ${cy}Z`
+}
+
+function headPath(species: PetSpecies): string {
+  const h = HEADS[species]
+  if (species === 'penguin') {
+    // Penguins are one egg: the head is the top of the body.
+    return 'M60 18C84 18 95 40 95 64C95 90 82 104 60 104C38 104 25 90 25 64C25 40 36 18 60 18Z'
+  }
+  if (species === 'hamster') {
+    // Chubby: a wide bun that is a bit flatter on top.
+    return 'M60 28C88 28 99 46 99 63C99 82 84 94 60 94C36 94 21 82 21 63C21 46 32 28 60 28Z'
+  }
+
+  return ellipsePath(h.cx, h.cy, h.rx, h.ry)
 }
 
 function inked(d: string, fill: string, ctx: Ctx, extra = ''): string {
   return `<path d="${d}" fill="${fill}" stroke="${INK}" stroke-width="${ctx.sw}" stroke-linejoin="round" stroke-linecap="round"${extra}/>`
 }
 
-function renderBehind(ctx: Ctx): string {
+function line(d: string, color: string, width: number, extra = ''): string {
+  return `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round"${extra}/>`
+}
+
+function renderTail(ctx: Ctx): string {
+  const { p } = ctx
+
+  switch (ctx.species) {
+    case 'cat':
+      // Long curled tabby tail with stripes.
+      return [
+        line('M80 96C98 98 106 86 102 72C100 64 94 62 92 66', INK, ctx.sw + 7.5),
+        line('M80 96C98 98 106 86 102 72C100 64 94 62 92 66', p.body, 7.5),
+        line('M97 93l3-4M103 83l4-1M104 73l4 1', p.mark, 2.6),
+      ].join('')
+    case 'dog':
+      return [
+        line('M80 92C92 90 96 80 92 72', INK, ctx.sw + 6),
+        line('M80 92C92 90 96 80 92 72', p.mark, 6),
+      ].join('')
+    case 'rabbit':
+      return `<circle cx="84" cy="98" r="7" fill="#ffffff" stroke="${INK}" stroke-width="${ctx.sw}"/>`
+    default:
+      return ''
+  }
+}
+
+function renderBody(ctx: Ctx): string {
+  const { p } = ctx
+
+  if (ctx.species === 'penguin') {
+    // Egg body with a white tummy; flippers and orange feet.
+    return [
+      inked('M30 74C20 80 18 92 24 96C30 92 34 86 34 80Z', p.inner, ctx),
+      inked('M90 74C100 80 102 92 96 96C90 92 86 86 86 80Z', p.inner, ctx),
+      inked('M44 101C40 101 37 104 40 107H54C56 104 52 101 48 101Z', p.mark, ctx),
+      inked('M76 101C80 101 83 104 80 107H66C64 104 68 101 72 101Z', p.mark, ctx),
+    ].join('')
+  }
+
+  const wide = ctx.species === 'hamster'
+  const body = wide ? ellipsePath(60, 90, 33, 16) : ellipsePath(60, 90, 24, 16)
+  const belly = wide ? ellipsePath(60, 93, 20, 10) : ellipsePath(60, 93, 13, 10)
+  const bellyFill = ctx.species === 'hedgehog' ? p.body : p.belly
+
+  return [
+    inked(body, ctx.species === 'hedgehog' ? p.mark : p.body, ctx),
+    `<path d="${belly}" fill="${bellyFill}"/>`,
+    // Feet peeking out under the body.
+    `<ellipse cx="${wide ? 44 : 49}" cy="104" rx="8" ry="5" fill="${ctx.species === 'hedgehog' ? p.body : p.body}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
+    `<ellipse cx="${wide ? 76 : 71}" cy="104" rx="8" ry="5" fill="${p.body}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
+  ].join('')
+}
+
+function renderEarsBehind(ctx: Ctx): string {
   const { p } = ctx
 
   switch (ctx.species) {
     case 'cat':
       return [
-        `<path d="M95 92C109 91 112 76 104 66" fill="none" stroke="${INK}" stroke-width="${ctx.sw + 7}" stroke-linecap="round"/>`,
-        `<path d="M95 92C109 91 112 76 104 66" fill="none" stroke="${p.body}" stroke-width="7" stroke-linecap="round"/>`,
-        inked('M26 58C23 45 25 31 31 24C39 27 47 35 52 43Z', p.body, ctx),
-        inked('M96 58C99 45 97 31 91 24C83 27 75 35 70 43Z', p.body, ctx),
-        `<path d="M31 49C30 42 31 36 33 32C37 35 40 38 42 42Z" fill="${p.inner}"/>`,
-        `<path d="M91 49C92 42 91 36 89 32C85 35 82 38 80 42Z" fill="${p.inner}"/>`,
+        inked('M30 46C26 32 28 18 33 12C42 15 50 24 54 32Z', p.body, ctx),
+        inked('M90 46C94 32 92 18 87 12C78 15 70 24 66 32Z', p.body, ctx),
+        `<path d="M33 40C31 31 32 23 35 19C40 22 44 27 47 32Z" fill="${p.inner}"/>`,
+        `<path d="M87 40C89 31 88 23 85 19C80 22 76 27 73 32Z" fill="${p.inner}"/>`,
       ].join('')
-    case 'dog':
-      return `<path d="M97 86C106 86 108 77 102 74" fill="none" stroke="${INK}" stroke-width="${ctx.sw}" stroke-linecap="round"/>`
     case 'rabbit':
       return [
-        `<g transform="rotate(-8 45 40)">`,
-        inked('M45 6C54 6 57 20 56 36C55 47 51 51 45 51C39 51 35 47 34 36C33 20 36 6 45 6Z', p.body, ctx),
-        `<path d="M45 15C49 15 50 24 50 33C50 40 48 43 45 43C42 43 40 40 40 33C40 24 41 15 45 15Z" fill="${p.inner}"/></g>`,
-        `<g transform="rotate(8 77 40)">`,
-        inked('M77 6C86 6 89 20 88 36C87 47 83 51 77 51C71 51 67 47 66 36C65 20 68 6 77 6Z', p.body, ctx),
-        `<path d="M77 15C81 15 82 24 82 33C82 40 80 43 77 43C74 43 72 40 72 33C72 24 73 15 77 15Z" fill="${p.inner}"/></g>`,
-        `<circle cx="99" cy="93" r="7.5" fill="${p.body}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
-      ].join('')
-    case 'hedgehog':
-      return [
-        inked(hedgehogSpikes(), p.mark, ctx),
-        `<circle cx="38" cy="53" r="6" fill="${p.body}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
-        `<circle cx="84" cy="53" r="6" fill="${p.body}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
+        `<g transform="rotate(-10 47 40)">`,
+        inked(ellipsePath(47, 24, 8.5, 18), '#ffffff', ctx),
+        `<path d="${ellipsePath(47, 26, 4.2, 12.5)}" fill="${p.inner}"/></g>`,
+        `<g transform="rotate(10 73 40)">`,
+        inked(ellipsePath(73, 24, 8.5, 18), '#ffffff', ctx),
+        `<path d="${ellipsePath(73, 26, 4.2, 12.5)}" fill="${p.inner}"/></g>`,
       ].join('')
     case 'hamster':
       return [
-        `<circle cx="35" cy="44" r="9.5" fill="${p.body}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
-        `<circle cx="87" cy="44" r="9.5" fill="${p.body}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
-        `<circle cx="35" cy="44" r="4.5" fill="${p.inner}"/>`,
-        `<circle cx="87" cy="44" r="4.5" fill="${p.inner}"/>`,
+        `<circle cx="34" cy="34" r="9" fill="${p.body}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
+        `<circle cx="86" cy="34" r="9" fill="${p.body}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
+        `<circle cx="34" cy="34" r="4.5" fill="${p.inner}"/>`,
+        `<circle cx="86" cy="34" r="4.5" fill="${p.inner}"/>`,
+      ].join('')
+    case 'hedgehog':
+      // A crown of spines behind the face.
+      return [
+        inked(hedgehogSpikes(), p.mark, ctx),
+        `<circle cx="38" cy="38" r="6" fill="${p.body}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
+        `<circle cx="82" cy="38" r="6" fill="${p.body}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
       ].join('')
     case 'penguin':
-      return `<path d="M58 31C56 23 62 19 67 22" fill="none" stroke="${INK}" stroke-width="${ctx.sw}" stroke-linecap="round"/>`
+      return line('M58 19C55 11 61 7 66 10', INK, ctx.sw)
+    default:
+      return ''
   }
 }
 
-function renderLimbs(ctx: Ctx): string {
-  const { p } = ctx
-  const footFill = ctx.species === 'penguin' ? p.mark : p.body
-  const armFill = ctx.species === 'penguin' ? p.inner : ctx.species === 'hedgehog' ? p.body : p.body
-  // Arms go up when the pet is excited, droop when it's sleepy.
-  const armTilt = ctx.status === 'excited' ? -38 : ctx.status === 'sleepy' ? 22 : 8
-  const armY = ctx.status === 'excited' ? 70 : 83
-
-  return [
-    `<ellipse cx="45" cy="101" rx="8.5" ry="5.5" fill="${footFill}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
-    `<ellipse cx="76" cy="101" rx="8.5" ry="5.5" fill="${footFill}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
-    `<ellipse cx="23" cy="${armY}" rx="6.5" ry="9" transform="rotate(${-armTilt} 23 ${armY})" fill="${armFill}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
-    `<ellipse cx="97" cy="${armY}" rx="6.5" ry="9" transform="rotate(${armTilt} 97 ${armY})" fill="${armFill}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
-  ].join('')
-}
-
-function renderBody(ctx: Ctx): string {
+function renderHead(ctx: Ctx): string {
   const { p, id } = ctx
-  const path = bodyPath(ctx.species)
   const clip = `clip-path="url(#${id}-clip)"`
+  const path = headPath(ctx.species)
   const markings: string[] = []
 
   switch (ctx.species) {
     case 'cat':
-      markings.push(`<path d="M54 44L55.5 50M61 42V49M68 44L66.5 50" stroke="${p.mark}" stroke-width="3.2" stroke-linecap="round"/>`)
+      // Tabby forehead stripes and a pale muzzle.
+      markings.push(
+        `<g ${clip}><ellipse cx="60" cy="70" rx="17" ry="11" fill="${p.belly}"/></g>`,
+        line('M55 27l1.5 7M60 25v8M65 27l-1.5 7', p.mark, 3),
+        line('M27 52l7 2M27 59l7 0M93 52l-7 2M93 59l-7 0', p.mark, 2.6),
+      )
       break
     case 'dog':
       markings.push(
-        `<g ${clip}><ellipse cx="86" cy="52" rx="12" ry="10" fill="${p.mark}" opacity="0.55"/></g>`,
-      )
-      break
-    case 'penguin':
-      markings.push(
-        `<g ${clip}><path d="M61 54C55 46 39 46 37 60C35 72 40 84 46 92C50 98 55 104 61 104C67 104 72 98 76 92C82 84 87 72 85 60C83 46 67 46 61 54Z" fill="${p.belly}"/></g>`,
+        `<g ${clip}><ellipse cx="74" cy="48" rx="12" ry="11" fill="${p.mark}" opacity="0.55"/><ellipse cx="60" cy="69" rx="16" ry="11" fill="${p.belly}"/></g>`,
       )
       break
     case 'hamster':
       markings.push(
-        `<g ${clip}><ellipse cx="60" cy="100" rx="38" ry="24" fill="${p.belly}"/></g>`,
-        `<path d="M61 40V47" stroke="${p.mark}" stroke-width="3.2" stroke-linecap="round"/>`,
+        `<g ${clip}><ellipse cx="60" cy="92" rx="40" ry="22" fill="${p.belly}"/></g>`,
+        line('M60 31v8', p.mark, 3.2),
       )
+      break
+    case 'penguin':
+      // Heart-shaped white face mask and white tummy.
+      markings.push(
+        `<g ${clip}><path d="M60 40C53 30 34 33 34 50C34 62 44 70 60 72C76 70 86 62 86 50C86 33 67 30 60 40Z" fill="${p.belly}"/><ellipse cx="60" cy="88" rx="22" ry="20" fill="${p.belly}"/></g>`,
+      )
+      break
+    case 'hedgehog':
+      markings.push(`<g ${clip}><ellipse cx="60" cy="72" rx="14" ry="10" fill="#fff6ea"/></g>`)
       break
   }
 
   const outline = `<path d="${path}" fill="none" stroke="${INK}" stroke-width="${ctx.sw}" stroke-linejoin="round"/>`
-  const ears = ctx.species === 'dog'
+  // A soft shine on the top-left of the head makes it read round and plush.
+  const shine = ctx.icon
+    ? ''
+    : `<g ${clip}><ellipse cx="44" cy="${HEADS[ctx.species].cy - 16}" rx="9" ry="5" fill="#ffffff" opacity="0.45" transform="rotate(-20 44 ${HEADS[ctx.species].cy - 16})"/></g>`
+  const floppyEars = ctx.species === 'dog'
     ? [
-        inked('M30 44C17 45 12 62 17 74C21 81 29 78 32 69C35 60 37 51 37 46Z', p.mark, ctx),
-        inked('M92 44C105 45 110 62 105 74C101 81 93 78 90 69C87 60 85 51 85 46Z', p.mark, ctx),
+        inked('M30 36C18 38 14 58 19 72C23 80 32 77 34 66C36 56 38 46 37 40Z', p.mark, ctx),
+        inked('M90 36C102 38 106 58 101 72C97 80 88 77 86 66C84 56 82 46 83 40Z', p.mark, ctx),
       ].join('')
     : ''
 
-  return `<path d="${path}" fill="${p.body}"/>${markings.join('')}${outline}${ears}`
+  return `<path d="${path}" fill="${p.body}"/>${markings.join('')}${shine}${outline}${floppyEars}`
 }
 
-// ---------- face ----------
-
-type FaceLayout = {
-  eyeY: number
-  eyeDx: number
-  mouthY: number
-  nose: 'cat' | 'dog' | 'pink' | 'beak' | 'none'
-}
-
-const FACE_LAYOUT: Record<PetSpecies, FaceLayout> = {
-  cat: { eyeY: 71, eyeDx: 14, mouthY: 76, nose: 'none' },
-  dog: { eyeY: 69, eyeDx: 14, mouthY: 78, nose: 'dog' },
-  hedgehog: { eyeY: 74, eyeDx: 13, mouthY: 81, nose: 'dog' },
-  rabbit: { eyeY: 71, eyeDx: 14, mouthY: 77, nose: 'pink' },
-  penguin: { eyeY: 68, eyeDx: 13, mouthY: 78, nose: 'beak' },
-  hamster: { eyeY: 70, eyeDx: 15, mouthY: 77, nose: 'pink' },
-}
+// ---------- face: big glossy eyes, little nose, cheeks ----------
 
 function renderFace(ctx: Ctx): string {
-  const layout = FACE_LAYOUT[ctx.species]
-  const left = 61 - layout.eyeDx
-  const right = 61 + layout.eyeDx
-  const blushY = layout.eyeY + 7
-  const blushRx = ctx.species === 'hamster' ? 8 : 6.5
+  const f = FACE[ctx.species]
+  const left = 60 - f.eyeDx
+  const right = 60 + f.eyeDx
+  const blushY = f.eyeY + 8
+  const blushDx = f.eyeDx + 9
 
   return [
-    renderBlush(left - 9, blushY, blushRx, ctx),
-    renderBlush(right + 9, blushY, blushRx, ctx),
-    // Open dot eyes get a class so the room can make them blink; drawn expressions stay put.
+    renderBlush(60 - blushDx, blushY, ctx),
+    renderBlush(60 + blushDx, blushY, ctx),
+    ctx.species === 'cat' && !ctx.icon ? renderWhiskers(f.noseY, ctx) : '',
+    // Open eyes get a class so the room can make them blink; drawn expressions stay put.
     OPEN_EYE_STATUSES.has(ctx.status) ? '<g class="pet-eyes">' : '<g>',
-    renderEye(left, layout.eyeY, 'left', ctx),
-    renderEye(right, layout.eyeY, 'right', ctx),
+    renderEye(left, f.eyeY, 'left', ctx),
+    renderEye(right, f.eyeY, 'right', ctx),
     '</g>',
-    renderNose(layout, ctx),
-    layout.nose === 'beak' ? '' : renderMouth(layout, ctx),
+    renderNose(f.noseY, ctx),
+    ctx.species === 'penguin' ? '' : renderMouth(f.noseY + 3, ctx),
   ].join('')
 }
 
-function renderBlush(x: number, y: number, rx: number, ctx: Ctx): string {
-  const blob = `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ctx.icon ? 4.5 : 4}" fill="${BLUSH}"/>`
+function renderWhiskers(y: number, ctx: Ctx): string {
+  return line(`M37 ${y - 1}l-11-3M37 ${y + 3}l-11 1M83 ${y - 1}l11-3M83 ${y + 3}l11 1`, INK, 1.6, ' opacity="0.7"')
+    + (ctx.icon ? '' : '')
+}
+
+function renderBlush(x: number, y: number, ctx: Ctx): string {
+  const blob = `<ellipse cx="${x}" cy="${y}" rx="${ctx.icon ? 7 : 6}" ry="${ctx.icon ? 4.5 : 3.6}" fill="${BLUSH}"/>`
   if (ctx.icon) return blob
 
   const hatch = [-3, 0, 3]
-    .map((dx) => `<path d="M${x + dx - 1.2} ${y + 1.8}L${x + dx + 1.2} ${y - 1.8}" stroke="${BLUSH_LINE}" stroke-width="1.3" stroke-linecap="round"/>`)
+    .map((dx) => `<path d="M${x + dx - 1.2} ${y + 1.6}L${x + dx + 1.2} ${y - 1.6}" stroke="${BLUSH_LINE}" stroke-width="1.2" stroke-linecap="round"/>`)
     .join('')
 
   return blob + hatch
 }
 
 function renderEye(x: number, y: number, side: 'left' | 'right', ctx: Ctx): string {
-  const k = ctx.icon ? 1.35 : 1
-  const line = `fill="none" stroke="${INK}" stroke-width="${(3 * k).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"`
+  const k = ctx.icon ? 1.25 : 1
+  const stroke = `fill="none" stroke="${INK}" stroke-width="${(3 * k).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round"`
+  // Big glossy kawaii eye: tall dark oval, a large catch-light and a tiny second one.
+  const glossy = (rx: number, ry: number) => [
+    `<ellipse cx="${x}" cy="${y}" rx="${rx * k}" ry="${ry * k}" fill="${INK}"/>`,
+    `<circle cx="${x + rx * 0.35 * k}" cy="${y - ry * 0.38 * k}" r="${rx * 0.42 * k}" fill="#ffffff"/>`,
+    ctx.icon ? '' : `<circle cx="${x - rx * 0.35}" cy="${y + ry * 0.42}" r="${rx * 0.2}" fill="#ffffff"/>`,
+  ].join('')
 
   switch (ctx.status) {
     case 'excited':
-      return `<path d="M${x - 4.5 * k} ${y + 1.5} Q${x} ${y - 4.5 * k} ${x + 4.5 * k} ${y + 1.5}" ${line}/>`
+      return `<path d="M${x - 5 * k} ${y + 2} Q${x} ${y - 5 * k} ${x + 5 * k} ${y + 2}" ${stroke}/>`
     case 'sleepy':
-      return `<path d="M${x - 4.5 * k} ${y - 0.5} Q${x} ${y + 3.5 * k} ${x + 4.5 * k} ${y - 0.5}" ${line}/>`
+      return `<path d="M${x - 5 * k} ${y} Q${x} ${y + 4 * k} ${x + 5 * k} ${y}" ${stroke}/>`
     case 'bored':
-      return `<path d="M${x - 5 * k} ${y} H${x + 5 * k}" ${line}/>`
+      // Half-lidded: the lid line cuts the glossy eye in half.
+      return [
+        `<path d="M${x - 4.6 * k} ${y}A${4.6 * k} ${5 * k} 0 0 0 ${x + 4.6 * k} ${y}Z" fill="${INK}"/>`,
+        `<path d="M${x - 5.6 * k} ${y}H${x + 5.6 * k}" ${stroke}/>`,
+      ].join('')
     case 'dirty': {
       const dir = side === 'left' ? 1 : -1
-      const s = 3.8 * k
+      const s = 4 * k
 
-      return `<path d="M${x - dir * s} ${y - s} L${x + dir * s * 0.7} ${y} L${x - dir * s} ${y + s}" ${line}/>`
+      return `<path d="M${x - dir * s} ${y - s} L${x + dir * s * 0.7} ${y} L${x - dir * s} ${y + s}" ${stroke}/>`
     }
     case 'hungry':
-      return [
-        `<circle cx="${x}" cy="${y}" r="${4.4 * k}" fill="${INK}"/>`,
-        `<circle cx="${x + 1.4}" cy="${y - 1.5}" r="${1.6 * k}" fill="#ffffff"/>`,
-        ctx.icon ? '' : `<circle cx="${x - 1.5}" cy="${y + 1.8}" r="0.8" fill="#ffffff"/>`,
-      ].join('')
+      return glossy(5.6, 6.6) + (ctx.icon ? '' : `<path d="M${x - 1.5} ${y + 2.6}l1 1.2 1-1.2" fill="none" stroke="#ffffff" stroke-width="1"/>`)
     default:
-      return `<circle cx="${x}" cy="${y}" r="${3.3 * k}" fill="${INK}"/>`
+      return glossy(4.8, 5.8)
   }
 }
 
-function renderNose(layout: FaceLayout, ctx: Ctx): string {
-  const y = layout.mouthY - 4
-
-  switch (layout.nose) {
+function renderNose(y: number, ctx: Ctx): string {
+  switch (ctx.species) {
+    case 'cat':
+      return `<path d="M57 ${y - 1.5}H63L60 ${y + 1.8}Z" fill="#f28b95" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round"/>`
     case 'dog':
-      return `<ellipse cx="61" cy="${y}" rx="${ctx.icon ? 4.5 : 3.8}" ry="${ctx.icon ? 3.4 : 2.8}" fill="${INK}"/>`
-    case 'pink':
-      return `<ellipse cx="61" cy="${y + 0.5}" rx="2.4" ry="1.7" fill="#f28b95"/>`
-    case 'beak': {
-      const by = layout.mouthY - 5
+      return `<ellipse cx="60" cy="${y}" rx="${ctx.icon ? 5.5 : 4.6}" ry="${ctx.icon ? 4 : 3.4}" fill="${INK}"/><circle cx="58.4" cy="${y - 1.2}" r="1.2" fill="#ffffff"/>`
+    case 'hedgehog':
+      return `<circle cx="60" cy="${y}" r="${ctx.icon ? 4.4 : 3.6}" fill="${INK}"/><circle cx="58.8" cy="${y - 1}" r="1" fill="#ffffff"/>`
+    case 'rabbit':
+    case 'hamster':
+      return `<ellipse cx="60" cy="${y}" rx="2.6" ry="1.9" fill="#f28b95"/>`
+    case 'penguin': {
+      const by = y
       if (ctx.status === 'excited') {
-        return `<path d="M54 ${by}Q61 ${by - 4} 68 ${by}L61 ${by + 4}Z" fill="${ctx.p.mark}" stroke="${INK}" stroke-width="${ctx.sw * 0.7}" stroke-linejoin="round"/><path d="M55.5 ${by + 4}Q61 ${by + 11} 66.5 ${by + 4}Z" fill="#f08a84" stroke="${INK}" stroke-width="${ctx.sw * 0.7}" stroke-linejoin="round"/>`
+        return `<path d="M53 ${by}Q60 ${by - 4} 67 ${by}L60 ${by + 4}Z" fill="${ctx.p.mark}" stroke="${INK}" stroke-width="${ctx.sw * 0.7}" stroke-linejoin="round"/><path d="M54.5 ${by + 4}Q60 ${by + 11} 65.5 ${by + 4}Z" fill="#f08a84" stroke="${INK}" stroke-width="${ctx.sw * 0.7}" stroke-linejoin="round"/>`
       }
 
-      return `<path d="M54.5 ${by}Q61 ${by - 3.5} 67.5 ${by}Q64 ${by + 6} 61 ${by + 6}Q58 ${by + 6} 54.5 ${by}Z" fill="${ctx.p.mark}" stroke="${INK}" stroke-width="${ctx.sw * 0.7}" stroke-linejoin="round"/>`
+      return `<path d="M53.5 ${by}Q60 ${by - 3.5} 66.5 ${by}Q63 ${by + 6} 60 ${by + 6}Q57 ${by + 6} 53.5 ${by}Z" fill="${ctx.p.mark}" stroke="${INK}" stroke-width="${ctx.sw * 0.7}" stroke-linejoin="round"/>`
     }
-    default:
-      return ''
   }
 }
 
-function renderMouth(layout: FaceLayout, ctx: Ctx): string {
-  const y = layout.mouthY
-  const w = ctx.icon ? 3.6 : 2.4
-  const line = `fill="none" stroke="${INK}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"`
-  const usesW = ctx.species === 'cat' || ctx.species === 'dog' || ctx.species === 'hedgehog'
+function renderMouth(y: number, ctx: Ctx): string {
+  const w = ctx.icon ? 3.4 : 2.2
+  const stroke = `fill="none" stroke="${INK}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"`
+  const omega = `<path d="M55 ${y}Q57.5 ${y + 3.4} 60 ${y}Q62.5 ${y + 3.4} 65 ${y}" ${stroke}/>`
 
   switch (ctx.status) {
     case 'excited':
-      return `<path d="M55 ${y - 1.5}Q61 ${y + 9} 67 ${y - 1.5}Z" fill="${INK}" stroke="${INK}" stroke-width="1.5" stroke-linejoin="round"/><path d="M57.8 ${y + 3.2}Q61 ${y + 1} 64.2 ${y + 3.2}Q61 ${y + 6.5} 57.8 ${y + 3.2}Z" fill="#f08a84"/>`
+      return `<path d="M54 ${y - 1}Q60 ${y + 10} 66 ${y - 1}Z" fill="${INK}" stroke="${INK}" stroke-width="1.5" stroke-linejoin="round"/><path d="M56.8 ${y + 3.6}Q60 ${y + 1.4} 63.2 ${y + 3.6}Q60 ${y + 7} 56.8 ${y + 3.6}Z" fill="#f08a84"/>`
     case 'hungry':
-      return [
-        `<ellipse cx="61" cy="${y + 1}" rx="2.6" ry="3" fill="${INK}"/>`,
-        ctx.icon ? '' : `<path d="M64.5 ${y + 1}C64 ${y + 5} 63.5 ${y + 8} 65.5 ${y + 9.5}C67.5 ${y + 8} 66.5 ${y + 5} 64.5 ${y + 1}Z" fill="#a9d6f5" stroke="${INK}" stroke-width="1.2"/>`,
-      ].join('')
+      return `<ellipse cx="60" cy="${y + 2}" rx="2.6" ry="3" fill="${INK}"/>${ctx.icon ? '' : `<path d="M64 ${y + 2}C63.5 ${y + 6} 63 ${y + 9} 65 ${y + 10.5}C67 ${y + 9} 66 ${y + 6} 64 ${y + 2}Z" fill="#a9d6f5" stroke="${INK}" stroke-width="1.2"/>`}`
     case 'sleepy':
-      return `<ellipse cx="61" cy="${y + 1}" rx="1.8" ry="2" fill="${INK}"/>`
+      return `<ellipse cx="60" cy="${y + 2}" rx="1.8" ry="2" fill="${INK}"/>`
     case 'bored':
-      return `<path d="M58 ${y + 1}H64" ${line}/>`
+      return `<path d="M57 ${y + 2}H63" ${stroke}/>`
     case 'dirty':
-      return `<path d="M55.5 ${y + 2}Q58.25 ${y - 0.5} 61 ${y + 2}T66.5 ${y + 2}" ${line}/>`
+      return `<path d="M54.5 ${y + 3}Q57.25 ${y + 0.5} 60 ${y + 3}T65.5 ${y + 3}" ${stroke}/>`
     default:
-      return usesW
-        ? `<path d="M56 ${y}Q58.5 ${y + 3.5} 61 ${y}Q63.5 ${y + 3.5} 66 ${y}" ${line}/>`
-        : `<path d="M57.5 ${y + 2}L61 ${y - 1}L64.5 ${y + 2}" ${line}/>`
+      if (ctx.species === 'dog' && !ctx.icon) {
+        // Happy pup: little tongue out.
+        return omega + `<path d="M57.5 ${y + 1.6}Q60 ${y + 9} 62.5 ${y + 1.6}Z" fill="#ff9aa6" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round"/>`
+      }
+
+      return omega
   }
+}
+
+function renderPaws(ctx: Ctx): string {
+  const { p } = ctx
+  if (ctx.species === 'penguin') return ''
+
+  const fill = ctx.species === 'hedgehog' ? p.body : p.body
+  if (ctx.status === 'excited') {
+    // Paws up in a cheer beside the face.
+    return [
+      `<ellipse cx="27" cy="74" rx="6.5" ry="8" transform="rotate(30 27 74)" fill="${fill}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
+      `<ellipse cx="93" cy="74" rx="6.5" ry="8" transform="rotate(-30 93 74)" fill="${fill}" stroke="${INK}" stroke-width="${ctx.sw}"/>`,
+    ].join('')
+  }
+
+  // Front paws resting on the tummy, with tiny toe lines.
+  const y = ctx.species === 'hamster' ? 86 : 88
+  const dx = ctx.species === 'hamster' ? 14 : 10
+
+  return [
+    `<ellipse cx="${60 - dx}" cy="${y}" rx="6" ry="5" fill="${fill}" stroke="${INK}" stroke-width="${ctx.sw * 0.85}"/>`,
+    `<ellipse cx="${60 + dx}" cy="${y}" rx="6" ry="5" fill="${fill}" stroke="${INK}" stroke-width="${ctx.sw * 0.85}"/>`,
+    line(`M${60 - dx - 1.6} ${y + 1.5}v2M${60 - dx + 1.6} ${y + 1.5}v2M${60 + dx - 1.6} ${y + 1.5}v2M${60 + dx + 1.6} ${y + 1.5}v2`, INK, 1.2),
+  ].join('')
 }
 
 // ---------- outfits (cosmetic pack) ----------
 
-const HEAD_TOP: Record<PetSpecies, number> = {
-  cat: 37,
-  dog: 37,
-  hedgehog: 34,
-  rabbit: 37,
-  penguin: 30,
-  hamster: 37,
+function headTop(species: PetSpecies): number {
+  if (species === 'penguin') return 19
+  if (species === 'hamster') return 29
+
+  return HEADS[species].cy - HEADS[species].ry
 }
 
 function renderOutfit(ctx: Ctx, outfit: PetOutfitId): string {
   const w = ctx.sw * 0.8
-  const top = HEAD_TOP[ctx.species]
+  const top = headTop(ctx.species)
 
   switch (outfit) {
     case 'party-hat': {
       const base = top + 6
 
       return [
-        `<g transform="rotate(10 61 ${base})">`,
-        `<path d="M47 ${base}L61 ${base - 30}L75 ${base}Q61 ${base + 6} 47 ${base}Z" fill="#8fc3ea" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
-        `<circle cx="57" cy="${base - 10}" r="2.4" fill="#ffffff"/><circle cx="65" cy="${base - 4}" r="2.4" fill="#ffffff"/><circle cx="62" cy="${base - 18}" r="2" fill="#ffffff"/>`,
-        `<circle cx="61" cy="${base - 31}" r="5" fill="#ffd25e" stroke="${INK}" stroke-width="${w}"/>`,
+        `<g transform="rotate(10 60 ${base})">`,
+        `<path d="M46 ${base}L60 ${base - 28}L74 ${base}Q60 ${base + 6} 46 ${base}Z" fill="#8fc3ea" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
+        `<circle cx="56" cy="${base - 10}" r="2.4" fill="#ffffff"/><circle cx="64" cy="${base - 4}" r="2.4" fill="#ffffff"/><circle cx="61" cy="${base - 18}" r="2" fill="#ffffff"/>`,
+        `<circle cx="60" cy="${base - 29}" r="5" fill="#ffd25e" stroke="${INK}" stroke-width="${w}"/>`,
         '</g>',
       ].join('')
     }
     case 'ribbon': {
       const x = 80
-      const y = top + 9
+      const y = top + 8
 
       return [
-        `<path d="M${x} ${y}C${x - 17} ${y - 17} ${x - 22} ${y + 6} ${x} ${y}Z" fill="#ff9aa6" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
-        `<path d="M${x} ${y}C${x + 17} ${y - 17} ${x + 22} ${y + 6} ${x} ${y}Z" fill="#ff9aa6" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
-        `<circle cx="${x}" cy="${y - 1}" r="4.6" fill="#ff7f8f" stroke="${INK}" stroke-width="${w}"/>`,
+        `<path d="M${x} ${y}C${x - 16} ${y - 16} ${x - 21} ${y + 6} ${x} ${y}Z" fill="#ff9aa6" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
+        `<path d="M${x} ${y}C${x + 16} ${y - 16} ${x + 21} ${y + 6} ${x} ${y}Z" fill="#ff9aa6" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
+        `<circle cx="${x}" cy="${y - 1}" r="4.4" fill="#ff7f8f" stroke="${INK}" stroke-width="${w}"/>`,
       ].join('')
     }
-    case 'scarf':
-      return [
-        `<path d="M78 90L84 106L94 103L88 88Z" fill="#ff8a7a" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
-        `<path d="M23 83Q61 97 99 83L99 92Q61 106 23 92Z" fill="#ff8a7a" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
-        `<path d="M40 90L42 97M56 92L57 99M72 91L71 98" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.8"/>`,
-      ].join('')
-    case 'glasses': {
-      const layout = FACE_LAYOUT[ctx.species]
-      const left = 61 - layout.eyeDx
-      const right = 61 + layout.eyeDx
-      const y = layout.eyeY
-      const r = ctx.icon ? 9 : 8
+    case 'scarf': {
+      const y = ctx.species === 'penguin' ? 74 : HEADS[ctx.species].cy + HEADS[ctx.species].ry - 4
 
       return [
-        `<circle cx="${left}" cy="${y}" r="${r}" fill="#ffffff" fill-opacity="0.25" stroke="${INK}" stroke-width="${w}"/>`,
-        `<circle cx="${right}" cy="${y}" r="${r}" fill="#ffffff" fill-opacity="0.25" stroke="${INK}" stroke-width="${w}"/>`,
-        `<path d="M${left + r} ${y - 1}Q61 ${y - 4} ${right - r} ${y - 1}" fill="none" stroke="${INK}" stroke-width="${w}" stroke-linecap="round"/>`,
+        `<path d="M74 ${y + 4}L80 ${y + 18}L89 ${y + 15}L84 ${y + 2}Z" fill="#ff8a7a" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
+        `<path d="M34 ${y - 2}Q60 ${y + 8} 86 ${y - 2}L86 ${y + 6}Q60 ${y + 16} 34 ${y + 6}Z" fill="#ff8a7a" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"/>`,
+        `<path d="M44 ${y + 4}L45 ${y + 10}M58 ${y + 6}L58.5 ${y + 12}M72 ${y + 5}L71 ${y + 11}" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.8"/>`,
+      ].join('')
+    }
+    case 'glasses': {
+      const f = FACE[ctx.species]
+      const left = 60 - f.eyeDx
+      const right = 60 + f.eyeDx
+      const y = f.eyeY
+      const r = ctx.icon ? 9.5 : 8.5
+
+      return [
+        `<circle cx="${left}" cy="${y}" r="${r}" fill="#ffffff" fill-opacity="0.2" stroke="${INK}" stroke-width="${w}"/>`,
+        `<circle cx="${right}" cy="${y}" r="${r}" fill="#ffffff" fill-opacity="0.2" stroke="${INK}" stroke-width="${w}"/>`,
+        `<path d="M${left + r} ${y - 1}Q60 ${y - 4} ${right - r} ${y - 1}" fill="none" stroke="${INK}" stroke-width="${w}" stroke-linecap="round"/>`,
       ].join('')
     }
   }
@@ -456,21 +553,21 @@ function zed(x: number, y: number, size: number, sw: number): string {
 }
 
 function hedgehogSpikes(): string {
-  const cx = 61
-  const cy = 76
-  const spikes = 14
-  const start = Math.PI * 0.88
-  const end = Math.PI * 2.12
-  const points: string[] = [`${cx - 24} ${cy + 18}`]
+  const cx = 60
+  const cy = 60
+  const spikes = 13
+  const start = Math.PI * 0.9
+  const end = Math.PI * 2.1
+  const points: string[] = [`${cx - 27} ${cy + 14}`]
 
   for (let i = 0; i <= spikes * 2; i += 1) {
     const t = start + ((end - start) * i) / (spikes * 2)
     const isTip = i % 2 === 1
-    const rx = isTip ? 48 : 42
-    const ry = isTip ? 45 : 39
+    const rx = isTip ? 44 : 36
+    const ry = isTip ? 41 : 33
     points.push(`${(cx + Math.cos(t) * rx).toFixed(1)} ${(cy + Math.sin(t) * ry).toFixed(1)}`)
   }
-  points.push(`${cx + 24} ${cy + 18}`)
+  points.push(`${cx + 27} ${cy + 14}`)
 
   return `M${points.join('L')}Z`
 }
