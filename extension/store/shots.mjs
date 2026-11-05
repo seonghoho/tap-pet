@@ -50,6 +50,7 @@ for (const [locale, copy] of Object.entries(COPY)) {
     await popup.goto(popupUrl)
 
     await popup.locator('.adopt__name').fill(copy.adoptName)
+    await popup.locator('.adopt__name').blur()
     const adoptShot = await popup.locator('main').screenshot()
     const tileArt = await popup.locator('.adopt__option').nth(5).locator('svg').evaluate((node) => node.outerHTML)
 
@@ -75,12 +76,14 @@ for (const [locale, copy] of Object.entries(COPY)) {
     const stage = await context.newPage()
     await stage.setViewportSize({ width: 1280, height: 800 })
     for (const [key, shot] of [['care', careShot], ['outfit', outfitShot], ['adopt', adoptShot]]) {
-      await stage.setContent(screenshotPage(copy[key], shot))
+      await stage.setContent(screenshotPage(copy[key], shot), { waitUntil: 'networkidle' })
+      await stage.evaluate(() => document.fonts.ready)
       await stage.screenshot({ path: resolve(outdir, `${locale}-${key}.png`), scale: 'css' })
     }
 
     await stage.setViewportSize({ width: 440, height: 280 })
-    await stage.setContent(tilePage(copy.tile, tileArt))
+    await stage.setContent(tilePage(copy.tile, tileArt), { waitUntil: 'networkidle' })
+    await stage.evaluate(() => document.fonts.ready)
     await stage.screenshot({ path: resolve(outdir, `${locale}-tile.png`), scale: 'css' })
   } finally {
     await context.close()
@@ -89,33 +92,55 @@ for (const [locale, copy] of Object.entries(COPY)) {
 
 console.log(`Store images ready: ${outdir}`)
 
+// The frame around the popup uses the website's look: dotted wallpaper, rounded Jua
+// headings, sticker outlines. (Jua is fetched while rendering; the extension itself
+// still makes no network requests.)
 function base(body) {
-  return `<!doctype html><meta charset="utf-8"><style>
+  return `<!doctype html><meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=block">
+  <style>
     * { box-sizing: border-box; margin: 0; }
-    body { background: #f5f1ea; color: #2a2420; font-family: -apple-system, "Apple SD Gothic Neo", "Pretendard", system-ui, sans-serif; letter-spacing: -0.02em; height: 100vh; overflow: hidden; }
+    body {
+      background:
+        radial-gradient(#f6dcc0 2.4px, transparent 2.8px) 0 0 / 34px 34px,
+        radial-gradient(#f6dcc0 2.4px, transparent 2.8px) 17px 17px / 34px 34px,
+        #fdf1e2;
+      color: #2a2420;
+      font-family: -apple-system, "Apple SD Gothic Neo", "Pretendard", system-ui, sans-serif;
+      height: 100vh;
+      letter-spacing: -0.02em;
+      overflow: hidden;
+    }
+    h1 { font-family: "Jua", -apple-system, "Apple SD Gothic Neo", sans-serif; font-weight: 400; letter-spacing: 0; }
+    .floor { background: #ecc49a; border-top: 4px solid #4a3934; bottom: 0; height: 22%; left: 0; position: fixed; right: 0; }
   </style>${body}`
+}
+
+// Keep the red dot glued to the last word so it never wraps onto a line of its own.
+function withDot(title) {
+  return title.replace(/(\S+)$/, '<span style="white-space: nowrap">$1<span class="dot"></span></span>')
 }
 
 function screenshotPage([title, lead], shot) {
   return base(`<style>
-    .wrap { align-items: center; display: grid; gap: 72px; grid-template-columns: 1fr 380px; height: 100%; padding: 0 120px; }
-    h1 { font-size: 52px; font-weight: 800; line-height: 1.2; }
-    p { color: #7a7068; font-size: 24px; line-height: 1.55; margin-top: 20px; white-space: pre-line; }
-    .dot { background: #ff6b4a; border-radius: 50%; display: inline-block; height: 14px; margin-left: 6px; vertical-align: super; width: 14px; }
-    .popup { background: #fffdf9; border: 1px solid #e6ded2; border-radius: 18px; box-shadow: 0 24px 60px rgba(80, 60, 40, 0.16); max-height: 700px; overflow: hidden; }
+    .wrap { align-items: center; display: grid; gap: 72px; grid-template-columns: 1fr 380px; height: 100%; padding: 0 120px; position: relative; }
+    h1 { font-size: 60px; line-height: 1.2; }
+    p { color: #6f625a; font-size: 25px; line-height: 1.55; margin-top: 22px; white-space: pre-line; }
+    .dot { background: #ff6b4a; border: 3px solid #4a3934; border-radius: 50%; display: inline-block; height: 20px; margin-left: 8px; vertical-align: super; width: 20px; }
+    .popup { background: #f5f1ea; border: 4px solid #4a3934; border-radius: 26px; box-shadow: 0 8px 0 #4a3934; max-height: 690px; overflow: hidden; }
     .popup img { display: block; width: 340px; }
     .popup-wrap { display: grid; justify-items: center; }
-  </style><div class="wrap">
-    <div><h1>${title}<span class="dot"></span></h1><p>${lead}</p></div>
+  </style><div class="floor"></div><div class="wrap">
+    <div><h1>${withDot(title)}</h1><p>${lead}</p></div>
     <div class="popup-wrap"><div class="popup"><img src="data:image/png;base64,${shot.toString('base64')}"></div></div>
   </div>`)
 }
 
 function tilePage([title, lead], art) {
   return base(`<style>
-    .tile { align-items: center; display: grid; gap: 18px; grid-template-columns: 170px 1fr; height: 100%; padding: 0 34px; }
-    .art svg { display: block; height: 170px; width: 170px; }
-    h1 { font-size: 40px; font-weight: 800; }
-    p { color: #7a7068; font-size: 19px; line-height: 1.4; margin-top: 8px; }
-  </style><div class="tile"><div class="art">${art}</div><div><h1>${title}</h1><p>${lead}</p></div></div>`)
+    .tile { align-items: center; display: grid; gap: 14px; grid-template-columns: 180px 1fr; height: 100%; padding: 0 30px; position: relative; }
+    .art svg { display: block; height: 180px; width: 180px; }
+    h1 { font-size: 46px; }
+    p { color: #6f625a; font-size: 19px; font-weight: 700; line-height: 1.4; margin-top: 6px; }
+  </style><div class="floor"></div><div class="tile"><div class="art">${art}</div><div><h1>${title}</h1><p>${lead}</p></div></div>`)
 }

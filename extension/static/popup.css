@@ -317,6 +317,11 @@ button:disabled { cursor: not-allowed; filter: grayscale(0.6); opacity: 0.5; }
   text-align: center;
 }
 
+.adopt__name:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
 .primary {
   background: var(--accent);
   border: 2.5px solid var(--ink);
