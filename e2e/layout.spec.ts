@@ -92,6 +92,8 @@ test.describe('visual baselines', () => {
   const screenshot = { animations: 'disabled' as const, maxDiffPixelRatio: 0.02 }
 
   test('setup screen', async ({ page }) => {
+    // First visits follow the browser language (en-US in CI); pin Korean like seedPet does.
+    await page.addInitScript(() => window.localStorage.setItem('tab-pet:locale', 'ko'))
     await page.goto('/')
     await expect(page.getByText('같이 지낼 친구를 골라주세요')).toBeVisible()
     await page.evaluate(() => document.fonts.ready)
