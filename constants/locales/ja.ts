@@ -528,6 +528,17 @@ export const ja = {
     invalid: 'コードが正しくありません。すべてコピーしたか確認してください。',
     imported: '引っ越し完了！',
   },
+  celebration: {
+    levelTitle: 'レベル {level} 達成！',
+    levelBody: '{name}、ちょっと大きくなりました。いつも一緒にいてくれてありがとう。',
+    streakTitle: '{days}日連続で一緒！',
+    streakBody: '{name}も毎日このタブで待っていました。',
+    unlocked: '新しく増えました：{item}',
+    share: '友だちに自慢する',
+    close: 'やったね',
+    shareLevel: 'レベル {level} 達成！',
+    shareStreak: '{days}日連続でお世話中！',
+  },
   shareCard: {
     button: '友だちカードを共有',
     making: 'カードを作成中…',
