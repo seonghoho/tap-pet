@@ -7,6 +7,9 @@ export type PurchaseNotice = {
   kind: 'success' | 'error'
   productId?: ShopProductId
   message?: string
+  // Set when the charge may have gone through but confirmation failed; the user can
+  // paste it into "Restore purchase" (the server asks Toss for the real status).
+  orderId?: string
 }
 
 type EntitlementResponse = { entitlement: Entitlement }
@@ -84,7 +87,7 @@ export function usePurchases() {
       trackEvent('purchase_completed', { product: response.entitlement.productId, amount: product?.price ?? 0 })
     } catch (error) {
       const data = (error as { data?: { statusMessage?: string, data?: { message?: string } } }).data
-      notice.value = { kind: 'error', productId: product?.id, message: data?.data?.message }
+      notice.value = { kind: 'error', productId: product?.id, message: data?.data?.message, orderId: orderId || undefined }
       trackEvent('purchase_failed', { code: data?.statusMessage ?? 'CONFIRM_FAILED' })
     }
   }

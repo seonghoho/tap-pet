@@ -26,6 +26,7 @@ export type AnalyticsEvents = {
   backup_exported: Record<string, never>
   backup_imported: { ok: boolean }
   pin_tip_dismissed: Record<string, never>
+  send_to_desktop: { result: 'shared' | 'copied' }
   pet_patted: Record<string, never>
   shop_viewed: { source: 'growth' | 'settings' }
   checkout_started: { product: ShopProductId }

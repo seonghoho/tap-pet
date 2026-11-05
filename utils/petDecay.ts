@@ -1,4 +1,4 @@
-import { DECAY_PER_HOUR, MAX_OFFLINE_DECAY_HOURS } from '~/constants/pet'
+import { DECAY_PER_HOUR, MAX_OFFLINE_DECAY_HOURS, STAT_MAX, STAT_MIN } from '~/constants/pet'
 import type { PetStats } from '~/types/pet'
 import { clampStat } from '~/utils/petValidation'
 
@@ -15,13 +15,34 @@ export function applyOfflineDecay(
   lastUpdatedAt: number,
   now = Date.now(),
 ): PetStats {
+  return applyOfflineDecayWithCarry(stats, lastUpdatedAt, now).stats
+}
+
+// Same as applyOfflineDecay, plus the fraction that rounding to whole stats dropped.
+// Seeding live decay with this carry means a reload a few minutes later loses nothing.
+export function applyOfflineDecayWithCarry(
+  stats: PetStats,
+  lastUpdatedAt: number,
+  now = Date.now(),
+): { stats: PetStats, carry: PetStats } {
   const decayHours = getOfflineDecayHours(lastUpdatedAt, now)
+  const fullness = decayStat(stats.fullness, DECAY_PER_HOUR.fullness * decayHours)
+  const energy = decayStat(stats.energy, DECAY_PER_HOUR.energy * decayHours)
+  const cleanliness = decayStat(stats.cleanliness, DECAY_PER_HOUR.cleanliness * decayHours)
 
   return {
-    fullness: clampStat(stats.fullness + DECAY_PER_HOUR.fullness * decayHours),
-    energy: clampStat(stats.energy + DECAY_PER_HOUR.energy * decayHours),
-    cleanliness: clampStat(stats.cleanliness + DECAY_PER_HOUR.cleanliness * decayHours),
+    stats: { fullness: fullness.value, energy: energy.value, cleanliness: cleanliness.value },
+    carry: { fullness: fullness.carry, energy: energy.carry, cleanliness: cleanliness.carry },
   }
+}
+
+function decayStat(stat: number, change: number): { value: number, carry: number } {
+  const exact = stat + change
+  const value = clampStat(exact)
+  // At the floor or ceiling there is nothing left to carry.
+  const carry = value <= STAT_MIN || value >= STAT_MAX ? 0 : exact - value
+
+  return { value, carry }
 }
 
 export type LiveDecayResult = {

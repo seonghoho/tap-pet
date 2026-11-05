@@ -64,11 +64,12 @@ export function renderPetArtSvg(input: {
   }
   const parts = [
     `<defs><clipPath id="${ctx.id}-clip"><path d="${bodyPath(ctx.species)}"/></clipPath></defs>`,
-    icon ? `<rect x="2" y="2" width="116" height="116" rx="30" fill="${ctx.p.tile}"/>` : '',
     icon ? '' : `<ellipse cx="60" cy="106" rx="32" ry="4.5" fill="${INK}" opacity="0.1"/>`,
-    icon ? '<g transform="translate(60 66) scale(1.16) translate(-60 -66)">' : '',
+    // Icons drop the tile and the limbs and zoom onto the head: at 16px every pixel
+    // goes to the silhouette (ears, colour) and the face, so species read at a glance.
+    icon ? `<g transform="translate(60 ${ICON_CY[ctx.species]}) scale(${ICON_SCALE[ctx.species]}) translate(-61 -${ICON_CY[ctx.species]})">` : '',
     renderBehind(ctx),
-    renderLimbs(ctx),
+    icon ? '' : renderLimbs(ctx),
     renderBody(ctx),
     renderFace(ctx),
     input.outfit ? renderOutfit(ctx, input.outfit) : '',
@@ -84,6 +85,10 @@ export function renderPetArtSvg(input: {
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"${unlockAttr}${a11y} data-species="${input.species}" data-status="${input.status}">${parts.join('')}</svg>`
 }
+
+// Per-species framing for the head-crop icon (centre y and zoom inside the 120 box).
+const ICON_CY: Record<PetSpecies, number> = { cat: 64, dog: 70, hedgehog: 72, rabbit: 56, penguin: 66, hamster: 68 }
+const ICON_SCALE: Record<PetSpecies, number> = { cat: 1.32, dog: 1.3, hedgehog: 1.2, rabbit: 1.12, penguin: 1.4, hamster: 1.38 }
 
 // ---------- silhouettes ----------
 

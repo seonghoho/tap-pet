@@ -4,7 +4,7 @@ import type { PetStatus } from '~/types/pet'
 import { normalizeEntitlements } from '~/utils/entitlements'
 import { petNeedsCare, renderPetArtSvg } from '~/utils/petArt'
 import { getMessages } from './messages'
-import { loadPet, serializePet, statusOf, visibleOutfit } from './petCore'
+import { loadPet, statusOf, visibleOutfit } from './petCore'
 import { ENTITLEMENTS_KEY, LAST_NOTIFIED_KEY, LAST_STATUS_KEY, NOTIFY_KEY, PET_KEY, readStorage, writeStorage } from './storage'
 
 const ALARM = 'tab-pet-tick'
@@ -25,7 +25,9 @@ chrome.notifications.onClicked.addListener(() => {
   void chrome.action.openPopup?.().catch(() => undefined)
 })
 
-// Applies time passed since the last save, then updates icon and maybe notifies.
+// Works out the pet's state from the time passed, then updates icon and maybe notifies.
+// Read-only on purpose: saving here would reset lastUpdatedAt every 5 minutes, and five
+// minutes of decay rounds to zero, so the pet would never get hungry.
 async function refresh(): Promise<void> {
   const now = Date.now()
   const pet = loadPet(await readStorage(PET_KEY), now)
@@ -34,7 +36,7 @@ async function refresh(): Promise<void> {
     return
   }
 
-  await writeStorage({ [PET_KEY]: serializePet(pet) })
+  await refreshIcon()
   const status = statusOf(pet, now)
   await maybeNotify(pet.name, status, now)
 }

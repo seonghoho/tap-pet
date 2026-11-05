@@ -8,6 +8,7 @@ import { type PetBackup, decodePetBackupWithPurchases, encodePetBackup } from '~
 import { getActiveStreak } from '~/utils/petStreak'
 import { pickVoiceLine } from '~/utils/petVoice'
 import { getMessages } from './messages'
+import { getActionLimitInfo } from '~/utils/petActionLimit'
 import { adoptPet, careFor, loadPet, remainingCare, serializePet, statusOf, visibleOutfit, wearOutfit } from './petCore'
 import { ENTITLEMENTS_KEY, NOTIFY_KEY, PET_KEY, readStorage, writeStorage } from './storage'
 
@@ -32,7 +33,7 @@ void start()
 async function start(): Promise<void> {
   pet = loadPet(await readStorage(PET_KEY), Date.now())
   entitlements = normalizeEntitlements(await readStorage(ENTITLEMENTS_KEY))
-  if (pet) await save()
+  // Opening the popup only looks; the pet is saved when you actually do something.
   render()
 }
 
@@ -42,7 +43,8 @@ async function save(): Promise<void> {
 
 // A backup code replaces the pet but only adds purchases, never removes them.
 async function applyBackup(backup: PetBackup): Promise<void> {
-  pet = { ...backup.state, lastUpdatedAt: Date.now() }
+  // Same as the website: time since the code was made still counts.
+  pet = loadPet(serializePet(backup.state), Date.now())
   entitlements = mergeEntitlements(entitlements, backup.entitlements)
   await writeStorage({ [ENTITLEMENTS_KEY]: entitlements })
   await save()
@@ -114,7 +116,7 @@ function renderPet(state: PetState): HTMLElement {
 
   const streak = getActiveStreak(state.streak, now)
   const meta = el('p', 'meta', remaining > 0
-    ? messages.actionLimit.remaining.replace('{remaining}', String(remaining)).replace('{limit}', String(state.actionLimit.bonusUses + 10))
+    ? messages.actionLimit.remaining.replace('{remaining}', String(remaining)).replace('{limit}', String(getActionLimitInfo(state.actionLimit, now).limit))
     : messages.actionLimit.locked)
   if (streak > 0) meta.append(el('span', 'meta__streak', messages.streak.days.replace('{days}', String(streak))))
 

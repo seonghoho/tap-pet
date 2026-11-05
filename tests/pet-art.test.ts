@@ -43,7 +43,8 @@ describe('pet art', () => {
       const icon = renderPetArtSvg({ species: 'dog', status, variant: 'icon' })
 
       expect(icon.includes('fill="#ff6b4a"')).toBe(petNeedsCare(status))
-      expect(icon).toContain(PET_ART_PALETTES.dog.tile)
+      // Head-crop icon: no tile behind the pet, so 16px goes to the silhouette.
+      expect(icon).not.toContain(`fill="${PET_ART_PALETTES.dog.tile}"`)
     }
   })
 

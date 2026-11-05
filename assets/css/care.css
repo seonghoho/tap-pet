@@ -432,6 +432,16 @@
   padding: 14px 16px;
 }
 
+@media (max-width: 480px) {
+  .pin-tip {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+
+  .pin-tip__dismiss {
+    grid-column: 1 / -1;
+  }
+}
+
 .pin-tip__icon {
   color: var(--app-muted);
   height: 28px;

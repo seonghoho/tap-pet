@@ -50,6 +50,7 @@
 | `backup_exported` | – | 백업 코드 복사 성공 |
 | `backup_imported` | `ok` | 백업 코드 불러오기 시도 |
 | `pin_tip_dismissed` | – | "이 탭을 고정해두세요" 안내 닫기 |
+| `send_to_desktop` | `result` (`shared`/`copied`) | 휴대폰에서 "PC로 링크 보내기" |
 | `pet_patted` | – | 페이지를 연 뒤 처음 펫을 쓰다듬음 (방문당 1회) |
 | `shop_viewed` | `source` | 상점이 화면에 그려짐 |
 | `checkout_started` | `product` | 토스 결제창을 열기 직전 |

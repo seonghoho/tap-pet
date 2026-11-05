@@ -14,6 +14,7 @@ export const ko = {
     label: '언어',
   },
   setup: {
+    unreadableSave: '저장된 친구를 읽지 못했어요. 원래 데이터는 이 브라우저에 따로 보관해 두었으니, 백업 코드가 있다면 설정에서 불러올 수 있어요.',
     invite: {
       eyebrow: '친구가 보낸 초대',
       title: '친구네 탭에 사는 {species}, 우리 탭에도?',
@@ -269,6 +270,12 @@ export const ko = {
     title: '이 탭을 고정해두세요',
     body: '탭을 우클릭해서 ‘고정’을 누르면 작게 자리 잡아요. 친구가 부르면 아이콘에 점이 떠요.',
     dismiss: '알겠어요',
+    mobile: {
+      title: 'PC에서 열면 탭에 살아요',
+      body: '휴대폰 브라우저에는 탭 아이콘이 안 보여요. 링크를 PC로 보내두면 일하는 동안 탭에서 지켜볼 수 있어요.',
+      send: 'PC로 링크 보내기',
+      copied: '링크를 복사했어요. PC에서 열어주세요.',
+    },
   },
   returnReport: {
     heading: '다시 왔네요',
@@ -580,6 +587,7 @@ export const ko = {
     },
   },
   shop: {
+    restoreWithOrderId: '결제가 됐다면 상점의 ‘구매 복원’에 이 주문번호를 넣어주세요: {orderId}',
     heading: '탭 꾸미기',
     description: '한 번 사면 계속 써요. 이 친구가 바뀌어도 그대로예요.',
     owned: '갖고 있어요',

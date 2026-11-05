@@ -188,7 +188,7 @@ describe('pet daily goal store behavior', () => {
     expect(store.dailyGoal.value).toEqual(createDailyGoal(dayTwo))
   })
 
-  it('commits a fresh incomplete daily goal when claiming a stale completed goal after day rollover', () => {
+  it('still pays out a goal finished yesterday but claimed after midnight', () => {
     const dayOne = new Date('2026-05-10T09:00:00+09:00').getTime()
     const dayTwo = new Date('2026-05-11T09:00:00+09:00').getTime()
     vi.setSystemTime(dayOne)
@@ -214,10 +214,14 @@ describe('pet daily goal store behavior', () => {
     vi.setSystemTime(dayTwo)
     ;(nuxtState.get('tab-pet:now') as Ref<number>).value = dayTwo
 
+    const levelExpBefore = store.petState.value!.growth.affinityExp
     store.claimDailyGoalReward()
 
-    expect(store.petState.value?.dailyGoal).toEqual(createDailyGoal(dayTwo))
-    expect(savedStates.at(-1)?.dailyGoal).toEqual(createDailyGoal(dayTwo))
+    // The reward from yesterday's finished goal is not lost at midnight…
+    expect(store.petState.value?.dailyGoal.claimedAt).toBe(dayTwo)
+    expect(store.petState.value!.growth.affinityExp).toBeGreaterThan(levelExpBefore)
+    // …and once claimed, today's fresh goal takes over.
+    expect(store.dailyGoal.value).toEqual(createDailyGoal(dayTwo))
   })
 
   it('clears the return report when care starts', () => {

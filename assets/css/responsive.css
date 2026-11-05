@@ -37,10 +37,8 @@
     min-height: 0;
   }
 
-  .pet-habitat__pet,
-  .pet-habitat__pet .pet-avatar {
-    height: 120px;
-    width: 120px;
+  .pet-habitat {
+    --room-pet-size: clamp(120px, 38cqw, 150px);
   }
 
   .stat-list {

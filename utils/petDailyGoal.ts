@@ -50,8 +50,12 @@ export function resolveDailyGoalForToday(
   now = Date.now(),
 ): PetDailyGoalState {
   if (!goal) return createDailyGoal(now)
+  if (goal.dateKey === getLocalDateKey(now)) return goal
+  // Finished but not yet claimed: keep it past midnight so the reward isn't lost.
+  // Once claimed, the next resolve starts today's goal.
+  if (goal.completedAt !== null && goal.claimedAt === null) return goal
 
-  return goal.dateKey === getLocalDateKey(now) ? goal : createDailyGoal(now)
+  return createDailyGoal(now)
 }
 
 export function progressDailyGoal(
