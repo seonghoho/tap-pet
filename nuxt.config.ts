@@ -13,6 +13,10 @@ export default defineNuxtConfig({
     head: {
       title: 'Tab Pet',
       link: [
+        // Jua: a rounded display face for headings and buttons, matching the round pets.
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Jua&display=swap' },
         {
           rel: 'stylesheet',
           href: 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css',
