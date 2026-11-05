@@ -2,7 +2,7 @@
 import { computed, nextTick, ref } from 'vue'
 import { DEFAULT_PET_NAMES } from '~/constants/pet'
 import type { PetSettings, PetSpecies, TitleMode } from '~/types/pet'
-import { renderPetArtSvg } from '~/utils/petArt'
+import { PET_ART_PALETTES, renderPetArtSvg } from '~/utils/petArt'
 import { getDisguiseTitleValue, svgToDataUrl } from '~/utils/tabPresentation'
 
 const props = withDefaults(defineProps<{
@@ -155,6 +155,7 @@ const demoIcons = computed(() => ({
         :key="option.species"
         class="species-option"
         type="button"
+        :style="{ '--species-tile': PET_ART_PALETTES[option.species].tile }"
         @click="chooseSpecies(option.species)"
       >
         <PetAvatar

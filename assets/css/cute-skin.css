@@ -1,0 +1,396 @@
+/* Cute skin: makes the UI around the pet speak the same language as the pet and its
+   room. Rounded display type (Jua), soft "sticker" outlines with a chunky bottom
+   shadow, pastel tints per care action and stat. Loaded after the component styles so
+   it only restyles; layout and behaviour stay in the files above. */
+
+.app-shell {
+  /* Outline colour derived from the theme: warm brown on light, soft beige on dark. */
+  --ink: color-mix(in srgb, var(--app-text) 72%, var(--app-bg));
+  --ink-soft: color-mix(in srgb, var(--app-text) 16%, var(--app-bg));
+  --sticker-shadow: 0 4px 0 color-mix(in srgb, var(--ink) 20%, transparent);
+  --font-cute: "Jua", "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif;
+
+  --tint-feed: #ffd8b8;
+  --tint-play: #ffc9d3;
+  --tint-sleep: #cfdcf7;
+  --tint-wash: #c4ebe4;
+}
+
+/* ---------- type ---------- */
+
+.brand h1,
+.section-heading h2,
+.pet-status__heading h2,
+.primary-button,
+.share-card__button,
+.daily-goal__title,
+.action-button__label > span:first-child,
+.species-option strong,
+.segmented-button {
+  font-family: var(--font-cute);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.brand h1 {
+  font-size: 1.35rem;
+}
+
+.section-heading h2 {
+  font-size: 1.6rem;
+  line-height: 1.25;
+}
+
+.eyebrow {
+  color: color-mix(in srgb, var(--app-accent) 80%, var(--app-text));
+  font-weight: 700;
+}
+
+/* ---------- panels: soft stickers ---------- */
+
+.main-panel,
+.pet-side-panel,
+.guide-panel {
+  border: 2px solid var(--ink-soft);
+  border-radius: 28px;
+  box-shadow: var(--sticker-shadow);
+}
+
+.brand-mark {
+  background: color-mix(in srgb, var(--app-accent) 14%, var(--app-surface));
+  border: 2px solid var(--ink-soft);
+  border-radius: 14px;
+  padding: 3px;
+}
+
+/* ---------- buttons ---------- */
+
+.primary-button,
+.share-card__button,
+.daily-goal__claim {
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 0 4px 0 var(--ink);
+  font-size: 1.1rem;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.primary-button:active,
+.share-card__button:active:not(:disabled),
+.daily-goal__claim:active {
+  box-shadow: 0 1px 0 var(--ink);
+  transform: translateY(3px);
+}
+
+/* ---------- pet card ---------- */
+
+.pet-status__heading h2 {
+  font-size: 2rem;
+}
+
+.pet-status__mood {
+  background: color-mix(in srgb, var(--app-accent) 14%, var(--app-surface));
+  border: 2px solid var(--ink-soft);
+  color: var(--app-text);
+  font-family: var(--font-cute);
+  font-size: 0.9rem;
+  font-weight: 400;
+  padding: 2px 12px;
+}
+
+/* The pet's voice is a real speech bubble with a little tail toward the room. */
+.pet-status__voice {
+  background: var(--app-surface);
+  border: 2px solid var(--ink-soft);
+  border-radius: 18px;
+  margin-top: 12px;
+  position: relative;
+}
+
+.pet-status__voice::before {
+  background: var(--app-surface);
+  border-left: 2px solid var(--ink-soft);
+  border-top: 2px solid var(--ink-soft);
+  content: "";
+  height: 12px;
+  left: 22px;
+  position: absolute;
+  top: -8px;
+  transform: rotate(45deg);
+  width: 12px;
+}
+
+/* ---------- stats: chunky candy bars ---------- */
+
+.stat-row__label span {
+  font-family: var(--font-cute);
+  font-size: 0.95rem;
+}
+
+/* A little candy dot in the bar's colour (emoji render differently on every OS). */
+.stat-row__label span::before {
+  background: var(--stat-color, var(--app-accent));
+  border: 2px solid var(--ink-soft);
+  border-radius: 50%;
+  content: "";
+  display: inline-block;
+  height: 10px;
+  margin-right: 6px;
+  vertical-align: 0;
+  width: 10px;
+}
+
+.stat-row--fullness {
+  --stat-color: #f7a96b;
+}
+
+.stat-row--energy {
+  --stat-color: #8fb3ea;
+}
+
+.stat-row--cleanliness {
+  --stat-color: #74cbb6;
+}
+
+.stat-track {
+  background: var(--app-surface-strong);
+  border: 2px solid var(--ink-soft);
+  height: 14px;
+}
+
+.stat-fill {
+  background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.28) 0 6px, transparent 6px 12px) !important;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.08);
+}
+
+.stat-fill {
+  background-color: var(--stat-color, var(--app-accent));
+}
+
+.stat-row--low .stat-fill {
+  animation: stat-low-pulse 1.4s ease-in-out infinite;
+  background-color: var(--app-accent);
+}
+
+@keyframes stat-low-pulse {
+  50% {
+    filter: brightness(1.12);
+  }
+}
+
+/* ---------- care buttons: pastel stickers ---------- */
+
+.action-panel {
+  gap: 10px;
+}
+
+.action-button {
+  --care-tint: var(--tint-feed);
+  background: color-mix(in srgb, var(--care-tint) 55%, var(--app-surface));
+  border: 2px solid var(--ink-soft);
+  border-radius: 22px;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--care-tint) 70%, var(--ink));
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background-color 160ms ease,
+    opacity 160ms ease;
+}
+
+.action-button--play {
+  --care-tint: var(--tint-play);
+}
+
+.action-button--sleep {
+  --care-tint: var(--tint-sleep);
+}
+
+.action-button--wash {
+  --care-tint: var(--tint-wash);
+}
+
+.action-button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--care-tint) 80%, var(--app-surface));
+  transform: translateY(-2px);
+}
+
+.action-button:hover:not(:disabled) .care-icon {
+  animation: care-icon-wiggle 500ms ease-in-out;
+}
+
+.action-button:active:not(:disabled) {
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--care-tint) 70%, var(--ink));
+  transform: translateY(3px);
+}
+
+.action-button:disabled {
+  filter: grayscale(0.6);
+  opacity: 0.55;
+}
+
+.action-button__label > span:first-child {
+  font-size: 1.1rem;
+}
+
+.care-icon {
+  height: 46px;
+  margin-bottom: 4px;
+  width: 46px;
+}
+
+/* The recommended care is the coral sticker, its icon gently bobbing. */
+.action-button--recommended {
+  --care-icon-ink: #4a3934;
+  background: var(--app-accent);
+  border-color: var(--ink);
+  box-shadow: 0 4px 0 var(--ink);
+}
+
+.action-button--recommended:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--app-accent) 90%, #fff);
+}
+
+.action-button--recommended:active:not(:disabled) {
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.action-button--recommended .care-icon {
+  animation: care-icon-bob 1.6s ease-in-out infinite;
+}
+
+.action-button__badge {
+  border: 1.5px solid currentColor;
+  font-family: var(--font-cute);
+  font-style: normal;
+  font-weight: 400;
+}
+
+@keyframes care-icon-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+
+  50% {
+    transform: translateY(-4px) rotate(3deg);
+  }
+}
+
+@keyframes care-icon-wiggle {
+  25% {
+    transform: rotate(-10deg) scale(1.08);
+  }
+
+  75% {
+    transform: rotate(8deg) scale(1.08);
+  }
+}
+
+/* ---------- side panel: cards ---------- */
+
+.segmented-control {
+  border: 2px solid var(--ink-soft);
+  border-radius: 999px;
+}
+
+.segmented-button {
+  border-radius: 999px;
+  font-size: 1rem;
+}
+
+.segmented-button--active {
+  background: var(--app-accent);
+  color: var(--app-accent-text);
+}
+
+.daily-goal {
+  background: color-mix(in srgb, #ffe7a8 45%, var(--app-surface));
+  border: 2px solid var(--ink-soft);
+  border-radius: 22px;
+}
+
+.daily-goal__title {
+  font-size: 1.15rem;
+}
+
+.level-unlock--next {
+  background: color-mix(in srgb, var(--tint-sleep) 40%, var(--app-surface));
+  border: 2px dashed var(--ink-soft);
+  border-radius: 18px;
+  padding: 10px 12px;
+}
+
+.progress-goal .stat-track {
+  height: 12px;
+}
+
+.progress-goal .stat-fill {
+  background-color: var(--app-accent);
+}
+
+.share-card__button {
+  background: color-mix(in srgb, var(--tint-play) 70%, var(--app-surface));
+  color: var(--app-text);
+}
+
+/* ---------- setup: species stickers ---------- */
+
+.species-option {
+  background: color-mix(in srgb, var(--species-tile, var(--app-surface-strong)) 85%, var(--app-surface));
+  border: 2px solid var(--ink-soft);
+  border-radius: 24px;
+  box-shadow: var(--sticker-shadow);
+}
+
+.species-option:hover {
+  border-color: var(--ink);
+  transform: translateY(-4px) rotate(-1deg);
+}
+
+.species-option:hover .pet-avatar {
+  animation: species-hop 600ms cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.species-option strong {
+  font-size: 1.2rem;
+}
+
+@keyframes species-hop {
+  40% {
+    transform: translateY(-10px) scale(1.05, 0.95);
+  }
+
+  70% {
+    transform: translateY(0) scale(0.97, 1.03);
+  }
+}
+
+/* ---------- dark theme: muted pastels so stickers glow instead of shout ---------- */
+
+.app-shell[data-theme="dark"] {
+  --tint-feed: #6b4a36;
+  --tint-play: #6b3f4c;
+  --tint-sleep: #3c4a6e;
+  --tint-wash: #2f5a54;
+}
+
+.app-shell[data-theme="dark"] .action-button:not(.action-button--recommended) {
+  background: color-mix(in srgb, var(--care-tint) 60%, var(--app-surface));
+}
+
+.app-shell[data-theme="dark"] .species-option {
+  background: color-mix(in srgb, var(--species-tile, var(--app-surface-strong)) 14%, var(--app-surface));
+}
+
+.app-shell[data-theme="dark"] .daily-goal {
+  background: color-mix(in srgb, #ffd25e 10%, var(--app-surface));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action-button--recommended .care-icon,
+  .action-button:hover .care-icon,
+  .species-option:hover .pet-avatar,
+  .stat-row--low .stat-fill {
+    animation: none;
+  }
+}

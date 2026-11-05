@@ -237,7 +237,7 @@ function handleColorSchemeChange(event: MediaQueryListEvent): void {
 </script>
 
 <template>
-  <div class="app-shell" :style="themeStyle">
+  <div class="app-shell" :style="themeStyle" :data-theme="resolvedThemeId">
     <header class="topbar">
       <div class="brand">
         <img class="brand-mark" :src="brandIcon" alt="" aria-hidden="true">
