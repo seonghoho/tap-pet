@@ -7,7 +7,7 @@
 1. `npm run pack:extension` → `extension/release/tab-pet-<버전>.zip` 업로드
 2. `npm run store:images` → `extension/store/images/` 의 이미지 업로드
 3. 아래 문구를 스토어 등록정보·개인정보 보호 탭에 붙여넣기
-4. 개인정보처리방침 URL: `https://<배포 도메인>/privacy.html`
+4. 개인정보처리방침 URL: `https://tap-pet.seonghoho.com/privacy.html`
 
 다시 올릴 때는 `extension/static/manifest.json`의 `version`을 올린다 (같은 버전은 업로드 거부).
 

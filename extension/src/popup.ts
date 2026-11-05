@@ -3,7 +3,8 @@ import { DEFAULT_PET_NAMES } from '~/constants/pet'
 import { PET_OUTFITS } from '~/constants/shop'
 import type { PetAction, PetOutfitId, PetSpecies, PetState } from '~/types/pet'
 import { type Entitlement, mergeEntitlements, normalizeEntitlements, ownsProduct } from '~/utils/entitlements'
-import { renderPetArtSvg } from '~/utils/petArt'
+import { PET_ART_PALETTES, renderPetArtSvg } from '~/utils/petArt'
+import { careIconSvg } from '~/utils/careIcons'
 import { type PetBackup, decodePetBackupWithPurchases, encodePetBackup } from '~/utils/petBackup'
 import { getActiveStreak } from '~/utils/petStreak'
 import { pickVoiceLine } from '~/utils/petVoice'
@@ -14,12 +15,6 @@ import { ENTITLEMENTS_KEY, NOTIFY_KEY, PET_KEY, readStorage, writeStorage } from
 
 const SPECIES: PetSpecies[] = ['cat', 'dog', 'hedgehog', 'rabbit', 'penguin', 'hamster']
 const ACTIONS: PetAction[] = ['feed', 'play', 'sleep', 'wash']
-const ACTION_ICONS: Record<PetAction, string> = {
-  feed: '<path d="M5 15h22c0 6.5-4.9 11-11 11S5 21.5 5 15Z" fill="#ffe2bf"/><path d="M11 11c0-2 2-2 2-4M16 11c0-2 2-2 2-4M21 11c0-2 2-2 2-4"/>',
-  play: '<circle cx="16" cy="16" r="10" fill="#ffd0cb"/><path d="M7 12.5c6 2 12 2 18 0M7.5 20c5.5-2 11.5-2 17 0"/>',
-  sleep: '<path d="M24 20.5A10 10 0 0 1 12 7a10 10 0 1 0 12 13.5Z" fill="#dbe4f7"/><path d="M20 6h4l-4 4h4"/>',
-  wash: '<path d="M16 4c4.5 6 8 10 8 14a8 8 0 0 1-16 0c0-4 3.5-8 8-14Z" fill="#cdeeea"/><path d="M12.5 18.5a3.5 3.5 0 0 0 3.5 3.5"/>',
-}
 
 const messages = getMessages()
 const root = document.getElementById('app')!
@@ -76,6 +71,8 @@ function renderPet(state: PetState): HTMLElement {
   const view = el('div', 'pet')
 
   const hero = el('div', 'pet__hero')
+  // A tiny version of the website's room behind the pet: dotted wall, floor and rug.
+  hero.append(el('span', 'pet__room'))
   hero.append(art(renderPetArtSvg({ species: state.species, status, idPrefix: 'popup', outfit: visibleOutfit(state, entitlements) }), 'pet__art'))
   const heading = el('div', 'pet__heading')
   const name = el('strong', 'pet__name', state.name)
@@ -105,10 +102,10 @@ function renderPet(state: PetState): HTMLElement {
   const remaining = remainingCare(state, now)
   const actions = el('div', 'actions')
   for (const action of ACTIONS) {
-    const button = el('button', 'action')
+    const button = el('button', `action action--${action}`)
     button.type = 'button'
     button.disabled = remaining <= 0
-    button.innerHTML = `<svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${ACTION_ICONS[action]}</g></svg>`
+    button.innerHTML = careIconSvg(action, 'action__icon') // Our own static drawing.
     button.append(el('span', '', messages.actions[action].label))
     button.addEventListener('click', () => void care(action))
     actions.append(button)
@@ -233,6 +230,7 @@ function renderAdoption(): HTMLElement {
     const option = el('button', `adopt__option${species === chosen ? ' adopt__option--active' : ''}`)
     option.type = 'button'
     option.setAttribute('aria-label', messages.species[species].label)
+    option.style.setProperty('--species-tile', PET_ART_PALETTES[species].tile)
     option.append(art(renderPetArtSvg({ species, status: 'happy', idPrefix: `adopt-${species}` }), 'adopt__art'))
     option.addEventListener('click', () => {
       chosen = species
