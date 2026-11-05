@@ -115,6 +115,15 @@ export const en = {
       excited: 'excited',
     },
   },
+  room: {
+    sounds: {
+      feed: 'Nom nom!',
+      play: 'Wheee!',
+      sleep: 'Zzz…',
+      wash: 'Squeaky!',
+    },
+    pats: ['Hehe', 'Yay!', 'More please', 'That tickles~', '♡'],
+  },
   voice: {
     petLabel: 'Pet {name}',
     fine: [

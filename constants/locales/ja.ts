@@ -115,6 +115,15 @@ export const ja = {
       excited: 'わくわくした',
     },
   },
+  room: {
+    sounds: {
+      feed: 'もぐもぐ！',
+      play: 'わーい！',
+      sleep: 'すやすや…',
+      wash: 'ぴかぴか！',
+    },
+    pats: ['えへへ', 'うれしい！', 'もっと〜', 'くすぐったい〜', '♡'],
+  },
   voice: {
     petLabel: '{name}をなでる',
     fine: [
