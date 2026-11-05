@@ -25,7 +25,7 @@ npm run build
 
 ## 3. 배포 후 확인
 
-- [ ] `/privacy.html`에서 운영자 이름과 연락 이메일(노란 표시)을 채웠는지
+- [x] `/privacy.html`에서 운영자 이름과 연락 이메일(노란 표시)을 채웠는지
 - [ ] 카카오톡·슬랙에 주소를 붙였을 때 미리보기 이미지가 뜨는지 (카카오 캐시는 [공유 디버거](https://developers.kakao.com/tool/debugger/sharing)에서 초기화)
 - [ ] PostHog Live events에 `tab_pet_pet_created`가 들어오는지
 - [ ] 설정에서 "익명 사용 통계 보내기"를 끄면 이벤트가 멈추는지

@@ -1,3 +1,7 @@
+/* Toolbar popup, in the same "sticker" look as the website: soft outlines with a chunky
+   bottom shadow, pastel tints per care action, a tiny room behind the pet.
+   No web fonts: the extension makes no network requests, so it uses system fonts. */
+
 :root {
   --bg: #f5f1ea;
   --surface: #fffdf9;
@@ -5,8 +9,20 @@
   --text: #2a2420;
   --muted: #7a7068;
   --accent: #ff6b4a;
+  --ink: #6a5850;
+  --ink-soft: #ddd2c4;
+  --wall: #fdf1e2;
+  --wall-dot: #f6dcc0;
+  --floor: #ecc49a;
+  --rug: #ffd9d2;
+
+  --tint-feed: #ffe4cf;
+  --tint-play: #ffdde3;
+  --tint-sleep: #e0e8fa;
+  --tint-wash: #d8f2ed;
+
   color-scheme: light;
-  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Pretendard", system-ui, sans-serif;
+  font-family: ui-rounded, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Pretendard", system-ui, sans-serif;
   letter-spacing: -0.01em;
 }
 
@@ -18,6 +34,18 @@
     --text: #f3ede6;
     --muted: #a3998f;
     --accent: #ff7a5c;
+    --ink: #b9ab9c;
+    --ink-soft: #4a423b;
+    --wall: #3b3456;
+    --wall-dot: #4b4370;
+    --floor: #6a5040;
+    --rug: #7a5a74;
+
+    --tint-feed: #4d3a2e;
+    --tint-play: #4d3139;
+    --tint-sleep: #2f3a55;
+    --tint-wash: #26463f;
+
     color-scheme: dark;
   }
 }
@@ -34,85 +62,167 @@ body {
 main { padding: 14px; }
 
 button { color: inherit; cursor: pointer; font: inherit; }
-button:disabled { cursor: not-allowed; opacity: 0.45; }
+button:disabled { cursor: not-allowed; filter: grayscale(0.6); opacity: 0.5; }
+
+/* ---------- pet ---------- */
 
 .pet__hero {
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 20px;
+  border: 2px solid var(--ink-soft);
+  border-radius: 24px;
+  box-shadow: 0 4px 0 var(--ink-soft);
   display: grid;
   gap: 6px;
   justify-items: center;
-  padding: 12px 14px 14px;
+  overflow: hidden;
+  padding: 0 14px 14px;
+  position: relative;
 }
 
-.pet__art { display: block; height: 128px; width: 128px; }
+/* Mini room: dotted wallpaper, a wood floor and a rug the pet sits on. */
+.pet__room {
+  background:
+    radial-gradient(ellipse 34% 9% at 50% 86%, var(--rug) 98%, transparent 100%),
+    linear-gradient(180deg, transparent 72%, var(--ink) 72% calc(72% + 2px), var(--floor) calc(72% + 2px)),
+    radial-gradient(var(--wall-dot) 1.6px, transparent 2px) 0 0 / 18px 18px,
+    var(--wall);
+  border-bottom: 2px solid var(--ink-soft);
+  display: block;
+  height: 150px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.pet__art {
+  display: block;
+  height: 132px;
+  margin-top: 12px;
+  position: relative;
+  width: 132px;
+}
+
+.pet__art svg { animation: pet-breathe 3.4s ease-in-out infinite; transform-origin: 50% 88%; }
 .pet__art svg, .adopt__art svg { display: block; height: 100%; width: 100%; }
 
-.pet__heading { align-items: center; display: flex; gap: 8px; }
-.pet__name { font-size: 1.15rem; }
+.pet__heading { align-items: center; display: flex; gap: 8px; margin-top: 10px; position: relative; }
+.pet__name { font-size: 1.3rem; font-weight: 800; }
+
 .pet__mood {
-  background: var(--bg);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  border: 2px solid var(--ink-soft);
   border-radius: 999px;
   font-size: 0.75rem;
-  font-weight: 600;
-  padding: 2px 9px;
+  font-weight: 700;
+  padding: 1px 9px;
 }
 
+/* The pet's line is a speech bubble pointing up at it. */
 .pet__voice {
-  background: var(--bg);
-  border-radius: 4px 14px 14px 14px;
+  background: var(--surface);
+  border: 2px solid var(--ink-soft);
+  border-radius: 16px;
   font-size: 0.875rem;
-  margin: 2px 0 0;
+  margin: 8px 0 0;
   padding: 8px 12px;
+  position: relative;
   text-align: center;
 }
+
+.pet__voice::before {
+  background: var(--surface);
+  border-left: 2px solid var(--ink-soft);
+  border-top: 2px solid var(--ink-soft);
+  content: "";
+  height: 10px;
+  left: calc(50% - 5px);
+  position: absolute;
+  top: -7px;
+  transform: rotate(45deg);
+  width: 10px;
+}
+
+/* ---------- stats: candy bars ---------- */
 
 .stats {
   display: grid;
   gap: 10px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 14px 2px;
+  margin: 16px 2px 14px;
 }
 
 .stat {
+  --stat-color: #f7a96b;
   display: grid;
   font-size: 0.75rem;
   gap: 4px;
   grid-template-columns: 1fr auto;
 }
 
-.stat__label { color: var(--muted); }
+.stat--energy { --stat-color: #8fb3ea; }
+.stat--cleanliness { --stat-color: #74cbb6; }
+.stat--low { --stat-color: var(--accent); }
+
+.stat__label { color: var(--muted); font-weight: 700; }
+
+.stat__label::before {
+  background: var(--stat-color);
+  border: 1.5px solid var(--ink-soft);
+  border-radius: 50%;
+  content: "";
+  display: inline-block;
+  height: 8px;
+  margin-right: 4px;
+  width: 8px;
+}
+
 .stat__track {
   background: var(--line);
+  border: 1.5px solid var(--ink-soft);
   border-radius: 999px;
   grid-column: 1 / -1;
-  height: 6px;
+  height: 11px;
   overflow: hidden;
 }
-.stat__fill { background: #f4a861; display: block; height: 100%; }
-.stat--energy .stat__fill { background: #8fb3e6; }
-.stat--cleanliness .stat__fill { background: #7ccbb8; }
-.stat--low .stat__fill { background: var(--accent); }
-.stat--low .stat__value { color: var(--accent); }
 
-.actions { display: grid; gap: 6px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
-
-.action {
-  align-items: center;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  display: grid;
-  font-size: 0.75rem;
-  font-weight: 700;
-  gap: 2px;
-  justify-items: center;
-  padding: 8px 2px;
+.stat__fill {
+  background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.28) 0 5px, transparent 5px 10px), var(--stat-color);
+  border-radius: 999px;
+  display: block;
+  height: 100%;
 }
 
-.action svg { height: 26px; width: 26px; }
-.action:active:not(:disabled) { transform: scale(0.95); }
+.stat--low .stat__value { color: var(--accent); }
+
+/* ---------- care buttons: pastel stickers ---------- */
+
+.actions { display: grid; gap: 8px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.action {
+  --care-tint: var(--tint-feed);
+  align-items: center;
+  background: var(--care-tint);
+  border: 2px solid var(--ink-soft);
+  border-radius: 18px;
+  box-shadow: 0 3px 0 var(--ink-soft);
+  display: grid;
+  font-size: 0.78rem;
+  font-weight: 800;
+  gap: 2px;
+  justify-items: center;
+  padding: 8px 2px 7px;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.action--play { --care-tint: var(--tint-play); }
+.action--sleep { --care-tint: var(--tint-sleep); }
+.action--wash { --care-tint: var(--tint-wash); }
+
+.action__icon { display: block; height: 34px; width: 34px; }
+.action:hover:not(:disabled) { transform: translateY(-2px); }
+.action:hover:not(:disabled) .action__icon { animation: icon-wiggle 500ms ease-in-out; }
+.action:active:not(:disabled) { box-shadow: 0 0 0 var(--ink-soft); transform: translateY(3px); }
 
 .meta {
   color: var(--muted);
@@ -121,13 +231,22 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   font-size: 0.75rem;
   gap: 4px 10px;
   justify-content: space-between;
-  margin: 10px 2px;
+  margin: 12px 2px 10px;
 }
 
-.meta__streak { color: #e5762e; font-weight: 700; }
+.meta__streak {
+  background: color-mix(in srgb, #ffd25e 30%, var(--surface));
+  border: 1.5px solid var(--ink-soft);
+  border-radius: 999px;
+  color: #c9601f;
+  font-weight: 800;
+  padding: 0 8px;
+}
+
+/* ---------- settings / move ---------- */
 
 .more {
-  border-top: 1px solid var(--line);
+  border-top: 2px dashed var(--ink-soft);
   display: grid;
   font-size: 0.8125rem;
   gap: 8px;
@@ -135,7 +254,7 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   padding-top: 10px;
 }
 
-.more summary { color: var(--muted); cursor: pointer; }
+.more summary { color: var(--muted); cursor: pointer; font-weight: 700; }
 .more[open] { padding-bottom: 4px; }
 .more__title { margin-top: 6px; }
 .more__hint, .more__notice { color: var(--muted); }
@@ -145,15 +264,17 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 
 .ghost {
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 7px 10px;
+  border: 2px solid var(--ink-soft);
+  border-radius: 999px;
+  box-shadow: 0 2px 0 var(--ink-soft);
+  font-weight: 700;
+  padding: 7px 12px;
 }
 
 .code {
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  border: 2px solid var(--ink-soft);
+  border-radius: 12px;
   color: var(--text);
   font: 0.75rem ui-monospace, Menlo, monospace;
   padding: 8px;
@@ -161,25 +282,34 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   width: 100%;
 }
 
+/* ---------- adoption ---------- */
+
 .adopt { display: grid; gap: 10px; }
-.adopt__title { font-size: 1.05rem; }
+.adopt__title { font-size: 1.15rem; font-weight: 800; }
 .adopt__hint, .adopt__move { color: var(--muted); font-size: 0.8125rem; margin: 0; }
-.adopt__grid { display: grid; gap: 6px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.adopt__grid { display: grid; gap: 8px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
 .adopt__option {
-  background: var(--surface);
-  border: 1.5px solid var(--line);
-  border-radius: 14px;
+  background: color-mix(in srgb, var(--species-tile, var(--surface)) 85%, var(--surface));
+  border: 2px solid var(--ink-soft);
+  border-radius: 18px;
+  box-shadow: 0 3px 0 var(--ink-soft);
   padding: 4px;
+  transition: transform 120ms ease;
 }
 
-.adopt__option--active { border-color: var(--text); }
+.adopt__option:hover { transform: translateY(-2px) rotate(-1deg); }
+.adopt__option--active { border-color: var(--accent); box-shadow: 0 3px 0 var(--accent); }
 .adopt__art { display: block; height: 76px; margin: 0 auto; width: 76px; }
+
+@media (prefers-color-scheme: dark) {
+  .adopt__option { background: color-mix(in srgb, var(--species-tile, var(--surface)) 14%, var(--surface)); }
+}
 
 .adopt__name {
   background: var(--surface);
-  border: 1.5px solid var(--line);
-  border-radius: 12px;
+  border: 2px solid var(--ink-soft);
+  border-radius: 999px;
   color: var(--text);
   font: inherit;
   font-weight: 700;
@@ -189,23 +319,46 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
 
 .primary {
   background: var(--accent);
-  border: 0;
-  border-radius: 14px;
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 0 4px 0 var(--ink);
   color: #fff;
-  font-weight: 700;
-  padding: 12px;
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 11px;
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
+
+.primary:active { box-shadow: 0 1px 0 var(--ink); transform: translateY(3px); }
+
+/* ---------- outfits ---------- */
 
 .outfits { display: grid; gap: 6px; margin-top: 6px; }
 .outfits__list { display: grid; gap: 6px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
 
 .outfits__option {
   background: var(--surface);
-  border: 1.5px solid var(--line);
-  border-radius: 12px;
+  border: 2px solid var(--ink-soft);
+  border-radius: 14px;
   padding: 2px;
 }
 
-.outfits__option--active { border-color: var(--text); }
+.outfits__option--active { border-color: var(--accent); }
 .outfits__art { display: block; height: 48px; margin: 0 auto; width: 48px; }
 .outfits__art svg { display: block; height: 100%; width: 100%; }
+
+/* ---------- motion ---------- */
+
+@keyframes pet-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1.025, 0.975); }
+}
+
+@keyframes icon-wiggle {
+  25% { transform: rotate(-10deg) scale(1.08); }
+  75% { transform: rotate(8deg) scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet__art svg, .action:hover .action__icon { animation: none; }
+}
