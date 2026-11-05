@@ -59,6 +59,7 @@ for (const [locale, copy] of Object.entries(COPY)) {
     await popup.locator('.primary').click()
     await popup.locator('.action').nth(0).click()
     await popup.locator('.action').nth(1).click()
+    await popup.mouse.move(0, 0) // No hover lift on the last button clicked.
     const careShot = await popup.locator('main').screenshot()
 
     await worker.evaluate(async (entitlements) => {
